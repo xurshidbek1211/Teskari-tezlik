@@ -1,1 +1,1 @@
-# Teskari-tezlik
+# Teskari_tezlik
