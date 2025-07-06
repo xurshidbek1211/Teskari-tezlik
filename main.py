@@ -1,15 +1,22 @@
 import logging
-from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-import json
 import os
+import json
 import random
 
-API_TOKEN = "7265238026:AAE4n-lQd--ViqQgyFhB51XnURFcRdM8Cp8"
-ADMIN_ID = 1899194677
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.dispatcher.webhook import get_new_configured_app
+from fastapi import FastAPI, Request
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+
+API_TOKEN = os.getenv("API_TOKEN")
+WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
+WEBHOOK_URL = os.getenv("RENDER_EXTERNAL_URL", "") + WEBHOOK_PATH
 
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=MemoryStorage())
+app = FastAPI()
+
 logging.basicConfig(level=logging.INFO)
 
 TESKARI_FILE = 'teskari_tezlik_savollar.json'
@@ -72,7 +79,15 @@ async def javobni_tekshir(message: types.Message):
             save_json(USER_STATE_FILE, user_state)
             await message.reply("✅ To‘g‘ri! Sizga 1 ball qo‘shildi.")
         else:
-            await message.reply("❌ Noto‘g‘ri. Yana urinib ko‘ring.")@
-if __name__ == '__main__':
-    from aiogram import executor
-    executor.start_polling(dp, skip_updates=True)
+            await message.reply("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
+
+@app.on_event("startup")
+async def on_startup():
+    await bot.set_webhook(WEBHOOK_URL)
+
+@app.post(WEBHOOK_PATH)
+async def handle_webhook(request: Request):
+    data = await request.body()
+    update = types.Update(**json.loads(data))
+    await dp.process_update(update)
+    return {"status": "ok"}
