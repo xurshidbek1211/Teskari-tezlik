@@ -43,6 +43,7 @@ def save_json(filename, data):
 async def start(message: types.Message):
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("🌀 Teskari tezlik", callback_data="teskari"))
+    kb.add(InlineKeyboardButton("📚 O‘yin qoidasi", callback_data="qoidalar"))
     await message.answer("Qaysi kategoriyani tanlaysiz?", reply_markup=kb)
 
 
@@ -61,6 +62,19 @@ async def send_teskari(callback_query: types.CallbackQuery):
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
     await bot.send_message(callback_query.message.chat.id, f"Toping: {question['savol']}", reply_markup=kb)
+    await callback_query.answer()
+
+
+@dp.callback_query_handler(lambda c: c.data == "qoidalar")
+async def show_rules(callback_query: types.CallbackQuery):
+    qoidalar_text = (
+        "Assalomu alaykum!\n"
+        "Bu bot teskari tezlik o‘yini uchun yaratildi.\n"
+        "O‘yinda so‘zlar teskari yozilgan va ba’zi harflar o‘rniga “1” qo‘yilgan.\n"
+        "Sizdan so‘zni to‘g‘ri tartibda va harflar to‘liq holda topish talab qilinadi.\n"
+        "Talab va takliflar uchun: @Xurshidbek_1211"
+    )
+    await bot.send_message(callback_query.message.chat.id, qoidalar_text)
     await callback_query.answer()
 
 
