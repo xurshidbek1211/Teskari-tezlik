@@ -66,8 +66,11 @@ async def send_teskari(callback_query: types.CallbackQuery):
         await bot.send_message(callback_query.message.chat.id, "Savollar hali mavjud emas.")
         await callback_query.answer()
         return
+
     question = random.choice(questions)
-    user_state = {"current": question, "answered": False}
+    user_state = load_json(USER_STATE_FILE)
+    user_state["current"] = question
+    user_state["answered_by"] = None
     save_json(USER_STATE_FILE, user_state)
 
     kb = InlineKeyboardMarkup()
@@ -115,42 +118,34 @@ async def javobni_tekshir(message: types.Message):
     user_id = str(message.from_user.id)
     user_state = load_json(USER_STATE_FILE)
 
-    if user_state and not user_state.get("answered"):
-        current = user_state["current"]
-        togri_javob = normalize_answer(current['javob'])
-        foydalanuvchi_javobi = normalize_answer(message.text)
-
-        if foydalanuvchi_javobi == togri_javob:
-            scores = load_json(SCORE_FILE)
-            scores[user_id] = scores.get(user_id, 0) + 1
-            save_json(SCORE_FILE, scores)
-
-            user_state["answered"] = True
-            save_json(USER_STATE_FILE, user_state)
-
-            user_fullname = message.from_user.full_name
-            text = f"✅ To‘g‘ri javob: {current['javob']}\n🎉 {user_fullname} ga 1 ball qo‘shildi."
-
-            top = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-            statistik = "\n".join(
-                [f"{i+1}. {await bot.get_chat(int(uid)).first_name} - {score} ball" for i, (uid, score) in enumerate(top)]
-            )
-            text += f"\n\n📊 Reyting:\n{statistik}"
-            await message.answer(text)
-
-            questions = load_json(TESKARI_FILE)
-            if questions:
-                new_question = random.choice(questions)
-                user_state = {"current": new_question, "answered": False}
-                save_json(USER_STATE_FILE, user_state)
-
-                kb = InlineKeyboardMarkup()
-                kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
-                await message.answer(f"Toping: {new_question['savol']}", reply_markup=kb)
-        else:
-            pass
-    else:
+    if not user_state or "current" not in user_state:
         await message.answer("Iltimos, avval /boshla buyrug‘i orqali oʻyinni boshlang.")
+        return
+
+    if user_state.get("answered_by"):
+        return
+
+    current = user_state["current"]
+    togri_javob = normalize_answer(current['javob'])
+    foydalanuvchi_javobi = normalize_answer(message.text)
+
+    if foydalanuvchi_javobi == togri_javob:
+        scores = load_json(SCORE_FILE)
+        scores[user_id] = scores.get(user_id, 0) + 1
+        save_json(SCORE_FILE, scores)
+
+        user_state["answered_by"] = user_id
+        save_json(USER_STATE_FILE, user_state)
+
+        user_fullname = message.from_user.full_name
+        text = f"✅ To‘g‘ri javob: {current['javob']}\n🎉 {user_fullname} ga 1 ball qo‘shildi."
+
+        top = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        statistik = "\n".join(
+            [f"{i+1}. {await bot.get_chat(int(uid)).first_name} - {score} ball" for i, (uid, score) in enumerate(top)]
+        )
+        text += f"\n\n📊 Umumiy reyting:\n{statistik}"
+        await message.answer(text)
 
 @app.on_event("startup")
 async def on_startup():
@@ -163,4 +158,3 @@ async def process_webhook(request: Request):
     update = types.Update(**json.loads(data))
     await dp.process_update(update)
     return {"status": "ok"}
-    
