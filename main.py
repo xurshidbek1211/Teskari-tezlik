@@ -67,8 +67,11 @@ async def send_teskari(callback_query: types.CallbackQuery):
         await callback_query.answer()
         return
     question = random.choice(questions)
+    chat_id = str(callback_query.message.chat.id)
+
     user_state = load_json(USER_STATE_FILE)
-    user_state[str(callback_query.from_user.id)] = question
+    # Guruh uchun yangi savol va javob berilmadi degan holat saqlanadi
+    user_state[chat_id] = {"savol": question, "javob_berildi": False}
     save_json(USER_STATE_FILE, user_state)
 
     kb = InlineKeyboardMarkup()
@@ -80,9 +83,9 @@ async def send_teskari(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "javob")
 async def show_answer(callback_query: types.CallbackQuery):
     user_state = load_json(USER_STATE_FILE)
-    user_id = str(callback_query.from_user.id)
-    if user_id in user_state:
-        await bot.send_message(callback_query.message.chat.id, f"✅ To‘g‘ri javob: {user_state[user_id]['javob']}")
+    chat_id = str(callback_query.message.chat.id)
+    if chat_id in user_state:
+        await bot.send_message(callback_query.message.chat.id, f"✅ To‘g‘ri javob: {user_state[chat_id]['savol']['javob']}")
     else:
         await bot.send_message(callback_query.message.chat.id, "Savol topilmadi. Iltimos, yangi savol oling.")
     await callback_query.answer()
@@ -120,33 +123,55 @@ async def add_question(message: types.Message):
 @dp.message_handler()
 async def javobni_tekshir(message: types.Message):
     user_id = str(message.from_user.id)
+    chat_id = str(message.chat.id)
     user_state = load_json(USER_STATE_FILE)
+    scores = load_json(SCORE_FILE)
 
-    if user_id in user_state:
-        togri_javob = user_state[user_id]['javob'].lower()
+    if chat_id in user_state:
+        current = user_state[chat_id]
+        # Agar javob allaqachon berilgan bo‘lsa, jim turamiz
+        if current.get("javob_berildi", False):
+            return
+
+        togri_javob = current['savol']['javob'].lower()
         if message.text.strip().lower() == togri_javob:
-            scores = load_json(SCORE_FILE)
+            # Birinchi to'g'ri javobni qabul qilamiz
             scores[user_id] = scores.get(user_id, 0) + 1
             save_json(SCORE_FILE, scores)
 
-            del user_state[user_id]
+            # Javob berildi deb belgilanadi
+            current["javob_berildi"] = True
+            user_state[chat_id] = current
             save_json(USER_STATE_FILE, user_state)
 
-            await message.answer("✅ To‘g‘ri! Sizga 1 ball qo‘shildi. Yangi savol kelmoqda...")
+            # Ball berilganini guruhga bildiramiz va statistikani chiqaramiz
+            stat_text = "📊 Umumiy ballar:\n"
+            sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            for i, (uid, sc) in enumerate(sorted_scores, 1):
+                try:
+                    user_obj = await bot.get_chat_member(message.chat.id, int(uid))
+                    user_name = user_obj.user.full_name
+                except:
+                    user_name = f"User {uid}"
+                stat_text += f"{i}. {user_name}: {sc} ball\n"
 
+            await message.reply(f"✅ To‘g‘ri javob! {message.from_user.full_name} ga 1 ball qo‘shildi.\n\n{stat_text}")
+
+            # Yangi savol yuborish
             questions = load_json(TESKARI_FILE)
             if not questions:
                 await message.answer("Savollar bazasi bo‘sh.")
                 return
             question = random.choice(questions)
-            user_state[user_id] = question
+            user_state[chat_id] = {"savol": question, "javob_berildi": False}
             save_json(USER_STATE_FILE, user_state)
 
             kb = InlineKeyboardMarkup()
             kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
             await bot.send_message(message.chat.id, f"Toping: {question['savol']}", reply_markup=kb)
+
         else:
-            # Xato javobda hech qanday javob bermaydi (jim turadi)
+            # Noto'g'ri javoblarda hech qanday javob bermaymiz (jim turamiz)
             pass
     else:
         await message.answer("Iltimos, avval kategoriya tanlab, savol oling.")
