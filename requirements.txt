@@ -1,5 +1,4 @@
-aiogram==3.4.1
+aiogram==2.25.1
+aiohttp==3.8.6
 fastapi
 uvicorn
-nest_asyncio
-aiohttp==3.8.6
