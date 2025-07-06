@@ -2,3 +2,4 @@ aiogram==3.4.1
 fastapi
 uvicorn
 nest_asyncio
+aiohttp==3.8.6
