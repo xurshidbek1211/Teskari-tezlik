@@ -5,7 +5,7 @@ import json
 import os
 import random
 
-API_TOKEN = 7265238026:AAE4n-lQd--ViqQgyFhB51XnURFcRdM8Cp8
+API_TOKEN = "7265238026:AAE4n-lQd--ViqQgyFhB51XnURFcRdM8Cp8"
 ADMIN_ID = 1899194677
 
 bot = Bot(token=API_TOKEN)
