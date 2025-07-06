@@ -1,1 +1,5 @@
+fastapi
+uvicorn
+aiohttp
+aiogram
 aiogram==2.25.1
