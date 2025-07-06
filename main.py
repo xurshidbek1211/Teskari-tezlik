@@ -1,128 +1,95 @@
-import nest_asyncio
-nest_asyncio.apply()
-
-import asyncio
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.enums import ParseMode
+import json
+import logging
+from fastapi import FastAPI, Request
+from aiogram import Bot, Dispatcher, types
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
-from fastapi import FastAPI
-import uvicorn
 import random
-from collections import defaultdict
 
-API_TOKEN = "7265238026:AAE4n-lQd--ViqQgyFhB51XnURFcRdM8Cp8"
+# --- SOZLAMALAR ---
+BOT_TOKEN = "7265238026:AAE4n-lQd--ViqQgyFhB51XnURFcRdM8Cp8"
+WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
+WEBHOOK_URL = f"https://turli-savollarbot.onrender.com{WEBHOOK_PATH}"  # Render URL ni o‘zingiznikiga moslang
+SCORE_FILE = "scores.json"
+QUESTIONS_FILE = "teskari_tezlik_savollar.json"
 
-bot = Bot(token=API_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher()
-
+# --- BOT VA FASTAPI ---
+bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
+dp = Dispatcher(storage=MemoryStorage())
 app = FastAPI()
 
-questions = [
-    {"savol": "nobirhe1", "javob": "mehribon"},
-    {"savol": "mol‘go1", "javob": "sog‘lom"},
-    {"savol": "tamh1r", "javob": "rahmat"},
-    {"savol": "movadra1", "javob": "bardavom"},
-    {"savol": "taqod1s", "javob": "sadoqat"},
-    {"savol": "to1ah", "javob": "hayot"},
-    {"savol": "r1hab", "javob": "bahor"},
-    {"savol": "il1li", "javob": "ilmli"},
-    {"savol": "o1nud", "javob": "dunyo"},
-    {"savol": "hsod1‘oy", "javob": "yo‘ldosh"},
-    {"savol": "1aloud", "javob": "duolar"},
-    {"savol": "oy1ad", "javob": "daryo"},
-    {"savol": "adgno1", "javob": "tongda"},
-    {"savol": "mu1sabat", "javob": "tabassum"},
-    {"savol": "ralhs1y", "javob": "yoshlar"},
-    {"savol": "noja1o", "javob": "onajon"},
-    {"savol": "a1ala‘g", "javob": "g‘alaba"},
-    {"savol": "aqabo1um", "javob": "musobaqa"},
-    {"savol": "kilts‘1d", "javob": "do‘stlik"},
-    {"savol": "yim1mas", "javob": "samimiy"},
-    {"savol": "1irihs", "javob": "shirin"},
-    {"savol": "ki1hcnit", "javob": "tinchlik"},
-    {"savol": "taros1j", "javob": "jasorat"},
-    {"savol": "1s‘od", "javob": "do‘st"},
-    {"savol": "1atkam", "javob": "maktab"},
-    {"savol": "nit1o", "javob": "oltin"},
-    {"savol": "ali1", "javob": "oila"},
-    {"savol": "ilr1n", "javob": "nurli"},
-    {"savol": "kildo1s", "javob": "shodlik"},
-    {"savol": "t1biqo", "javob": "oqibat"},
-    {"savol": "hc1ovuq", "javob": "quvonch"},
-    {"savol": "m1lib", "javob": "bilim"},
-    {"savol": "kill1z‘og", "javob": "go‘zallik"},
-    {"savol": "r1zlug", "javob": "gulzor"},
-    {"savol": "kaja1ek", "javob": "kelajak"},
-    {"savol": "i1nay", "javob": "yangi"},
-    {"savol": "anida1", "javob": "madina"},
-    {"savol": "firhsa1", "javob": "tashrif"},
-    {"savol": "1hem", "javob": "mehr"},
-    {"savol": "ig1es", "javob": "sevgi"},
-    {"savol": "tal1da", "javob": "adolat"},
-    {"savol": "1iblaq", "javob": "qalbim"},
-    {"savol": "dn1zraf", "javob": "farzand"},
-    {"savol": "azo1", "javob": "toza"},
-    {"savol": "zudlu1", "javob": "yulduz"},
-    {"savol": "1atav", "javob": "vatan"},
-    {"savol": "tn1khsot", "javob": "toshkent"},
-    {"savol": "b1tik", "javob": "kitob"},
-    {"savol": "fn1s", "javob": "sinf"},
-    {"savol": "ad1nis", "javob": "sinfda"}
-]
+# --- YORDAMCHI FUNKSIYALAR ---
+def load_json(filename):
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
 
-asked_questions = {}
-scores = defaultdict(lambda: defaultdict(int))
-current_answers = {}
+def save_json(filename, data):
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
-@dp.message(F.text == "/boshla")
-async def boshla_handler(message: Message):
-    if not message.chat.type.endswith("group"):
-        return await message.answer("Iltimos, bu buyruq faqat guruhda ishlaydi.")
-    await send_new_question(message.chat.id)
+def get_random_question():
+    questions = load_json(QUESTIONS_FILE)
+    return random.choice(questions)
 
-async def send_new_question(chat_id: int):
-    question = random.choice(questions)
-    asked_questions[chat_id] = question
-    current_answers[chat_id] = {'javob': question["javob"].lower(), 'answered': False}
+# --- GLOBAL HOLAT SAQLASH ---
+state = {}
 
-    await bot.send_message(
-        chat_id,
-        f"🔄 <b>So‘zning teskari shakli:</b>\n<code>{question['savol']}</code>\n\n✅ To‘g‘ri javob bergan foydalanuvchi ball oladi!",
-        reply_markup=types.InlineKeyboardMarkup(
-            inline_keyboard=[
-                [types.InlineKeyboardButton(text="🤖 Botni guruhga qo‘shish", url="https://t.me/Turli_Savollarbot?startgroup=true")]
-            ]
-        )
-    )
+# --- /boshla ---
+@dp.message(commands=["boshla"])
+async def cmd_start(message: Message, state_fsm: FSMContext):
+    state["chat_id"] = message.chat.id
+    state["current"] = get_random_question()
+    await message.answer(f"♻️ So‘z: <b>{state['current']['savol']}</b>")
 
+# --- JAVOBNI QABUL QILISH ---
 @dp.message()
-async def javob_tekshir(message: Message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    username = message.from_user.full_name
-
-    if chat_id not in current_answers or current_answers[chat_id]['answered']:
+async def handle_answer(message: Message, state_fsm: FSMContext):
+    if "current" not in state:
         return
 
-    if message.text.strip().lower() == current_answers[chat_id]['javob']:
-        current_answers[chat_id]['answered'] = True
-        scores[chat_id][user_id] += 1
+    if message.text.lower().strip() == state["current"]["javob"].lower():
+        scores = load_json(SCORE_FILE)
+        user_id = str(message.from_user.id)
+        chat_id = str(message.chat.id)
+
+        if chat_id not in scores:
+            scores[chat_id] = {}
+        scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
+        save_json(SCORE_FILE, scores)
+
+        # Reyting tayyorlash
+        top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
+        reyting = ""
+        for i, (uid, ball) in enumerate(top):
+            try:
+                user = await bot.get_chat(int(uid))
+                name = user.first_name
+            except:
+                name = "👤 Nomaʼlum"
+            reyting += f"{i+1}. {name} - {ball} ball\n"
 
         await message.answer(
-            f"🎉 <b>{username}</b> to‘g‘ri javob berdi!\n📊 <b>Ball:</b> {scores[chat_id][user_id]}"
+            f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
+            f"🏆 Guruh reytingi:\n{reyting}"
         )
 
-        await asyncio.sleep(3)
-        await send_new_question(chat_id)
+        state["current"] = get_random_question()
+        await message.answer(f"♻️ Yangi so‘z: <b>{state['current']['savol']}</b>")
 
-@app.get("/")
-async def home():
-    return {"status": "Bot ishlayapti!"}
+# --- WEBHOOK STARTUP ---
+@app.on_event("startup")
+async def on_startup():
+    await bot.set_webhook(WEBHOOK_URL)
+    logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
-async def main():
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    import threading
-    threading.Thread(target=lambda: uvicorn.run(app, host="0.0.0.0", port=10000)).start()
-    asyncio.run(main())
+# --- WEBHOOK QABUL QILISH ---
+@app.post(WEBHOOK_PATH)
+async def process_webhook(request: Request):
+    data = await request.body()
+    update = types.Update(**json.loads(data))
+    await dp.process_update(update)
+    return {"status": "ok"}
