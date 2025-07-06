@@ -5,8 +5,8 @@ import json
 import os
 import random
 
-API_TOKEN = '7265238026:AAE4n-lQd--ViqQgyFhB51XnURFcRdM8Cp8'  # Sizning tokeningiz
-ADMIN_ID = 1899194677  # Sizning ID'ingiz
+API_TOKEN = 'TOKENINGIZNI_BU_YERGA_QO‘YING'
+ADMIN_ID = 1899194677
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -71,3 +71,5 @@ async def javobni_tekshir(message: types.Message):
             del user_state[user_id]
             save_json(USER_STATE_FILE, user_state)
             await message.reply("✅ To‘g‘ri! Sizga 1 ball qo‘shildi.")
+        else:
+            await message.reply("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
