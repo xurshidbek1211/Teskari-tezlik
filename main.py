@@ -17,6 +17,7 @@ WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
 
 # Bot, Dispatcher, FastAPI ilovasi
 bot = Bot(token=API_TOKEN)
+Bot.set_current(bot)
 dp = Dispatcher(bot, storage=MemoryStorage())
 app = FastAPI()
 
