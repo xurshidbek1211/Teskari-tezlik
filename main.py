@@ -73,3 +73,6 @@ async def javobni_tekshir(message: types.Message):
             await message.reply("✅ To‘g‘ri! Sizga 1 ball qo‘shildi.")
         else:
             await message.reply("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
+            if __name__ == '__main__':
+    from aiogram import executor
+    executor.start_polling(dp, skip_updates=True)
