@@ -11,6 +11,8 @@ from aiogram.dispatcher.webhook import get_new_configured_app
 
 # Token va URL
 API_TOKEN = os.getenv("API_TOKEN")
+ADMIN_ID = 1899194677  # Xurshidbek
+RUXSAT_ETILGANLAR = [1899194677]  
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
 WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
