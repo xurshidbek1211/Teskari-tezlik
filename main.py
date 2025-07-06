@@ -39,12 +39,24 @@ def save_json(filename, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-@dp.message_handler(commands=['start'])
-async def start(message: types.Message):
+@dp.message_handler(commands=['boshla'])
+async def boshla(message: types.Message):
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("🌀 Teskari tezlik", callback_data="teskari"))
-    kb.add(InlineKeyboardButton("📚 O‘yin qoidasi", callback_data="qoidalar"))
+    kb.add(InlineKeyboardButton("📜 O'yin qoidasi", callback_data="qoidalar"))
     await message.answer("Qaysi kategoriyani tanlaysiz?", reply_markup=kb)
+
+
+@dp.callback_query_handler(lambda c: c.data == "qoidalar")
+async def send_rules(callback_query: types.CallbackQuery):
+    rules_text = (
+        "Assalomu alaykum! Bu bot teskari tezlik o‘yini uchun yaratildi.\n"
+        "O‘yinda so‘zlar teskari yozilgan va ba’zi harflar o‘rniga “1” qo‘yilgan.\n"
+        "Sizdan so‘zni to‘g‘ri tartibda va harflar to‘liq holda topish talab qilinadi.\n"
+        "Talab va takliflar uchun @Xurshidbek_1211 ga murojaat qiling."
+    )
+    await bot.send_message(callback_query.message.chat.id, rules_text)
+    await callback_query.answer()
 
 
 @dp.callback_query_handler(lambda c: c.data == "teskari")
@@ -62,19 +74,6 @@ async def send_teskari(callback_query: types.CallbackQuery):
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
     await bot.send_message(callback_query.message.chat.id, f"Toping: {question['savol']}", reply_markup=kb)
-    await callback_query.answer()
-
-
-@dp.callback_query_handler(lambda c: c.data == "qoidalar")
-async def show_rules(callback_query: types.CallbackQuery):
-    qoidalar_text = (
-        "Assalomu alaykum!\n"
-        "Bu bot teskari tezlik o‘yini uchun yaratildi.\n"
-        "O‘yinda so‘zlar teskari yozilgan va ba’zi harflar o‘rniga “1” qo‘yilgan.\n"
-        "Sizdan so‘zni to‘g‘ri tartibda va harflar to‘liq holda topish talab qilinadi.\n"
-        "Talab va takliflar uchun: @Xurshidbek_1211"
-    )
-    await bot.send_message(callback_query.message.chat.id, qoidalar_text)
     await callback_query.answer()
 
 
@@ -147,7 +146,8 @@ async def javobni_tekshir(message: types.Message):
             kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
             await bot.send_message(message.chat.id, f"Toping: {question['savol']}", reply_markup=kb)
         else:
-            await message.answer("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
+            # Xato javobda hech qanday javob bermaydi (jim turadi)
+            pass
     else:
         await message.answer("Iltimos, avval kategoriya tanlab, savol oling.")
 
