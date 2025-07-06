@@ -9,8 +9,8 @@ from fastapi import FastAPI, Request
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 API_TOKEN = os.getenv("API_TOKEN")
-ADMIN_ID = 1899194677  # Sizning IDingiz
-RUXSAT_ETILGANLAR = [ADMIN_ID]  # Savol qo'shish uchun ruxsat berilganlar
+ADMIN_ID = 1899194677  # Sizning Telegram ID
+RUXSAT_ETILGANLAR = [ADMIN_ID]  # Savol qo'shish huquqi berilganlar ro'yxati
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
 WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
@@ -50,7 +50,8 @@ async def start(message: types.Message):
 async def send_teskari(callback_query: types.CallbackQuery):
     questions = load_json(TESKARI_FILE)
     if not questions:
-        await dp.bot.send_message(callback_query.from_user.id, "Savollar hali mavjud emas.")
+        await bot.send_message(callback_query.message.chat.id, "Savollar hali mavjud emas.")
+        await callback_query.answer()
         return
     question = random.choice(questions)
     user_state = load_json(USER_STATE_FILE)
@@ -59,8 +60,8 @@ async def send_teskari(callback_query: types.CallbackQuery):
 
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
-    await dp.bot.send_message(callback_query.from_user.id, f"Toping: {question['savol']}", reply_markup=kb)
-    await callback_query.answer()  # callbackni tugatish uchun
+    await bot.send_message(callback_query.message.chat.id, f"Toping: {question['savol']}", reply_markup=kb)
+    await callback_query.answer()
 
 
 @dp.callback_query_handler(lambda c: c.data == "javob")
@@ -68,9 +69,9 @@ async def show_answer(callback_query: types.CallbackQuery):
     user_state = load_json(USER_STATE_FILE)
     user_id = str(callback_query.from_user.id)
     if user_id in user_state:
-        await dp.bot.send_message(callback_query.from_user.id, f"✅ To‘g‘ri javob: {user_state[user_id]['javob']}")
+        await bot.send_message(callback_query.message.chat.id, f"✅ To‘g‘ri javob: {user_state[user_id]['javob']}")
     else:
-        await dp.bot.send_message(callback_query.from_user.id, "Savol topilmadi. Iltimos, yangi savol oling.")
+        await bot.send_message(callback_query.message.chat.id, "Savol topilmadi. Iltimos, yangi savol oling.")
     await callback_query.answer()
 
 
@@ -78,12 +79,11 @@ async def show_answer(callback_query: types.CallbackQuery):
 async def show_ball(message: types.Message):
     scores = load_json(SCORE_FILE)
     score = scores.get(str(message.from_user.id), 0)
-    await message.reply(f"📊 Sizning umumiy balingiz: {score}")
+    await message.answer(f"📊 Sizning umumiy balingiz: {score}")
 
 
 @dp.message_handler(commands=['add'])
 async def add_question(message: types.Message):
-    # Faqat ruxsat berilgan adminlar savol qo‘shishi mumkin
     if message.from_user.id not in RUXSAT_ETILGANLAR:
         await message.reply("Sizda savol qo‘shish huquqi yo‘q.")
         return
@@ -99,7 +99,6 @@ async def add_question(message: types.Message):
         return
 
     questions = load_json(TESKARI_FILE)
-    # Yangi savolni qo'shish
     questions.append({"savol": savol, "javob": javob})
     save_json(TESKARI_FILE, questions)
     await message.reply(f"✅ Savol qo‘shildi:\nSavol: {savol}\nJavob: {javob}")
@@ -109,19 +108,19 @@ async def add_question(message: types.Message):
 async def javobni_tekshir(message: types.Message):
     user_id = str(message.from_user.id)
     user_state = load_json(USER_STATE_FILE)
+
     if user_id in user_state:
         togri_javob = user_state[user_id]['javob'].lower()
         if message.text.strip().lower() == togri_javob:
             scores = load_json(SCORE_FILE)
             scores[user_id] = scores.get(user_id, 0) + 1
             save_json(SCORE_FILE, scores)
-            # Savolni olib tashlaymiz va yangi savol yuboramiz
+
             del user_state[user_id]
             save_json(USER_STATE_FILE, user_state)
 
-            await message.reply("✅ To‘g‘ri! Sizga 1 ball qo‘shildi. Yangi savol kelmoqda...")
+            await message.answer("✅ To‘g‘ri! Sizga 1 ball qo‘shildi. Yangi savol kelmoqda...")
 
-            # Yangi savol berish
             questions = load_json(TESKARI_FILE)
             if not questions:
                 await message.answer("Savollar bazasi bo‘sh.")
@@ -132,12 +131,11 @@ async def javobni_tekshir(message: types.Message):
 
             kb = InlineKeyboardMarkup()
             kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
-            await dp.bot.send_message(message.from_user.id, f"Toping: {question['savol']}", reply_markup=kb)
+            await bot.send_message(message.chat.id, f"Toping: {question['savol']}", reply_markup=kb)
         else:
-            await message.reply("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
+            await message.answer("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
     else:
-        # Agar foydalanuvchi hali savol olmagan bo‘lsa
-        await message.reply("Iltimos, avval kategoriya tanlab, savol oling.")
+        await message.answer("Iltimos, avval kategoriya tanlab, savol oling.")
 
 
 @app.on_event("startup")
