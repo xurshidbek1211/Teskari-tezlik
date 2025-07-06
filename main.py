@@ -5,26 +5,30 @@ import random
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from fastapi import FastAPI, Request
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.utils.executor import start_webhook
+from aiogram.dispatcher.webhook import get_new_configured_app
 
+# Token va URL
 API_TOKEN = os.getenv("API_TOKEN")
-WEBHOOK_HOST = os.getenv("RENDER_EXTERNAL_URL", "").strip("/")
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
-WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
+WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
 
-WEBAPP_HOST = "0.0.0.0"
-WEBAPP_PORT = int(os.environ.get('PORT', 10000))
-
+# Bot, Dispatcher, FastAPI ilovasi
 bot = Bot(token=API_TOKEN)
-bot.set_current(bot)  # MUHIM QATOR
 dp = Dispatcher(bot, storage=MemoryStorage())
+app = FastAPI()
+
+# Log sozlamasi
 logging.basicConfig(level=logging.INFO)
 
+# Fayllar
 TESKARI_FILE = 'teskari_tezlik_savollar.json'
 SCORE_FILE = 'user_scores.json'
 USER_STATE_FILE = 'user_states.json'
 
+# JSON fayl o‘qish/yozish
 def load_json(filename):
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -35,12 +39,14 @@ def save_json(filename, data):
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+# Start komandasi
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     kb = InlineKeyboardMarkup()
     kb.add(InlineKeyboardButton("🌀 Teskari tezlik", callback_data="teskari"))
     await message.answer("Qaysi kategoriyani tanlaysiz?", reply_markup=kb)
 
+# Teskari kategoriyasi
 @dp.callback_query_handler(lambda c: c.data == "teskari")
 async def send_teskari(callback_query: types.CallbackQuery):
     questions = load_json(TESKARI_FILE)
@@ -54,6 +60,7 @@ async def send_teskari(callback_query: types.CallbackQuery):
         kb.add(InlineKeyboardButton("📖 To‘g‘ri javob", callback_data="javob"))
         await bot.send_message(callback_query.from_user.id, f"Toping: {question['savol']}", reply_markup=kb)
 
+# To‘g‘ri javobni ko‘rsatish
 @dp.callback_query_handler(lambda c: c.data == "javob")
 async def show_answer(callback_query: types.CallbackQuery):
     user_state = load_json(USER_STATE_FILE)
@@ -61,12 +68,14 @@ async def show_answer(callback_query: types.CallbackQuery):
     if user_id in user_state:
         await bot.send_message(callback_query.from_user.id, f"✅ To‘g‘ri javob: {user_state[user_id]['javob']}")
 
+# Ball ko‘rsatish
 @dp.message_handler(commands=['ball'])
 async def show_ball(message: types.Message):
     scores = load_json(SCORE_FILE)
     score = scores.get(str(message.from_user.id), 0)
     await message.reply(f"📊 Sizning umumiy balingiz: {score}")
 
+# Javobni tekshirish
 @dp.message_handler()
 async def javobni_tekshir(message: types.Message):
     user_id = str(message.from_user.id)
@@ -83,20 +92,15 @@ async def javobni_tekshir(message: types.Message):
         else:
             await message.reply("❌ Noto‘g‘ri. Yana urinib ko‘ring.")
 
-# === Webhook setup functions ===
-async def on_startup(dp):
+# Webhook sozlash
+@app.on_event("startup")
+async def on_startup():
     await bot.set_webhook(WEBHOOK_URL)
 
-async def on_shutdown(dp):
-    await bot.delete_webhook()
-
-if __name__ == '__main__':
-    start_webhook(
-        dispatcher=dp,
-        webhook_path=WEBHOOK_PATH,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-        host=WEBAPP_HOST,
-        port=WEBAPP_PORT,
-    )
+# Webhook orqali kelgan yangilanishlarni qabul qilish
+@app.post(WEBHOOK_PATH)
+async def process_webhook(request: Request):
+    data = await request.body()
+    update = types.Update(**json.loads(data))
+    await dp.process_update(update)
+    return {"status": "ok"}
