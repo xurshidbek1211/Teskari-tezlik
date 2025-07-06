@@ -1,81 +1,145 @@
-import json
 import logging
 import os
-from fastapi import FastAPI, Request
+import json
+import random
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import ParseMode
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from dotenv import load_dotenv
+from fastapi import FastAPI, Request
+from aiogram.utils.executor import start_webhook
 
-load_dotenv()
+API_TOKEN = os.getenv("API_TOKEN")
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 
-api_token = os.getenv("API_TOKEN")
-WEBHOOK_PATH = "/webhook"
-WEBHOOK_URL = f"{os.getenv('WEBHOOK_BASE_URL')}{WEBHOOK_PATH}"
+WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
+WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
 
-bot = Bot(token=api_token, parse_mode=ParseMode.HTML)
+ADMIN_ID = 1899194677
+RUXSAT_ETILGANLAR = [ADMIN_ID]
+
+bot = Bot(token=API_TOKEN)
+Bot.set_current(bot)
 dp = Dispatcher(bot, storage=MemoryStorage())
 app = FastAPI()
 
-SAVOL_FILE = "teskari_tezlik_savollar.json"
-SCORE_FILE = "score.json"
-STATE_FILE = "state.json"
+logging.basicConfig(level=logging.INFO)
 
-def load_json(file):
-    try:
-        with open(file, "r", encoding="utf-8") as f:
+TESKARI_FILE = "teskari_tezlik_savollar.json"
+SCORE_FILE = "user_scores.json"
+STATE_FILE = "user_states.json"
+
+# --- JSON fayllarni yuklash/saqlash ---
+def load_json(filename):
+    if os.path.exists(filename):
+        with open(filename, "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
-        return {}
+    return {}
 
-def save_json(file, data):
-    with open(file, "w", encoding="utf-8") as f:
+def save_json(filename, data):
+    with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-def get_next_question(chat_id):
-    savollar = load_json(SAVOL_FILE)
-    state = load_json(STATE_FILE)
+# --- Javoblarni normallashtirish ---
+def normalize_answer(text):
+    return (
+        text.lower()
+        .replace("ʼ", "'")
+        .replace("`", "'")
+        .replace("´", "'")
+        .replace("‘", "'")
+        .replace("’", "'")
+        .strip()
+    )
 
-    if chat_id not in state:
-        state[chat_id] = {"used": []}
-
-    used = state[chat_id]["used"]
-    q_list = [s for s in savollar if s["id"] not in used]
-
-    if not q_list:
-        state[chat_id]["used"] = []
-        q_list = savollar
-
-    question = q_list[0]
-    state[chat_id]["current"] = question
-    state[chat_id]["used"].append(question["id"])
-    save_json(STATE_FILE, state)
-    return question
-
+# --- Yangi savol yuborish ---
 async def send_new_question(chat_id):
-    question = get_next_question(str(chat_id))
-    matn = f"🧠 <b>Topshiriq:</b>\n{question['savol']}"
-    await bot.send_message(chat_id, matn)
+    questions = load_json(TESKARI_FILE)
+    if not questions:
+        await bot.send_message(chat_id, "❌ Savollar mavjud emas.")
+        return
+    question = random.choice(questions)
+    states = load_json(STATE_FILE)
+    states[str(chat_id)] = {
+        "current": question,
+        "answered_by": None,
+        "chat_id": chat_id
+    }
+    save_json(STATE_FILE, states)
 
+    # ** To‘g‘ri javob tugmasini olib tashladik (so‘rov bo‘yicha) **
+    # kb = InlineKeyboardMarkup()
+    # kb.add(InlineKeyboardButton("✅ To‘g‘ri javob", callback_data="javob"))
+    # await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}", reply_markup=kb)
+
+    await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
+
+# --- /boshla komandasi ---
+@dp.message_handler(commands=["boshla"])
+async def boshla(message: types.Message):
+    await send_new_question(message.chat.id)
+
+# --- /add komandasi (faqat adminlarga) ---
+@dp.message_handler(commands=["add"])
+async def add_question(message: types.Message):
+    if message.from_user.id not in RUXSAT_ETILGANLAR:
+        await message.reply("❌ Sizda savol qo‘shish huquqi yo‘q.")
+        return
+    text = message.text[4:].strip()
+    if "||" not in text:
+        await message.reply("❗️ Format: /add savol || javob")
+        return
+    savol, javob = map(str.strip, text.split("||", maxsplit=1))
+    if not savol or not javob:
+        await message.reply("❗️ Savol va javob bo‘sh bo‘lishi mumkin emas.")
+        return
+    questions = load_json(TESKARI_FILE)
+    questions.append({"savol": savol, "javob": javob})
+    save_json(TESKARI_FILE, questions)
+    await message.reply("✅ Savol qo‘shildi!")
+
+# --- /ball komandasi ---
+@dp.message_handler(commands=["ball"])
+async def show_score(message: types.Message):
+    scores = load_json(SCORE_FILE)
+    chat_id = str(message.chat.id)
+    user_id = str(message.from_user.id)
+    chat_scores = scores.get(chat_id, {})
+    user_score = chat_scores.get(user_id, 0)
+    await message.answer(f"📊 Sizning guruhdagi umumiy balingiz: {user_score}")
+
+# --- Javoblarni tekshirish ---
 @dp.message_handler()
-async def handle_answer(message: types.Message):
-    state = load_json(STATE_FILE)
+async def check_answer(message: types.Message):
+    states = load_json(STATE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
 
-    if chat_id not in state or "current" not in state[chat_id]:
-        await message.answer("❗ Savol hali yuborilmagan.")
+    if chat_id not in states:
+        return
+    state = states[chat_id]
+
+    if "current" not in state:
+        return
+    if state.get("answered_by") is not None:
+        # Allaqachon javob berilgan
         return
 
-    current = state[chat_id]["current"]
-    if message.text.strip().lower() == current["javob"].lower():
+    correct = normalize_answer(state["current"]["javob"])
+    user_answer = normalize_answer(message.text)
+
+    if user_answer == correct:
+        # Javob to‘g‘ri!
+        state["answered_by"] = user_id
+        states[chat_id] = state
+        save_json(STATE_FILE, states)
+
         scores = load_json(SCORE_FILE)
         if chat_id not in scores:
             scores[chat_id] = {}
-
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
 
+        # Reytingni olish (top 10)
         top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
@@ -87,22 +151,21 @@ async def handle_answer(message: types.Message):
             reyting += f"{i+1}. {name} - {ball} ball\n"
 
         await message.answer(
-            f"✅ To‘g‘ri javob: <b>{current['javob']}</b>\n"
+            f"🎯 To‘g‘ri javob: {state['current']['javob']}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
-            f"🏆 <b>Reyting:</b>\n{reyting}"
+            f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
 
-        await send_new_question(chat_id)
-    else:
-        await message.answer("❌ Noto‘g‘ri javob. Yana urinib ko‘ring.")
+        # Yangi savol yuborish
+        await send_new_question(message.chat.id)
 
-# Webhook sozlash
+# --- Webhook sozlash ---
 @app.on_event("startup")
 async def on_startup():
     await bot.set_webhook(WEBHOOK_URL)
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
-# Webhookni qabul qilish
+# --- Webhookni qabul qilish ---
 @app.post(WEBHOOK_PATH)
 async def process_webhook(request: Request):
     data = await request.body()
