@@ -4,27 +4,26 @@ import os
 import random
 from fastapi import FastAPI, Request
 from aiogram import Bot, Dispatcher, types
-from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")  # yoki bevosita yozing
-WEBHOOK_URL = "https://your-app-name.onrender.com/webhook"
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # Yoki tokenni bevosita yozing
+WEBHOOK_URL = "https://your-app-name.onrender.com/webhook"  # <-- o'zgartiring
 WEBHOOK_PATH = "/webhook"
 
 SCORE_FILE = "scores.json"
-QUESTION_FILE = "questions.json"
+QUESTION_FILE = "teskari_tezlik_savollar.json"
 
-ADMINS = [123456789]  # <-- O‘Z TELEGRAM ID'INGIZNI yozing
+ADMINS = [123456789]  # O‘zingizning Telegram ID'ingizni yozing
 
 bot = Bot(token=BOT_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 app = FastAPI()
 
-# JSON funksiyalari
+# JSON yuklash/saqlash
 def load_json(filename):
     if not os.path.exists(filename):
-        return []
+        return {} if filename == SCORE_FILE else []
     with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -32,7 +31,7 @@ def save_json(filename, data):
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-# Bot holati (savollar)
+# Bot holati
 bot_state = {}
 
 async def send_new_question(chat_id):
@@ -57,6 +56,8 @@ async def add_question(message: types.Message):
     try:
         _, savol, javob = message.text.split(";", 2)
         savollar = load_json(QUESTION_FILE)
+        if not isinstance(savollar, list):
+            savollar = []
         savollar.append({"savol": savol.strip(), "javob": javob.strip()})
         save_json(QUESTION_FILE, savollar)
         await message.reply("✅ Savol muvaffaqiyatli qo‘shildi.")
@@ -98,7 +99,7 @@ async def handle_answer(message: types.Message):
         reyting += f"{i+1}. {name} - {ball} ball\n"
 
     await message.answer(
-        f"🎯 To‘g‘ri javob: {tog risi}\n"
+        f"🎯 To‘g‘ri javob: {togrisi}\n"
         f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
         f"🏆 Reyting:\n{reyting}"
     )
