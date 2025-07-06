@@ -86,8 +86,7 @@ async def show_answer(callback_query: types.CallbackQuery):
     else:
         await bot.send_message(callback_query.message.chat.id, "Savol topilmadi. Iltimos, yangi savol oling.")
     await callback_query.answer()
-
-@dp.message_handler(commands=['ball'])
+    @dp.message_handler(commands=['ball'])
 async def show_ball(message: types.Message):
     scores = load_json(SCORE_FILE)
     score = scores.get(str(message.from_user.id), 0)
@@ -119,11 +118,10 @@ async def javobni_tekshir(message: types.Message):
     user_state = load_json(USER_STATE_FILE)
 
     if not user_state or "current" not in user_state:
-        await message.answer("Iltimos, avval /boshla buyrug‘i orqali oʻyinni boshlang.")
-        return
+        return  # o‘yin boshlanmagan
 
     if user_state.get("answered_by"):
-        return
+        return  # javob allaqachon berilgan
 
     current = user_state["current"]
     togri_javob = normalize_answer(current['javob'])
@@ -141,10 +139,16 @@ async def javobni_tekshir(message: types.Message):
         text = f"✅ To‘g‘ri javob: {current['javob']}\n🎉 {user_fullname} ga 1 ball qo‘shildi."
 
         top = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        statistik = "\n".join(
-            [f"{i+1}. {await bot.get_chat(int(uid)).first_name} - {score} ball" for i, (uid, score) in enumerate(top)]
-        )
-        text += f"\n\n📊 Umumiy reyting:\n{statistik}"
+        statistik = ""
+        for i, (uid, score) in enumerate(top[:10]):
+            try:
+                user = await bot.get_chat(int(uid))
+                statistik += f"{i+1}. {user.first_name} - {score} ball\n"
+            except:
+                continue
+        if statistik:
+            text += f"\n\n📊 Umumiy reyting:\n{statistik}"
+
         await message.answer(text)
 
 @app.on_event("startup")
