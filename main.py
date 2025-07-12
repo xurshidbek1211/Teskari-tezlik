@@ -33,7 +33,7 @@ def load_json(filename):
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
             return json.load(f)
-    return {}
+    return []
 
 def save_json(filename, data):
     with open(filename, "w", encoding="utf-8") as f:
@@ -65,11 +65,6 @@ async def send_new_question(chat_id):
         "chat_id": chat_id
     }
     save_json(STATE_FILE, states)
-
-    # ** To‘g‘ri javob tugmasini olib tashladik (so‘rov bo‘yicha) **
-    # kb = InlineKeyboardMarkup()
-    # kb.add(InlineKeyboardButton("✅ To‘g‘ri javob", callback_data="javob"))
-    # await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}", reply_markup=kb)
 
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
@@ -121,14 +116,12 @@ async def check_answer(message: types.Message):
     if "current" not in state:
         return
     if state.get("answered_by") is not None:
-        # Allaqachon javob berilgan
         return
 
     correct = normalize_answer(state["current"]["javob"])
     user_answer = normalize_answer(message.text)
 
     if user_answer == correct:
-        # Javob to‘g‘ri!
         state["answered_by"] = user_id
         states[chat_id] = state
         save_json(STATE_FILE, states)
@@ -139,7 +132,6 @@ async def check_answer(message: types.Message):
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
 
-        # Reytingni olish (top 10)
         top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
@@ -156,7 +148,6 @@ async def check_answer(message: types.Message):
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
 
-        # Yangi savol yuborish
         await send_new_question(message.chat.id)
 
 # --- Webhook sozlash ---
@@ -172,3 +163,8 @@ async def process_webhook(request: Request):
     update = types.Update(**json.loads(data))
     await dp.process_update(update)
     return {"status": "ok"}
+
+# ✅ Render tirikligini saqlab turuvchi endpoint
+@app.get("/")
+async def root():
+    return {"status": "Bot tirik va ishlayapti ✅"}
