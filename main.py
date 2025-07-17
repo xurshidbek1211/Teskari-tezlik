@@ -2,8 +2,9 @@ import logging
 import os
 import json
 import random
+import asyncio
+from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import FastAPI, Request
 from aiogram.utils.executor import start_webhook
@@ -124,22 +125,44 @@ async def check_answer(message: types.Message):
         await message.answer(
             f"🎯 To‘g‘ri javob: {state['current']['javob']}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
-            "🌟🌸 TABRIKLAYMIZ! 🌸🌟\n\n"
-            "🥇 Siz bugungi kunning G‘OLIBI bo‘ldingiz!\n"
-            "🎉 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! 🎉\n\n"
-            "🌷 Ilmingiz yana-da ziyoda bo‘lsin,\n"
-            "🌼 Zukkoligingiz yanada charog‘on bo‘lsin,\n"
-            "🌺 Har bir yutuq sizga ilhom bersin!\n\n"
-            "💫 Siz kabi bilimdonlar bizning botimizning faxridir!\n"
-            "Doimo yuksalishda bo‘ling! 🚀\n\n"
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
 
         await send_new_question(message.chat.id)
 
+# ✅ Har kuni soat 00:00 da g‘olibni aniqlab tabriklash
+async def daily_congratulations():
+    while True:
+        now = datetime.now()
+        tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        wait_seconds = (tomorrow - now).total_seconds()
+        await asyncio.sleep(wait_seconds)
+
+        scores = load_json(SCORE_FILE)
+        for chat_id, user_scores in scores.items():
+            if not user_scores:
+                continue
+            top_user_id = max(user_scores, key=user_scores.get)
+            top_score = user_scores[top_user_id]
+
+            try:
+                user = await bot.get_chat(int(top_user_id))
+                name = user.first_name
+            except:
+                name = "👤 Nomaʼlum"
+
+            message = (
+                f"🎉 Kun g‘olibi: {name}!\n"
+                f"🏆 Ballar: {top_score}\n"
+                f"🥳 Tabriklaymiz! Ajoyib natija!\n\n"
+                f"🕛 Yangi kun boshlandi – bugun yana bellashamiz!"
+            )
+            await bot.send_message(int(chat_id), message)
+
 @app.on_event("startup")
 async def on_startup():
     await bot.set_webhook(WEBHOOK_URL)
+    asyncio.create_task(daily_congratulations())
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
 @app.post(WEBHOOK_PATH)
