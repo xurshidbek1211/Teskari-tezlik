@@ -4,43 +4,43 @@ API_TOKEN = os.getenv("API_TOKEN") RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTER
 
 ADMIN_ID = 1899194677 RUXSAT_ETILGANLAR = [ADMIN_ID]
 
-bot = Bot(token=API_TOKEN, parse_mode="HTML") Bot.set_current(bot) dp = Dispatcher(bot, storage=MemoryStorage()) app = FastAPI()
+bot = Bot(token=API_TOKEN, parse_mode="HTML") dp = Dispatcher(bot, storage=MemoryStorage()) app = FastAPI()
 
 logging.basicConfig(level=logging.INFO)
 
 TESKARI_FILE = "teskari_tezlik_savollar.json" SCORE_FILE = "user_scores.json" STATE_FILE = "user_states.json"
 
---- JSON fayllarni yuklash/saqlash ---
+JSON fayllarni yuklash/saqlash
 
 def load_json(filename): if os.path.exists(filename): with open(filename, "r", encoding="utf-8") as f: return json.load(f) return {}
 
 def save_json(filename, data): with open(filename, "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=2)
 
---- Javoblarni normallashtirish ---
+Javoblarni normallashtirish
 
 def normalize_answer(text): return ( text.lower() .replace("ʼ", "'") .replace("`", "'") .replace("´", "'") .replace("‘", "'") .replace("’", "'") .strip() )
 
---- Buyruqlar ro‘yxatini ko‘rsatish uchun ---
+Buyruqlar ro'yxatini ko'rsatish uchun
 
 async def set_bot_commands(bot): commands = [ BotCommand("boshla", "Botni boshlash"), BotCommand("add", "Savol qo‘shish (adminlar uchun)"), BotCommand("ball", "Sizning balingizni ko‘rish") ] await bot.set_my_commands(commands)
 
---- Yangi savol yuborish ---
+Yangi savol yuborish
 
 async def send_new_question(chat_id): questions = load_json(TESKARI_FILE) if not questions: await bot.send_message(chat_id, "❌ Savollar mavjud emas.") return question = random.choice(questions) states = load_json(STATE_FILE) states[str(chat_id)] = { "current": question, "answered_by": None, "chat_id": chat_id } save_json(STATE_FILE, states) await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
---- /boshla komandasi ---
+/boshla komandasi
 
 @dp.message_handler(commands=["boshla"]) async def boshla(message: types.Message): await send_new_question(message.chat.id)
 
---- /add komandasi ---
+/add komandasi
 
 @dp.message_handler(commands=["add"]) async def add_question(message: types.Message): if message.from_user.id not in RUXSAT_ETILGANLAR: await message.reply("❌ Sizda savol qo‘shish huquqi yo‘q.") return text = message.text[4:].strip() if "||" not in text: await message.reply("❗️ Format: /add savol || javob") return savol, javob = map(str.strip, text.split("||", maxsplit=1)) if not savol or not javob: await message.reply("❗️ Savol va javob bo‘sh bo‘lishi mumkin emas.") return questions = load_json(TESKARI_FILE) questions.append({"savol": savol, "javob": javob}) save_json(TESKARI_FILE, questions) await message.reply("✅ Savol qo‘shildi!")
 
---- /ball komandasi ---
+/ball komandasi
 
 @dp.message_handler(commands=["ball"]) async def show_score(message: types.Message): scores = load_json(SCORE_FILE) chat_id = str(message.chat.id) user_id = str(message.from_user.id) chat_scores = scores.get(chat_id, {}) user_score = chat_scores.get(user_id, 0) await message.answer(f"📊 Sizning guruhdagi umumiy balingiz: {user_score}")
 
---- Javoblarni tekshirish ---
+Javoblarni tekshirish
 
 @dp.message_handler() async def check_answer(message: types.Message): states = load_json(STATE_FILE) chat_id = str(message.chat.id) user_id = str(message.from_user.id)
 
@@ -82,7 +82,7 @@ if user_answer == correct:
 
     await send_new_question(message.chat.id)
 
---- Har kuni 00:00 da g‘olibni aniqlash va tabriklash ---
+Har kuni 00:00 da g‘olibni aniqlash va tabriklash
 
 async def tabrikla_golib(): scores = load_json(SCORE_FILE) for chat_id, user_scores in scores.items(): if not user_scores: continue top_user_id = max(user_scores, key=user_scores.get) top_score = user_scores[top_user_id]
 
@@ -93,23 +93,23 @@ try:
         name = "👤 G‘olib"
 
     tabrik_matni = (
-        "\ud83c\udf1f\ud83c\udf38 <b>TABRIKLAYMIZ!</b> \ud83c\udf38\ud83c\udf1f\n\n"
-        "\ud83e\udd47 <b>Siz bugungi kunning G‘OLIBI bo‘ldingiz!</b>\n"
-        "\ud83c\udf89 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! \ud83c\udf89\n\n"
-        "\ud83c\udf37 Ilmingiz yana-da ziyoda bo‘lsin,\n"
-        "\ud83c\udf3c Zukkoligingiz yanada charog‘on bo‘lsin,\n"
-        "\ud83c\udf3a Har bir yutuq sizga ilhom bersin!\n\n"
-        "\ud83d\udcab Siz kabi bilimdonlar bizning botimizning faxridir!\n"
-        "Doimo yuksalishda bo‘ling! \ud83d\ude80"
+        "\U0001F31F\U0001F338 <b>TABRIKLAYMIZ!</b> \U0001F338\U0001F31F\n\n"
+        "\U0001F947 <b>Siz bugungi kunning G‘OLIBI bo‘ldingiz!</b>\n"
+        "\U0001F389 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! \U0001F389\n\n"
+        "\U0001F337 Ilmingiz yana-da ziyoda bo‘lsin,\n"
+        "\U0001F33C Zukkoligingiz yanada charog‘on bo‘lsin,\n"
+        "\U0001F33A Har bir yutuq sizga ilhom bersin!\n\n"
+        "\U0001F4AB Siz kabi bilimdonlar bizning botimizning faxridir!\n"
+        "Doimo yuksalishda bo‘ling! \U0001F680"
     )
 
     await bot.send_message(int(chat_id), tabrik_matni)
 
---- Jadvalni har kuni yangilovchi scheduler ---
+Jadvalni har kuni yangilovchi scheduler
 
 def schedule_daily_job(): scheduler = AsyncIOScheduler(timezone="Asia/Tashkent") scheduler.add_job(tabrikla_golib, "cron", hour=0, minute=0) scheduler.start()
 
---- Webhook sozlash ---
+Webhook sozlash
 
 @app.on_event("startup") async def on_startup(): await bot.set_webhook(WEBHOOK_URL) await set_bot_commands(bot) schedule_daily_job() logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
