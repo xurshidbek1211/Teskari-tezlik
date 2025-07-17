@@ -2,8 +2,6 @@ import logging
 import os
 import json
 import random
-import datetime
-import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -30,7 +28,6 @@ TESKARI_FILE = "teskari_tezlik_savollar.json"
 SCORE_FILE = "user_scores.json"
 STATE_FILE = "user_states.json"
 
-# --- JSON fayllarni yuklash/saqlash ---
 def load_json(filename):
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
@@ -41,19 +38,6 @@ def save_json(filename, data):
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# --- Javoblarni normallashtirish ---
-def normalize_answer(text):
-    return (
-        text.lower()
-        .replace("ʼ", "'")
-        .replace("`", "'")
-        .replace("´", "'")
-        .replace("‘", "'")
-        .replace("’", "'")
-        .strip()
-    )
-
-# --- Yangi savol yuborish ---
 async def send_new_question(chat_id):
     questions = load_json(TESKARI_FILE)
     if not questions:
@@ -69,12 +53,10 @@ async def send_new_question(chat_id):
     save_json(STATE_FILE, states)
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
-# --- /boshla komandasi ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
     await send_new_question(message.chat.id)
 
-# --- /add komandasi (faqat adminlarga) ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
     if message.from_user.id not in RUXSAT_ETILGANLAR:
@@ -93,7 +75,6 @@ async def add_question(message: types.Message):
     save_json(TESKARI_FILE, questions)
     await message.reply("✅ Savol qo‘shildi!")
 
-# --- /ball komandasi ---
 @dp.message_handler(commands=["ball"])
 async def show_score(message: types.Message):
     scores = load_json(SCORE_FILE)
@@ -103,19 +84,22 @@ async def show_score(message: types.Message):
     user_score = chat_scores.get(user_id, 0)
     await message.answer(f"📊 Sizning guruhdagi umumiy balingiz: {user_score}")
 
-# --- Javoblarni tekshirish ---
 @dp.message_handler()
 async def check_answer(message: types.Message):
     states = load_json(STATE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
+
     if chat_id not in states:
         return
     state = states[chat_id]
+
     if "current" not in state or state.get("answered_by") is not None:
         return
-    correct = normalize_answer(state["current"]["javob"])
-    user_answer = normalize_answer(message.text)
+
+    correct = state["current"]["javob"]
+    user_answer = message.text.strip()
+
     if user_answer == correct:
         state["answered_by"] = user_id
         states[chat_id] = state
@@ -136,54 +120,28 @@ async def check_answer(message: types.Message):
             except:
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
+
         await message.answer(
             f"🎯 To‘g‘ri javob: {state['current']['javob']}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
+            "🌟🌸 TABRIKLAYMIZ! 🌸🌟\n\n"
+            "🥇 Siz bugungi kunning G‘OLIBI bo‘ldingiz!\n"
+            "🎉 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! 🎉\n\n"
+            "🌷 Ilmingiz yana-da ziyoda bo‘lsin,\n"
+            "🌼 Zukkoligingiz yanada charog‘on bo‘lsin,\n"
+            "🌺 Har bir yutuq sizga ilhom bersin!\n\n"
+            "💫 Siz kabi bilimdonlar bizning botimizning faxridir!\n"
+            "Doimo yuksalishda bo‘ling! 🚀\n\n"
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
+
         await send_new_question(message.chat.id)
 
-# --- Kunlik g‘olibni aniqlab tabriklash ---
-async def check_daily_winner():
-    while True:
-        now = datetime.datetime.now()
-        if now.hour == 0 and now.minute == 0:
-            scores = load_json(SCORE_FILE)
-            for chat_id, user_scores in scores.items():
-                if not user_scores:
-                    continue
-                winner_id = max(user_scores, key=user_scores.get)
-                try:
-                    winner = await bot.get_chat(int(winner_id))
-                    name = winner.first_name
-                except:
-                    name = "👤 Nomaʼlum"
-                await bot.send_message(
-                    int(chat_id),
-                    f"""🌟🌸 TABRIKLAYMIZ! 🌸🌟
-
-🥇 Bugungi kunning G‘OLIBI: {name}!
-🎉 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! 🎉
-
-🌷 Ilmingiz yana-da ziyoda bo‘lsin,
-🌼 Zukkoligingiz yanada charog‘on bo‘lsin,
-🌺 Har bir yutuq sizga ilhom bersin!
-
-💫 Siz kabi bilimdonlar bizning botimizning faxridir!
-Doimo yuksalishda bo‘ling! 🚀"""
-                )
-            await asyncio.sleep(60)
-        else:
-            await asyncio.sleep(30)
-
-# --- Webhook sozlash ---
 @app.on_event("startup")
 async def on_startup():
     await bot.set_webhook(WEBHOOK_URL)
-    asyncio.create_task(check_daily_winner())
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
-# --- Webhookni qabul qilish ---
 @app.post(WEBHOOK_PATH)
 async def process_webhook(request: Request):
     data = await request.body()
@@ -191,7 +149,6 @@ async def process_webhook(request: Request):
     await dp.process_update(update)
     return {"status": "ok"}
 
-# ✅ Render tirikligini saqlab turuvchi endpoint
 @app.get("/")
 async def root():
     return {"status": "Bot tirik va ishlayapti ✅"}
