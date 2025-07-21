@@ -108,24 +108,38 @@ async def check_answer(message: types.Message):
     states = load_json(STATE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
+
     if chat_id not in states:
         return
+
     state = states[chat_id]
     if "current" not in state:
         return
+
     if state.get("answered_by") is not None:
         return
-    correct = normalize_answer(state["current"]["javob"])
+
     user_answer = normalize_answer(message.text)
-    if user_answer == correct:
+    correct_raw = state["current"]["javob"]
+
+    # --- Agar javob list bo‘lsa ---
+    if isinstance(correct_raw, list):
+        correct_list = [normalize_answer(j) for j in correct_raw]
+    else:
+        correct_list = [normalize_answer(correct_raw)]
+
+    if user_answer in correct_list:
         state["answered_by"] = user_id
         states[chat_id] = state
         save_json(STATE_FILE, states)
+
         scores = load_json(SCORE_FILE)
         if chat_id not in scores:
             scores[chat_id] = {}
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
+
+        # --- Reyting ---
         top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
@@ -135,11 +149,17 @@ async def check_answer(message: types.Message):
             except:
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
+
+        # --- Foydalanuvchiga javob va ball haqida xabar ---
+        javob_text = (
+            "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
+        )
         await message.answer(
-            f"🎯 To‘g‘ri javob: {state['current']['javob']}\n"
+            f"🎯 To‘g‘ri javob: {javob_text}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
+
         await send_new_question(message.chat.id)
 
 # --- Har kuni 00:00 da guruhlar bo‘yicha g‘olibni tabriklash ---
