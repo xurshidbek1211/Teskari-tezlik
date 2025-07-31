@@ -1,0 +1,13 @@
+name: Daily Trigger
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Har kuni soat 14:00 Toshkent vaqti
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger your bot endpoint
+        run: curl -X GET "https://teskari-tekshirish.onrender.com/check-users"
