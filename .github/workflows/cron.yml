@@ -2,7 +2,7 @@ name: Daily Trigger
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Har kuni soat 14:00 Toshkent vaqti
+    - cron: '0 3 * * *'  # Har kuni soat 00:38 Toshkent vaqti
   workflow_dispatch:
 
 jobs:
