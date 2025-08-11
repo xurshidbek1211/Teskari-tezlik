@@ -2,12 +2,12 @@ import logging
 import os
 import json
 import random
+import asyncio
 from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import FastAPI, Request
-from aiogram.utils.executor import start_webhook
 
 # --- Atrof-muhit o‘zgaruvchilar ---
 API_TOKEN = os.getenv("API_TOKEN")
@@ -194,18 +194,38 @@ Doimo yuksalishda bo‘ling! 🚀"""
 
     save_json(SCORE_FILE, new_scores)
 
-# --- Tabriklashni qo‘lda yoki CRON orqali ishga tushirish uchun endpoint ---
-@app.get("/run_congratulations")
-async def run_congratulations():
-    await congratulate_daily_winner_once()
-    return {"status": "Tabriklash bajarildi ✅"}
+# --- /tabrik komandasi (faqat bot egasiga) ---
+@dp.message_handler(commands=["tabrik"])
+async def manual_congratulation(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.reply("❌ Sizda bu buyruqni ishlatish huquqi yo‘q.")
+        return
 
-# --- Webhook sozlash ---
+    await congratulate_daily_winner_once()
+    await message.reply("✅ Barcha guruhlarda g‘oliblar tabriklandi va ballar yangilandi.")
+
+# --- Har kuni 00:00 da tabriklash ---
+async def schedule_daily_congratulations():
+    while True:
+        now = datetime.now()
+        tomorrow = now + timedelta(days=1)
+        run_time = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 0, 0, 0)
+        wait_seconds = (run_time - now).total_seconds()
+
+        logging.info(f"⏳ Keyingi tabriklash {run_time} da ishga tushadi.")
+        await asyncio.sleep(wait_seconds)
+
+        logging.info("🏆 Kunlik g‘olibni tabriklash boshlandi.")
+        await congratulate_daily_winner_once()
+
+# --- Webhook startup ---
 @app.on_event("startup")
 async def on_startup():
     await bot.set_webhook(WEBHOOK_URL)
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
-    # ❌ asyncio.create_task(...) olib tashlandi, Render cron bilan ishlaymiz
+
+    # Kunlik tabriklashni rejalashtirish
+    asyncio.create_task(schedule_daily_congratulations())
 
 # --- Webhookni qabul qilish ---
 @app.post(WEBHOOK_PATH)
