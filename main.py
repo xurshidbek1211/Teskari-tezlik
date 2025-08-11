@@ -9,7 +9,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import FastAPI, Request
 
-# --- Atrof-muhit o‘zgaruvchilar ---
+# --- Atrof-muhit sozlamalari ---
 API_TOKEN = os.getenv("API_TOKEN")
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
@@ -19,7 +19,6 @@ ADMIN_ID = 1899194677
 RUXSAT_ETILGANLAR = [ADMIN_ID]
 
 bot = Bot(token=API_TOKEN)
-Bot.set_current(bot)
 dp = Dispatcher(bot, storage=MemoryStorage())
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
@@ -27,6 +26,7 @@ logging.basicConfig(level=logging.INFO)
 TESKARI_FILE = "teskari_tezlik_savollar.json"
 SCORE_FILE = "user_scores.json"
 STATE_FILE = "user_states.json"
+WINNER_FILE = "winner_count.json"
 
 # --- JSON fayllarni yuklash/saqlash ---
 def load_json(filename):
@@ -67,12 +67,12 @@ async def send_new_question(chat_id):
     save_json(STATE_FILE, states)
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
-# --- /boshla komandasi ---
+# --- /boshla ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
     await send_new_question(message.chat.id)
 
-# --- /add komandasi (faqat adminlarga) ---
+# --- /add ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
     if message.from_user.id not in RUXSAT_ETILGANLAR:
@@ -89,11 +89,11 @@ async def add_question(message: types.Message):
     questions = load_json(TESKARI_FILE)
     if not isinstance(questions, list):
         questions = []
-    questions.append({"savol": savol, "javob": javob})
+    questions.append({"savol": savol, "javob": javob if isinstance(javob, list) else javob})
     save_json(TESKARI_FILE, questions)
     await message.reply("✅ Savol qo‘shildi!")
 
-# --- /ball komandasi ---
+# --- /ball ---
 @dp.message_handler(commands=["ball"])
 async def show_score(message: types.Message):
     scores = load_json(SCORE_FILE)
@@ -161,9 +161,10 @@ async def check_answer(message: types.Message):
 
         await send_new_question(message.chat.id)
 
-# --- Faqat bir marta ishlaydigan tabriklash funksiyasi ---
+# --- Kun g‘oliblarini aniqlash ---
 async def congratulate_daily_winner_once():
     scores = load_json(SCORE_FILE)
+    winner_count = load_json(WINNER_FILE)
     new_scores = {}
 
     for chat_id, users in scores.items():
@@ -171,6 +172,12 @@ async def congratulate_daily_winner_once():
             continue
 
         winner_id, max_score = max(users.items(), key=lambda x: x[1])
+        try:
+            chat_info = await bot.get_chat(int(chat_id))
+            chat_title = chat_info.title
+        except:
+            chat_title = "Nomaʼlum guruh"
+
         try:
             user = await bot.get_chat(int(winner_id))
             name = user.first_name
@@ -182,50 +189,62 @@ async def congratulate_daily_winner_once():
 🥇 Bugungi kunning G‘OLIBI: {name}!
 🎉 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! 🎉
 
-🌷 Ilmingiz yana-da ziyoda bo‘lsin,
-🌼 Zukkoligingiz yanada charog‘on bo‘lsin,
-🌺 Har bir yutuq sizga ilhom bersin!
-
 💫 Siz kabi bilimdonlar bizning botimizning faxridir!
-Doimo yuksalishda bo‘ling! 🚀"""
+🏆 Guruh: {chat_title}"""
 
         await bot.send_message(int(chat_id), congrat_msg)
-        new_scores[chat_id] = {}  # Har bir guruh uchun ballarni 0 ga tushuramiz
+
+        # Winner count update
+        winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
+
+        new_scores[chat_id] = {}
 
     save_json(SCORE_FILE, new_scores)
+    save_json(WINNER_FILE, winner_count)
 
-# --- /tabrik komandasi (faqat bot egasiga) ---
+# --- /tabrik komandasi ---
 @dp.message_handler(commands=["tabrik"])
-async def manual_congratulation(message: types.Message):
+async def manual_tabrik(message: types.Message):
     if message.from_user.id != ADMIN_ID:
-        await message.reply("❌ Sizda bu buyruqni ishlatish huquqi yo‘q.")
+        return
+    await congratulate_daily_winner_once()
+    await message.answer("✅ Barcha guruhlarda tabrik yuborildi va ballar yangilandi.")
+
+# --- /kun komandasi ---
+@dp.message_handler(commands=["kun"])
+async def show_top_winners(message: types.Message):
+    winner_count = load_json(WINNER_FILE)
+    if not winner_count:
+        await message.answer("❌ Hali hech kim Kun bilimdoni bo‘lmagan.")
         return
 
-    await congratulate_daily_winner_once()
-    await message.reply("✅ Barcha guruhlarda g‘oliblar tabriklandi va ballar yangilandi.")
+    sorted_winners = sorted(winner_count.items(), key=lambda x: x[1], reverse=True)[:20]
+    text = "🏆 *Top 20 Kun Bilimdonlari:*\n\n"
 
-# --- Har kuni 00:00 da tabriklash ---
-async def schedule_daily_congratulations():
+    for idx, (user_id, count) in enumerate(sorted_winners, start=1):
+        try:
+            user = await bot.get_chat(int(user_id))
+            name = user.first_name
+        except:
+            name = "👤 Nomaʼlum"
+        text += f"{idx}. {name} — {count} marta\n"
+
+    await message.answer(text, parse_mode="Markdown")
+
+# --- Scheduler 00:00 ---
+async def scheduler():
     while True:
         now = datetime.now()
-        tomorrow = now + timedelta(days=1)
-        run_time = datetime(tomorrow.year, tomorrow.month, tomorrow.day, 0, 0, 0)
-        wait_seconds = (run_time - now).total_seconds()
-
-        logging.info(f"⏳ Keyingi tabriklash {run_time} da ishga tushadi.")
-        await asyncio.sleep(wait_seconds)
-
-        logging.info("🏆 Kunlik g‘olibni tabriklash boshlandi.")
+        target = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        await asyncio.sleep((target - now).total_seconds())
         await congratulate_daily_winner_once()
 
-# --- Webhook startup ---
+# --- Webhook sozlash ---
 @app.on_event("startup")
 async def on_startup():
+    asyncio.create_task(scheduler())
     await bot.set_webhook(WEBHOOK_URL)
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
-
-    # Kunlik tabriklashni rejalashtirish
-    asyncio.create_task(schedule_daily_congratulations())
 
 # --- Webhookni qabul qilish ---
 @app.post(WEBHOOK_PATH)
@@ -235,7 +254,6 @@ async def process_webhook(request: Request):
     await dp.process_update(update)
     return {"status": "ok"}
 
-# --- Render tirikligini ko‘rsatish uchun root endpoint ---
 @app.get("/")
 async def root():
     return {"status": "Bot tirik va ishlayapti ✅"}
