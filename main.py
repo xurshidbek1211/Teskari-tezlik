@@ -80,16 +80,23 @@ async def add_question(message: types.Message):
         return
     text = message.text[4:].strip()
     if "||" not in text:
-        await message.reply("❗️ Format: /add savol || javob")
+        await message.reply("❗️ Format: /add savol || javob1, javob2, ...")
         return
+
     savol, javob = map(str.strip, text.split("||", maxsplit=1))
     if not savol or not javob:
         await message.reply("❗️ Savol va javob bo‘sh bo‘lishi mumkin emas.")
         return
+
+    # Bir nechta javoblarni ro‘yxatga aylantirish
+    answers = [a.strip() for a in javob.split(",") if a.strip()]
+    if len(answers) == 1:
+        answers = answers[0]  # faqat bitta bo‘lsa string bo‘lib qoladi
+
     questions = load_json(TESKARI_FILE)
     if not isinstance(questions, list):
         questions = []
-    questions.append({"savol": savol, "javob": javob if isinstance(javob, list) else javob})
+    questions.append({"savol": savol, "javob": answers})
     save_json(TESKARI_FILE, questions)
     await message.reply("✅ Savol qo‘shildi!")
 
@@ -123,6 +130,7 @@ async def check_answer(message: types.Message):
     user_answer = normalize_answer(message.text)
     correct_raw = state["current"]["javob"]
 
+    # Har doim list qilib ishlash
     if isinstance(correct_raw, list):
         correct_list = [normalize_answer(j) for j in correct_raw]
     else:
@@ -150,9 +158,8 @@ async def check_answer(message: types.Message):
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
 
-        javob_text = (
-            "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
-        )
+        # To‘g‘ri javob matnini chiqarish
+        javob_text = ", ".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
         await message.answer(
             f"🎯 To‘g‘ri javob: {javob_text}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
