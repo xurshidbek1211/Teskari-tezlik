@@ -5,11 +5,10 @@ import random
 import asyncio
 from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import FastAPI, Request
 
-# --- Sozlamalar ---
+# --- Atrof-muhit sozlamalari ---
 API_TOKEN = os.getenv("API_TOKEN")
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
 WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
@@ -19,7 +18,7 @@ ADMIN_ID = 1899194677
 RUXSAT_ETILGANLAR = [ADMIN_ID]
 
 bot = Bot(token=API_TOKEN)
-Bot.set_current(bot)
+Dispatcher.set_current(bot)
 dp = Dispatcher(bot, storage=MemoryStorage())
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +28,7 @@ SCORE_FILE = "user_scores.json"
 STATE_FILE = "user_states.json"
 WINNER_FILE = "winner_count.json"
 
-# --- JSON fayllar bilan ishlash ---
+# --- JSON fayllarni yuklash/saqlash ---
 def load_json(filename):
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
@@ -40,7 +39,7 @@ def save_json(filename, data):
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# --- Javob normalizatsiyasi ---
+# --- Javoblarni normallashtirish ---
 def normalize_answer(text):
     return (
         text.lower()
@@ -52,8 +51,11 @@ def normalize_answer(text):
         .strip()
     )
 
-# --- Guruh adminligini tekshirish ---
-async def is_admin(chat_id, user_id):
+# --- Adminlik tekshiruvi ---
+async def is_admin(chat_id: int, user_id: int) -> bool:
+    # Lichka chatida har doim True (adminlik shart emas)
+    if chat_id > 0:
+        return True
     try:
         member = await bot.get_chat_member(chat_id, user_id)
         return member.is_chat_admin()
@@ -70,7 +72,8 @@ async def send_new_question(chat_id):
     states = load_json(STATE_FILE)
     states[str(chat_id)] = {
         "current": question,
-        "answered_by": None
+        "answered_by": None,
+        "chat_id": chat_id
     }
     save_json(STATE_FILE, states)
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
@@ -78,31 +81,32 @@ async def send_new_question(chat_id):
 # --- /boshla ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
-    if not await is_admin(message.chat.id, message.from_user.id):
-        await message.reply("❌ Faqat guruh adminlari botni ishlata oladi.")
+    # Guruhda adminlik tekshiruvi, lichkada ochiq
+    if message.chat.type != "private" and not await is_admin(message.chat.id, message.from_user.id):
+        await message.answer("❌ Faqat guruh adminlari botni ishlata oladi.")
         return
     await send_new_question(message.chat.id)
 
 # --- /add ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
-    if message.from_user.id not in RUXSAT_ETILGANLAR:
-        await message.reply("❌ Sizda savol qo‘shish huquqi yo‘q.")
+    if not await is_admin(message.chat.id, message.from_user.id):
+        await message.answer("❌ Sizda savol qo‘shish huquqi yo‘q.")
         return
     text = message.text[4:].strip()
     if "||" not in text:
-        await message.reply("❗️ Format: /add savol || javob")
+        await message.answer("❗️ Format: /add savol || javob")
         return
     savol, javob = map(str.strip, text.split("||", maxsplit=1))
     if not savol or not javob:
-        await message.reply("❗️ Savol va javob bo‘sh bo‘lishi mumkin emas.")
+        await message.answer("❗️ Savol va javob bo‘sh bo‘lishi mumkin emas.")
         return
     questions = load_json(TESKARI_FILE)
     if not isinstance(questions, list):
         questions = []
     questions.append({"savol": savol, "javob": javob if isinstance(javob, list) else javob})
     save_json(TESKARI_FILE, questions)
-    await message.reply("✅ Savol qo‘shildi!")
+    await message.answer("✅ Savol qo‘shildi!")
 
 # --- /ball ---
 @dp.message_handler(commands=["ball"])
@@ -114,21 +118,25 @@ async def show_score(message: types.Message):
     user_score = chat_scores.get(user_id, 0)
     await message.answer(f"📊 Sizning guruhdagi umumiy balingiz: {user_score}")
 
-# --- Javob tekshirish ---
+# --- Javoblarni tekshirish ---
 @dp.message_handler()
 async def check_answer(message: types.Message):
     states = load_json(STATE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
 
-    if chat_id not in states or "current" not in states[chat_id]:
+    if chat_id not in states:
         return
 
-    if states[chat_id].get("answered_by") is not None:
+    state = states[chat_id]
+    if "current" not in state:
+        return
+
+    if state.get("answered_by") is not None:
         return
 
     user_answer = normalize_answer(message.text)
-    correct_raw = states[chat_id]["current"]["javob"]
+    correct_raw = state["current"]["javob"]
 
     if isinstance(correct_raw, list):
         correct_list = [normalize_answer(j) for j in correct_raw]
@@ -136,7 +144,8 @@ async def check_answer(message: types.Message):
         correct_list = [normalize_answer(correct_raw)]
 
     if user_answer in correct_list:
-        states[chat_id]["answered_by"] = user_id
+        state["answered_by"] = user_id
+        states[chat_id] = state
         save_json(STATE_FILE, states)
 
         scores = load_json(SCORE_FILE)
@@ -145,6 +154,7 @@ async def check_answer(message: types.Message):
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
 
+        # --- Reyting ---
         top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
@@ -155,15 +165,18 @@ async def check_answer(message: types.Message):
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
 
-        javob_text = "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
+        javob_text = (
+            "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
+        )
         await message.answer(
             f"🎯 To‘g‘ri javob: {javob_text}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
+
         await send_new_question(message.chat.id)
 
-# --- Kunlik g‘olib ---
+# --- Kun g‘oliblarini aniqlash ---
 async def congratulate_daily_winner_once():
     scores = load_json(SCORE_FILE)
     winner_count = load_json(WINNER_FILE)
@@ -196,21 +209,25 @@ async def congratulate_daily_winner_once():
 
         await bot.send_message(int(chat_id), congrat_msg)
 
+        # Winner count update (kunlik g'oliblar sonini ko‘paytirish, nolga tushmaydi)
         winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
+
+        # Kunlik ballarni 0 ga tushuramiz
         new_scores[chat_id] = {}
 
     save_json(SCORE_FILE, new_scores)
     save_json(WINNER_FILE, winner_count)
 
-# --- /tabrik ---
+# --- /tabrik komandasi ---
 @dp.message_handler(commands=["tabrik"])
 async def manual_tabrik(message: types.Message):
+    # Faqat admin
     if message.from_user.id != ADMIN_ID:
         return
     await congratulate_daily_winner_once()
     await message.answer("✅ Barcha guruhlarda tabrik yuborildi va ballar yangilandi.")
 
-# --- /kun ---
+# --- /kun komandasi ---
 @dp.message_handler(commands=["kun"])
 async def show_top_winners(message: types.Message):
     winner_count = load_json(WINNER_FILE)
@@ -231,7 +248,7 @@ async def show_top_winners(message: types.Message):
 
     await message.answer(text, parse_mode="Markdown")
 
-# --- Scheduler ---
+# --- Scheduler 00:00 ---
 async def scheduler():
     while True:
         now = datetime.now()
@@ -239,13 +256,14 @@ async def scheduler():
         await asyncio.sleep((target - now).total_seconds())
         await congratulate_daily_winner_once()
 
-# --- Webhook ---
+# --- Webhook sozlash ---
 @app.on_event("startup")
 async def on_startup():
     asyncio.create_task(scheduler())
     await bot.set_webhook(WEBHOOK_URL)
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
+# --- Webhookni qabul qilish ---
 @app.post(WEBHOOK_PATH)
 async def process_webhook(request: Request):
     data = await request.body()
