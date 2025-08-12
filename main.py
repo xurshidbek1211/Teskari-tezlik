@@ -62,7 +62,8 @@ async def is_admin(chat_id: int, user_id: int) -> bool:
     try:
         member = await bot.get_chat_member(chat_id, user_id)
         return member.is_chat_admin()
-    except:
+    except Exception as e:
+        logging.error(f"Adminlikni tekshirishda xato: {e}")
         return False
 
 # --- Yangi savol yuborish ---
@@ -79,22 +80,27 @@ async def send_new_question(chat_id):
         "chat_id": chat_id
     }
     save_json(STATE_FILE, states)
+    logging.info(f"Yangi savol yuborildi chat_id={chat_id}: {question['savol']}")
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
 # --- /boshla ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
+    logging.info(f"/boshla chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     # Guruhda adminlik tekshiruvi, lichkada ochiq
     if message.chat.type != "private" and not await is_admin(message.chat.id, message.from_user.id):
         await message.answer("❌ Faqat guruh adminlari botni ishlata oladi.")
+        logging.info(f"Foydalanuvchi admin emas: user_id={message.from_user.id}, chat_id={message.chat.id}")
         return
     await send_new_question(message.chat.id)
 
 # --- /add ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
+    logging.info(f"/add chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     if not await is_admin(message.chat.id, message.from_user.id):
         await message.answer("❌ Sizda savol qo‘shish huquqi yo‘q.")
+        logging.info(f"Foydalanuvchi savol qo‘shishga ruxsat yo‘q: user_id={message.from_user.id}")
         return
     text = message.text[4:].strip()
     if "||" not in text:
@@ -109,11 +115,13 @@ async def add_question(message: types.Message):
         questions = []
     questions.append({"savol": savol, "javob": javob if isinstance(javob, list) else javob})
     save_json(TESKARI_FILE, questions)
+    logging.info(f"Yangi savol qo‘shildi: {savol}")
     await message.answer("✅ Savol qo‘shildi!")
 
 # --- /ball ---
 @dp.message_handler(commands=["ball"])
 async def show_score(message: types.Message):
+    logging.info(f"/ball chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     scores = load_json(SCORE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
@@ -164,13 +172,15 @@ async def check_answer(message: types.Message):
             try:
                 user = await bot.get_chat(int(uid))
                 name = user.first_name
-            except:
+            except Exception as e:
+                logging.error(f"Foydalanuvchini olishda xato: {e}")
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
 
         javob_text = (
             "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
         )
+        logging.info(f"To‘g‘ri javob berildi: user_id={user_id}, chat_id={chat_id}, javob={javob_text}")
         await message.answer(
             f"🎯 To‘g‘ri javob: {javob_text}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
@@ -181,6 +191,7 @@ async def check_answer(message: types.Message):
 
 # --- Kun g‘oliblarini aniqlash ---
 async def congratulate_daily_winner_once():
+    logging.info("Kun g‘oliblarini aniqlash boshlandi")
     scores = load_json(SCORE_FILE)
     winner_count = load_json(WINNER_FILE)
     new_scores = {}
@@ -193,13 +204,15 @@ async def congratulate_daily_winner_once():
         try:
             chat_info = await bot.get_chat(int(chat_id))
             chat_title = chat_info.title
-        except:
+        except Exception as e:
+            logging.error(f"Guruh nomini olishda xato: {e}")
             chat_title = "Nomaʼlum guruh"
 
         try:
             user = await bot.get_chat(int(winner_id))
             name = user.first_name
-        except:
+        except Exception as e:
+            logging.error(f"G‘olib foydalanuvchi ma'lumotini olishda xato: {e}")
             name = "👤 Nomaʼlum"
 
         congrat_msg = f"""🌟🌸 TABRIKLAYMIZ! 🌸🌟
@@ -211,6 +224,7 @@ async def congratulate_daily_winner_once():
 🏆 Guruh: {chat_title}"""
 
         await bot.send_message(int(chat_id), congrat_msg)
+        logging.info(f"Tabrik yuborildi: chat_id={chat_id}, g‘olib={name}({winner_id})")
 
         # Winner count update (kunlik g'oliblar sonini ko‘paytirish, nolga tushmaydi)
         winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
@@ -220,12 +234,15 @@ async def congratulate_daily_winner_once():
 
     save_json(SCORE_FILE, new_scores)
     save_json(WINNER_FILE, winner_count)
+    logging.info("Kun g‘oliblarini aniqlash yakunlandi")
 
 # --- /tabrik komandasi ---
 @dp.message_handler(commands=["tabrik"])
 async def manual_tabrik(message: types.Message):
+    logging.info(f"/tabrik chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     # Faqat admin
     if message.from_user.id != ADMIN_ID:
+        logging.info(f"Admin emas: {message.from_user.id}")
         return
     await congratulate_daily_winner_once()
     await message.answer("✅ Barcha guruhlarda tabrik yuborildi va ballar yangilandi.")
@@ -233,6 +250,7 @@ async def manual_tabrik(message: types.Message):
 # --- /kun komandasi ---
 @dp.message_handler(commands=["kun"])
 async def show_top_winners(message: types.Message):
+    logging.info(f"/kun chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     winner_count = load_json(WINNER_FILE)
     if not winner_count:
         await message.answer("❌ Hali hech kim Kun bilimdoni bo‘lmagan.")
@@ -245,11 +263,16 @@ async def show_top_winners(message: types.Message):
         try:
             user = await bot.get_chat(int(user_id))
             name = user.first_name
-        except:
+        except Exception as e:
+            logging.error(f"Foydalanuvchi ma'lumotini olishda xato: {e}")
             name = "👤 Nomaʼlum"
         text += f"{idx}. {name} — {count} marta\n"
 
-    await message.answer(text, parse_mode="Markdown")
+    try:
+        await message.answer(text, parse_mode="Markdown")
+    except Exception as e:
+        logging.error(f"Xabar yuborishda xato: {e}")
+        await message.answer(text)
 
 # --- Scheduler 00:00 ---
 async def scheduler():
@@ -257,11 +280,13 @@ async def scheduler():
         now = datetime.now()
         target = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
         await asyncio.sleep((target - now).total_seconds())
+        logging.info("Scheduler ishga tushdi: kunlik g‘oliblarni tabriklash")
         await congratulate_daily_winner_once()
 
 # --- Webhook sozlash ---
 @app.on_event("startup")
 async def on_startup():
+    logging.info("Bot ishga tushmoqda...")
     asyncio.create_task(scheduler())
     await bot.set_webhook(WEBHOOK_URL)
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
