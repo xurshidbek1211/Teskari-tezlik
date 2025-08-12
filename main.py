@@ -18,8 +18,11 @@ ADMIN_ID = 1899194677
 RUXSAT_ETILGANLAR = [ADMIN_ID]
 
 bot = Bot(token=API_TOKEN)
-Dispatcher.set_current(bot)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
+Bot.set_current(bot)
+Dispatcher.set_current(dp)
+
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 
