@@ -51,6 +51,18 @@ def normalize_answer(text):
         .strip()
     )
 
+# --- Bot adminligini tekshirish ---
+async def bot_is_admin(chat_id):
+    try:
+        # Agar shaxsiy chat bo‘lsa — adminlik tekshirilmaydi
+        if chat_id > 0:
+            return True
+        me = await bot.get_me()
+        member = await bot.get_chat_member(chat_id, me.id)
+        return member.is_chat_admin()
+    except:
+        return False
+
 # --- Yangi savol yuborish ---
 async def send_new_question(chat_id):
     questions = load_json(TESKARI_FILE)
@@ -70,39 +82,41 @@ async def send_new_question(chat_id):
 # --- /boshla ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
+    if not await bot_is_admin(message.chat.id):
+        await message.answer("❌ Botni ishlatish uchun uni guruhda admin qiling.")
+        return
     await send_new_question(message.chat.id)
 
 # --- /add ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
+    if not await bot_is_admin(message.chat.id):
+        await message.answer("❌ Botni ishlatish uchun uni guruhda admin qiling.")
+        return
     if message.from_user.id not in RUXSAT_ETILGANLAR:
         await message.reply("❌ Sizda savol qo‘shish huquqi yo‘q.")
         return
     text = message.text[4:].strip()
     if "||" not in text:
-        await message.reply("❗️ Format: /add savol || javob1, javob2, ...")
+        await message.reply("❗️ Format: /add savol || javob")
         return
-
     savol, javob = map(str.strip, text.split("||", maxsplit=1))
     if not savol or not javob:
         await message.reply("❗️ Savol va javob bo‘sh bo‘lishi mumkin emas.")
         return
-
-    # Bir nechta javoblarni ro‘yxatga aylantirish
-    answers = [a.strip() for a in javob.split(",") if a.strip()]
-    if len(answers) == 1:
-        answers = answers[0]  # faqat bitta bo‘lsa string bo‘lib qoladi
-
     questions = load_json(TESKARI_FILE)
     if not isinstance(questions, list):
         questions = []
-    questions.append({"savol": savol, "javob": answers})
+    questions.append({"savol": savol, "javob": javob if isinstance(javob, list) else javob})
     save_json(TESKARI_FILE, questions)
     await message.reply("✅ Savol qo‘shildi!")
 
 # --- /ball ---
 @dp.message_handler(commands=["ball"])
 async def show_score(message: types.Message):
+    if not await bot_is_admin(message.chat.id):
+        await message.answer("❌ Botni ishlatish uchun uni guruhda admin qiling.")
+        return
     scores = load_json(SCORE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
@@ -113,24 +127,22 @@ async def show_score(message: types.Message):
 # --- Javoblarni tekshirish ---
 @dp.message_handler()
 async def check_answer(message: types.Message):
+    if not await bot_is_admin(message.chat.id):
+        return
     states = load_json(STATE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
 
     if chat_id not in states:
         return
-
     state = states[chat_id]
     if "current" not in state:
         return
-
     if state.get("answered_by") is not None:
         return
 
     user_answer = normalize_answer(message.text)
     correct_raw = state["current"]["javob"]
-
-    # Har doim list qilib ishlash
     if isinstance(correct_raw, list):
         correct_list = [normalize_answer(j) for j in correct_raw]
     else:
@@ -147,7 +159,6 @@ async def check_answer(message: types.Message):
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
 
-        # --- Reyting ---
         top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
@@ -158,14 +169,14 @@ async def check_answer(message: types.Message):
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
 
-        # To‘g‘ri javob matnini chiqarish
-        javob_text = ", ".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
+        javob_text = (
+            "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
+        )
         await message.answer(
             f"🎯 To‘g‘ri javob: {javob_text}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
-
         await send_new_question(message.chat.id)
 
 # --- Kun g‘oliblarini aniqlash ---
@@ -177,14 +188,12 @@ async def congratulate_daily_winner_once():
     for chat_id, users in scores.items():
         if not users:
             continue
-
         winner_id, max_score = max(users.items(), key=lambda x: x[1])
         try:
             chat_info = await bot.get_chat(int(chat_id))
             chat_title = chat_info.title
         except:
             chat_title = "Nomaʼlum guruh"
-
         try:
             user = await bot.get_chat(int(winner_id))
             name = user.first_name
@@ -200,10 +209,7 @@ async def congratulate_daily_winner_once():
 🏆 Guruh: {chat_title}"""
 
         await bot.send_message(int(chat_id), congrat_msg)
-
-        # Winner count update
         winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
-
         new_scores[chat_id] = {}
 
     save_json(SCORE_FILE, new_scores)
@@ -212,6 +218,9 @@ async def congratulate_daily_winner_once():
 # --- /tabrik komandasi ---
 @dp.message_handler(commands=["tabrik"])
 async def manual_tabrik(message: types.Message):
+    if not await bot_is_admin(message.chat.id):
+        await message.answer("❌ Botni ishlatish uchun uni guruhda admin qiling.")
+        return
     if message.from_user.id != ADMIN_ID:
         return
     await congratulate_daily_winner_once()
@@ -220,14 +229,15 @@ async def manual_tabrik(message: types.Message):
 # --- /kun komandasi ---
 @dp.message_handler(commands=["kun"])
 async def show_top_winners(message: types.Message):
+    if not await bot_is_admin(message.chat.id):
+        await message.answer("❌ Botni ishlatish uchun uni guruhda admin qiling.")
+        return
     winner_count = load_json(WINNER_FILE)
     if not winner_count:
         await message.answer("❌ Hali hech kim Kun bilimdoni bo‘lmagan.")
         return
-
     sorted_winners = sorted(winner_count.items(), key=lambda x: x[1], reverse=True)[:20]
     text = "🏆 *Top 20 Kun Bilimdonlari:*\n\n"
-
     for idx, (user_id, count) in enumerate(sorted_winners, start=1):
         try:
             user = await bot.get_chat(int(user_id))
@@ -235,7 +245,6 @@ async def show_top_winners(message: types.Message):
         except:
             name = "👤 Nomaʼlum"
         text += f"{idx}. {name} — {count} marta\n"
-
     await message.answer(text, parse_mode="Markdown")
 
 # --- Scheduler 00:00 ---
