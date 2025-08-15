@@ -54,18 +54,6 @@ def normalize_answer(text):
         .strip()
     )
 
-# --- Adminlik tekshiruvi ---
-async def is_admin(chat_id: int, user_id: int) -> bool:
-    # Lichka chatida har doim True (adminlik shart emas)
-    if chat_id > 0:
-        return True
-    try:
-        member = await bot.get_chat_member(chat_id, user_id)
-        return member.is_chat_admin()
-    except Exception as e:
-        logging.error(f"Adminlikni tekshirishda xato: {e}")
-        return False
-
 # --- Yangi savol yuborish ---
 async def send_new_question(chat_id):
     questions = load_json(TESKARI_FILE)
@@ -83,24 +71,18 @@ async def send_new_question(chat_id):
     logging.info(f"Yangi savol yuborildi chat_id={chat_id}: {question['savol']}")
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
-# --- /boshla ---
+# --- /boshla (oddiy a’zolar ham ishlata oladi) ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
     logging.info(f"/boshla chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
-    # Guruhda adminlik tekshiruvi, lichkada ochiq
-    if message.chat.type != "private" and not await is_admin(message.chat.id, message.from_user.id):
-        await message.answer("❌ Faqat guruh adminlari botni ishlata oladi.")
-        logging.info(f"Foydalanuvchi admin emas: user_id={message.from_user.id}, chat_id={message.chat.id}")
-        return
     await send_new_question(message.chat.id)
 
 # --- /add ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
     logging.info(f"/add chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
-    if not await is_admin(message.chat.id, message.from_user.id):
+    if message.from_user.id not in RUXSAT_ETILGANLAR:
         await message.answer("❌ Sizda savol qo‘shish huquqi yo‘q.")
-        logging.info(f"Foydalanuvchi savol qo‘shishga ruxsat yo‘q: user_id={message.from_user.id}")
         return
     text = message.text[4:].strip()
     if "||" not in text:
@@ -121,7 +103,6 @@ async def add_question(message: types.Message):
 # --- /ball ---
 @dp.message_handler(commands=["ball"])
 async def show_score(message: types.Message):
-    logging.info(f"/ball chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     scores = load_json(SCORE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
@@ -138,12 +119,8 @@ async def check_answer(message: types.Message):
 
     if chat_id not in states:
         return
-
     state = states[chat_id]
-    if "current" not in state:
-        return
-
-    if state.get("answered_by") is not None:
+    if "current" not in state or state.get("answered_by") is not None:
         return
 
     user_answer = normalize_answer(message.text)
@@ -165,57 +142,47 @@ async def check_answer(message: types.Message):
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
 
-        # --- Reyting ---
+        # Reyting
         top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
             try:
                 user = await bot.get_chat(int(uid))
                 name = user.first_name
-            except Exception as e:
-                logging.error(f"Foydalanuvchini olishda xato: {e}")
+            except:
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} - {ball} ball\n"
 
-        javob_text = (
-            "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
-        )
-        logging.info(f"To‘g‘ri javob berildi: user_id={user_id}, chat_id={chat_id}, javob={javob_text}")
+        javob_text = "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
         await message.answer(
             f"🎯 To‘g‘ri javob: {javob_text}\n"
             f"🎉 {message.from_user.full_name} 1 ball oldi!\n\n"
             f"🏆 Guruhdagi eng yaxshi 10 ta foydalanuvchi:\n{reyting}"
         )
-
         await send_new_question(message.chat.id)
 
-# --- Kun g‘oliblarini aniqlash ---
-async def congratulate_daily_winner_once():
-    logging.info("Kun g‘oliblarini aniqlash boshlandi")
+# --- /tabrik (faqat shu guruh uchun) ---
+@dp.message_handler(commands=["tabrik"])
+async def manual_tabrik(message: types.Message):
+    chat_id = str(message.chat.id)
     scores = load_json(SCORE_FILE)
     winner_count = load_json(WINNER_FILE)
-    new_scores = {}
 
-    for chat_id, users in scores.items():
-        if not users:
-            continue
+    if chat_id not in scores or not scores[chat_id]:
+        await message.answer("❌ Bu guruhda hali hech kim ball olmagan.")
+        return
 
-        winner_id, max_score = max(users.items(), key=lambda x: x[1])
-        try:
-            chat_info = await bot.get_chat(int(chat_id))
-            chat_title = chat_info.title
-        except Exception as e:
-            logging.error(f"Guruh nomini olishda xato: {e}")
-            chat_title = "Nomaʼlum guruh"
+    winner_id, max_score = max(scores[chat_id].items(), key=lambda x: x[1])
+    try:
+        name = (await bot.get_chat(int(winner_id))).first_name
+    except:
+        name = "👤 Nomaʼlum"
+    try:
+        chat_title = (await bot.get_chat(int(chat_id))).title
+    except:
+        chat_title = "Nomaʼlum guruh"
 
-        try:
-            user = await bot.get_chat(int(winner_id))
-            name = user.first_name
-        except Exception as e:
-            logging.error(f"G‘olib foydalanuvchi ma'lumotini olishda xato: {e}")
-            name = "👤 Nomaʼlum"
-
-        congrat_msg = f"""🌟🌸 TABRIKLAYMIZ! 🌸🌟
+    congrat_msg = f"""🌟🌸 TABRIKLAYMIZ! 🌸🌟
 
 🥇 Bugungi kunning G‘OLIBI: {name}!
 🎉 1-o‘rinni egallaganingiz bilan chin dildan tabriklaymiz! 🎉
@@ -223,34 +190,18 @@ async def congratulate_daily_winner_once():
 💫 Siz kabi bilimdonlar bizning botimizning faxridir!
 🏆 Guruh: {chat_title}"""
 
-        await bot.send_message(int(chat_id), congrat_msg)
-        logging.info(f"Tabrik yuborildi: chat_id={chat_id}, g‘olib={name}({winner_id})")
+    await bot.send_message(int(chat_id), congrat_msg)
 
-        # Winner count update (kunlik g'oliblar sonini ko‘paytirish, nolga tushmaydi)
-        winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
-
-        # Kunlik ballarni 0 ga tushuramiz
-        new_scores[chat_id] = {}
-
-    save_json(SCORE_FILE, new_scores)
+    winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
+    scores[chat_id] = {}
+    save_json(SCORE_FILE, scores)
     save_json(WINNER_FILE, winner_count)
-    logging.info("Kun g‘oliblarini aniqlash yakunlandi")
 
-# --- /tabrik komandasi ---
-@dp.message_handler(commands=["tabrik"])
-async def manual_tabrik(message: types.Message):
-    logging.info(f"/tabrik chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
-    # Faqat admin
-    if message.from_user.id != ADMIN_ID:
-        logging.info(f"Admin emas: {message.from_user.id}")
-        return
-    await congratulate_daily_winner_once()
-    await message.answer("✅ Barcha guruhlarda tabrik yuborildi va ballar yangilandi.")
+    await message.answer("✅ Shu guruh uchun tabrik yuborildi va ballar yangilandi.")
 
 # --- /kun komandasi ---
 @dp.message_handler(commands=["kun"])
 async def show_top_winners(message: types.Message):
-    logging.info(f"/kun chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     winner_count = load_json(WINNER_FILE)
     if not winner_count:
         await message.answer("❌ Hali hech kim Kun bilimdoni bo‘lmagan.")
@@ -258,36 +209,19 @@ async def show_top_winners(message: types.Message):
 
     sorted_winners = sorted(winner_count.items(), key=lambda x: x[1], reverse=True)[:20]
     text = "🏆 *Top 20 Kun Bilimdonlari:*\n\n"
-
     for idx, (user_id, count) in enumerate(sorted_winners, start=1):
         try:
-            user = await bot.get_chat(int(user_id))
-            name = user.first_name
-        except Exception as e:
-            logging.error(f"Foydalanuvchi ma'lumotini olishda xato: {e}")
+            name = (await bot.get_chat(int(user_id))).first_name
+        except:
             name = "👤 Nomaʼlum"
         text += f"{idx}. {name} — {count} marta\n"
 
-    try:
-        await message.answer(text, parse_mode="Markdown")
-    except Exception as e:
-        logging.error(f"Xabar yuborishda xato: {e}")
-        await message.answer(text)
-
-# --- Scheduler 00:00 ---
-async def scheduler():
-    while True:
-        now = datetime.now()
-        target = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-        await asyncio.sleep((target - now).total_seconds())
-        logging.info("Scheduler ishga tushdi: kunlik g‘oliblarni tabriklash")
-        await congratulate_daily_winner_once()
+    await message.answer(text, parse_mode="Markdown")
 
 # --- Webhook sozlash ---
 @app.on_event("startup")
 async def on_startup():
     logging.info("Bot ishga tushmoqda...")
-    asyncio.create_task(scheduler())
     await bot.set_webhook(WEBHOOK_URL)
     logging.info(f"✅ Webhook o‘rnatildi: {WEBHOOK_URL}")
 
