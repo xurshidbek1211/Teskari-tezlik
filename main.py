@@ -54,10 +54,14 @@ def normalize_answer(text):
         .strip()
     )
 
-# --- Bot adminligini tekshirish ---
-async def check_bot_admin(chat_id: int) -> bool:
+# --- Bot adminligini tekshirish (faqat guruhda) ---
+async def check_bot_admin(message: types.Message) -> bool:
+    # Agar bu private chat bo'lsa, adminlik shart emas
+    if message.chat.type == "private":
+        return True  
+
     try:
-        bot_member = await bot.get_chat_member(chat_id, (await bot.get_me()).id)
+        bot_member = await bot.get_chat_member(message.chat.id, (await bot.get_me()).id)
         return bot_member.is_chat_admin()
     except Exception as e:
         logging.error(f"Bot adminligini tekshirishda xato: {e}")
@@ -80,19 +84,19 @@ async def send_new_question(chat_id):
     logging.info(f"Yangi savol yuborildi chat_id={chat_id}: {question['savol']}")
     await bot.send_message(chat_id, f"🔄 Toping: {question['savol']}")
 
-# --- /boshla (oddiy foydalanuvchi ham ishlata oladi, ammo bot admin bo‘lishi shart) ---
+# --- /boshla ---
 @dp.message_handler(commands=["boshla"])
 async def boshla(message: types.Message):
-    if not await check_bot_admin(message.chat.id):
+    if not await check_bot_admin(message):
         await message.answer("❌ Botni admin qiling, aks holda bu buyruq ishlamaydi.")
         return
     logging.info(f"/boshla chaqirildi: user_id={message.from_user.id}, chat_id={message.chat.id}")
     await send_new_question(message.chat.id)
 
-# --- /add (faqat ruxsat berilgan foydalanuvchi va bot admin bo‘lishi shart) ---
+# --- /add ---
 @dp.message_handler(commands=["add"])
 async def add_question(message: types.Message):
-    if not await check_bot_admin(message.chat.id):
+    if not await check_bot_admin(message):
         await message.answer("❌ Botni admin qiling, aks holda bu buyruq ishlamaydi.")
         return
     if message.from_user.id not in RUXSAT_ETILGANLAR:
@@ -119,7 +123,7 @@ async def add_question(message: types.Message):
 # --- /ball ---
 @dp.message_handler(commands=["ball"])
 async def show_score(message: types.Message):
-    if not await check_bot_admin(message.chat.id):
+    if not await check_bot_admin(message):
         await message.answer("❌ Botni admin qiling, aks holda bu buyruq ishlamaydi.")
         return
     scores = load_json(SCORE_FILE)
@@ -132,7 +136,7 @@ async def show_score(message: types.Message):
 # --- Javoblarni tekshirish ---
 @dp.message_handler()
 async def check_answer(message: types.Message):
-    if not await check_bot_admin(message.chat.id):
+    if not await check_bot_admin(message):
         return
 
     states = load_json(STATE_FILE)
@@ -185,7 +189,7 @@ async def check_answer(message: types.Message):
 # --- /tabrik ---
 @dp.message_handler(commands=["tabrik"])
 async def manual_tabrik(message: types.Message):
-    if not await check_bot_admin(message.chat.id):
+    if not await check_bot_admin(message):
         await message.answer("❌ Botni admin qiling, aks holda bu buyruq ishlamaydi.")
         return
 
@@ -224,10 +228,10 @@ async def manual_tabrik(message: types.Message):
 
     await message.answer("✅ Shu guruh uchun tabrik yuborildi va ballar yangilandi.")
 
-# --- /kun komandasi ---
+# --- /kun ---
 @dp.message_handler(commands=["kun"])
 async def show_top_winners(message: types.Message):
-    if not await check_bot_admin(message.chat.id):
+    if not await check_bot_admin(message):
         await message.answer("❌ Botni admin qiling, aks holda bu buyruq ishlamaydi.")
         return
 
