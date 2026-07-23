@@ -11,39 +11,42 @@ from aiogram.types import BotCommand, Update
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import pytz
 
+# ── Rasm o'yini moduli (rasm_router bu yerda eksport qilinadi) ────────────────
 import rasm_oyini
 
 # ---------- ENV ----------
 API_TOKEN = os.getenv("API_TOKEN")
 
-# Replit dev domenidan avtomatik URL olish
 def _base_url() -> str:
     url = os.getenv("RENDER_EXTERNAL_URL", "").strip().rstrip("/")
     if url:
         return url
     dev = os.getenv("REPLIT_DEV_DOMAIN", "").strip()
-    if dev:
-        return f"https://{dev}"
-    return ""
+    return f"https://{dev}" if dev else ""
 
 RENDER_EXTERNAL_URL = _base_url()
 WEBHOOK_PATH        = f"/webhook/{API_TOKEN}"
 WEBHOOK_URL         = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
 
-ADMIN_ID           = 1899194677
-RUXSAT_ETILGANLAR  = [ADMIN_ID]
+ADMIN_ID          = 1899194677
+RUXSAT_ETILGANLAR = [ADMIN_ID]
 
 # ---------- BOT & DISPATCHER ----------
 bot = Bot(token=API_TOKEN)
 dp  = Dispatcher()
-router = Router()
-dp.include_router(router)
+
+# ⚠️  TARTIB MUHIM: rasm_router (Command filtrlari) OLDIN,
+#     keyin main router (catch-all) ulanishi kerak.
+#     Aks holda catch-all /rasm ni ushlaydi.
+dp.include_router(rasm_oyini.rasm_router)   # 1-o'rinda — Command("rasm") + callbacklar
+
+main_router = Router()                       # 2-o'rinda — /start, /boshla, /add + catch-all
+dp.include_router(main_router)
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
@@ -86,7 +89,7 @@ async def check_bot_admin(message: types.Message, bot: Bot) -> bool:
     if message.chat.type == "private":
         return True
     try:
-        me = await bot.get_me()
+        me     = await bot.get_me()
         member = await bot.get_chat_member(message.chat.id, me.id)
         return member.status in ("administrator", "creator")
     except Exception:
@@ -118,13 +121,15 @@ async def send_new_question(chat_id: int, bot: Bot):
     await bot.send_message(chat_id, f"🔄 Toping:\n{question['savol']}")
 
 # ---------- /start ----------
-@router.message(Command("start"))
+@main_router.message(Command("start"))
 async def start_cmd(message: types.Message):
     await message.answer(
         "👋 Salom! Men <b>Teskari Tezlik</b> botiman.\n\n"
         "📋 <b>Mavjud komandalar:</b>\n"
         "/boshla — Teskari tezlik o'yinini boshlash\n"
         "/rasm — 🎨 Rasm chizish o'yinini boshlash\n"
+        "/ball — Ballaringizni ko'rish\n"
+        "/reyting — Reyting ro'yxati\n"
         "/add — Yangi savol qo'shish (admin)\n\n"
         "🎮 <b>Qanday o'ynash:</b>\n"
         "• <b>Teskari tezlik:</b> Teskari yozilgan so'zni toping!\n"
@@ -133,7 +138,7 @@ async def start_cmd(message: types.Message):
     )
 
 # ---------- /boshla ----------
-@router.message(Command("boshla"))
+@main_router.message(Command("boshla"))
 async def boshla(message: types.Message, bot: Bot):
     if not await check_bot_admin(message, bot):
         await message.answer("❌ Botni admin qiling.")
@@ -141,7 +146,7 @@ async def boshla(message: types.Message, bot: Bot):
     await send_new_question(message.chat.id, bot)
 
 # ---------- /add ----------
-@router.message(Command("add"))
+@main_router.message(Command("add"))
 async def add_question_cmd(message: types.Message):
     if message.from_user.id not in RUXSAT_ETILGANLAR:
         await message.answer("❌ Sizda huquq yo'q.")
@@ -161,10 +166,16 @@ async def add_question_cmd(message: types.Message):
     save_json(TESKARI_FILE, questions)
     await message.answer("✅ Savol qo'shildi")
 
-# ---------- UMUMIY XABAR HANDLER ----------
-@router.message()
+# ---------- UMUMIY XABAR HANDLER (CATCH-ALL) ----------
+# F.text filtri: faqat matn xabarlar (media, sticker emas)
+# Command xabarlar (/rasm, /boshla va h.k.) bu yerga TUSHMAYDI —
+# chunki rasm_router va main_router'dagi Command handlerlari oldinroq ishlaydi.
+@main_router.message(F.text)
 async def check_answer(message: types.Message, bot: Bot):
-    if not message.text:
+    txt = message.text or ""
+
+    # Qo'shimcha himoya: agar slash bilan boshlansa va noma'lum komanda bo'lsa — o'tkazib yubor
+    if txt.startswith("/"):
         return
 
     # 1) Shaxsiy chatda custom so'z kiritish (rasm o'yini)
@@ -194,7 +205,7 @@ async def check_answer(message: types.Message, bot: Bot):
     if state.get("answered_by"):
         return
 
-    user_answer = normalize_answer(message.text)
+    user_answer = normalize_answer(txt)
     correct_raw = state["current"]["javob"]
 
     correct_list = (
@@ -267,19 +278,26 @@ async def daily_reset():
 # ---------- STARTUP ----------
 @app.on_event("startup")
 async def startup():
-    # Rasm o'yini modulini sozlash
-    rasm_oyini.setup(bot=bot, app=app, dp=dp)
+    # rasm_oyini ga bot havolasini berish va FastAPI routelarini qo'shish
+    rasm_oyini.setup_fastapi(bot=bot, app=app)
 
-    # Bot komandalarini o'rnatish
+    # Bot "/" menyusida ko'rinadigan komandalar
     await bot.set_my_commands([
-        BotCommand(command="boshla", description="Teskari tezlik o'yinini boshlash"),
-        BotCommand(command="rasm",   description="🎨 Rasm chizish o'yinini boshlash"),
-        BotCommand(command="add",    description="Yangi savol qo'shish (admin)"),
-        BotCommand(command="start",  description="Botni ishga tushirish / komandalar"),
+        BotCommand(command="boshla",    description="Teskari tezlik o'yinini boshlash"),
+        BotCommand(command="rasm",      description="🎨 Rasm chizish o'yinini boshlash"),
+        BotCommand(command="ball",      description="Ballaringizni ko'rish"),
+        BotCommand(command="reyting",   description="Reyting ro'yxati"),
+        BotCommand(command="tabrik",    description="Tabriknoma"),
+        BotCommand(command="kun",       description="Kun bilimdoni"),
+        BotCommand(command="adminadd",  description="Admin qo'shish"),
+        BotCommand(command="add",       description="Yangi savol qo'shish (admin)"),
+        BotCommand(command="start",     description="Botni ishga tushirish"),
     ])
+    # /on, /off, /ruxsat — foydalanuvchi menyusida ko'rsatilmaydi (qo'shilmadi)
 
     # Webhook
     await bot.set_webhook(WEBHOOK_URL)
+    logging.info(f"Webhook set: {WEBHOOK_URL}")
 
     # Kunlik scheduler
     scheduler = AsyncIOScheduler(timezone=pytz.timezone("Asia/Tashkent"))
@@ -297,4 +315,4 @@ async def webhook(request: Request):
 # ---------- ROOT ----------
 @app.get("/")
 async def root():
-    return {"status": "Bot ishlayapti ✅", "commands": ["/boshla", "/rasm", "/add"]}
+    return {"status": "Bot ishlayapti ✅", "commands": ["/boshla", "/rasm", "/ball", "/reyting"]}

@@ -580,16 +580,15 @@ async def _serve_draw(request):
     return FileResponse("static/draw.html")
 
 # ─── SETUP ────────────────────────────────────────────────────────────────────
-def setup(bot: Bot, app, dp: Dispatcher):
+def setup_fastapi(bot: Bot, app):
     """
     main.py startup() ichidan chaqiriladi.
-    Routerni va FastAPI endpointlarini ro'yxatdan o'tkazadi.
+    Faqat bot havolasini saqlaydi va FastAPI endpointlarini qo'shadi.
+    rasm_router ni dp ga ULASH main.py da modul darajasida qilinadi —
+    shu tarzda catch-all handlerdan OLDIN ro'yxatdan o'tadi.
     """
     global _bot
     _bot = bot
-
-    # Aiogram router
-    dp.include_router(rasm_router)
 
     # FastAPI endpointlar
     app.add_route("/api/draw/word",     _api_draw_word,     methods=["GET"])
@@ -597,6 +596,10 @@ def setup(bot: Bot, app, dp: Dispatcher):
     app.add_route("/api/draw/submit",   _api_draw_submit,   methods=["POST"])
     app.add_route("/draw",              _serve_draw,        methods=["GET"])
 
-    # Static papka
     pathlib.Path("static").mkdir(exist_ok=True)
-    log.info("✅ rasm_oyini moduli sozlandi")
+    log.info("✅ rasm_oyini FastAPI endpointlari sozlandi")
+
+
+# Eskiga muvofiqlash uchun (agar boshqa joyda ishlatilsa)
+def setup(bot: Bot, app, dp: Dispatcher):
+    setup_fastapi(bot=bot, app=app)
