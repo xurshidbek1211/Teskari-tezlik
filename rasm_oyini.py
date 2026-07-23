@@ -129,8 +129,15 @@ def _user_id_from_init_data(init_data: str) -> str | None:
         return None
 
 # ─── INLINE KLAVIATURALAR ────────────────────────────────────────────────────
+def _base_url() -> str:
+    url = os.getenv("RENDER_EXTERNAL_URL", "").strip().rstrip("/")
+    if url:
+        return url
+    dev = os.getenv("REPLIT_DEV_DOMAIN", "").strip()
+    return f"https://{dev}" if dev else ""
+
 def _start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
-    base_url = os.getenv("RENDER_EXTERNAL_URL", "").rstrip("/")
+    base_url = _base_url()
     draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎨 Chizishni boshlash",
@@ -142,7 +149,7 @@ def _start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     ])
 
 def _result_keyboard(chat_id: int, message_id: int, drawer_id, session_id: str) -> InlineKeyboardMarkup:
-    base_url = os.getenv("RENDER_EXTERNAL_URL", "").rstrip("/")
+    base_url = _base_url()
     draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
     return InlineKeyboardMarkup(inline_keyboard=[
         [

@@ -20,8 +20,19 @@ import pytz
 import rasm_oyini
 
 # ---------- ENV ----------
-API_TOKEN           = os.getenv("API_TOKEN")
-RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").rstrip("/")
+API_TOKEN = os.getenv("API_TOKEN")
+
+# Replit dev domenidan avtomatik URL olish
+def _base_url() -> str:
+    url = os.getenv("RENDER_EXTERNAL_URL", "").strip().rstrip("/")
+    if url:
+        return url
+    dev = os.getenv("REPLIT_DEV_DOMAIN", "").strip()
+    if dev:
+        return f"https://{dev}"
+    return ""
+
+RENDER_EXTERNAL_URL = _base_url()
 WEBHOOK_PATH        = f"/webhook/{API_TOKEN}"
 WEBHOOK_URL         = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
 
