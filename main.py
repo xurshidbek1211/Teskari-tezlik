@@ -2,42 +2,50 @@ import logging
 import os
 import json
 import random
+import pathlib
 from datetime import datetime
 
-from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram import Bot, Dispatcher, Router, types, F
+from aiogram.filters import Command
+from aiogram.types import BotCommand, Update
 
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import pytz
 
+import rasm_oyini
+
 # ---------- ENV ----------
-API_TOKEN = os.getenv("API_TOKEN")
-RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
+API_TOKEN           = os.getenv("API_TOKEN")
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "").rstrip("/")
+WEBHOOK_PATH        = f"/webhook/{API_TOKEN}"
+WEBHOOK_URL         = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
 
-WEBHOOK_PATH = f"/webhook/{API_TOKEN}"
-WEBHOOK_URL = f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}"
+ADMIN_ID           = 1899194677
+RUXSAT_ETILGANLAR  = [ADMIN_ID]
 
-ADMIN_ID = 1899194677
-RUXSAT_ETILGANLAR = [ADMIN_ID]
-
-# ---------- BOT ----------
+# ---------- BOT & DISPATCHER ----------
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot, storage=MemoryStorage())
-
-Bot.set_current(bot)
-Dispatcher.set_current(dp)
+dp  = Dispatcher()
+router = Router()
+dp.include_router(router)
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 
+# ---------- STATIC ----------
+pathlib.Path("static").mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # ---------- FILES ----------
 TESKARI_FILE = "teskari_tezlik_savollar.json"
-SCORE_FILE = "user_scores.json"
-STATE_FILE = "user_states.json"
-WINNER_FILE = "winner_count.json"
+SCORE_FILE   = "user_scores.json"
+STATE_FILE   = "user_states.json"
+WINNER_FILE  = "winner_count.json"
 
 # ---------- JSON ----------
 def load_json(filename):
@@ -57,85 +65,114 @@ def normalize_answer(text):
         .replace("ʼ", "'")
         .replace("`", "'")
         .replace("´", "'")
-        .replace("‘", "'")
-        .replace("’", "'")
+        .replace("\u2018", "'")
+        .replace("\u2019", "'")
         .strip()
     )
 
 # ---------- ADMIN CHECK ----------
-async def check_bot_admin(message: types.Message):
+async def check_bot_admin(message: types.Message, bot: Bot) -> bool:
     if message.chat.type == "private":
         return True
-
     try:
-        bot_member = await bot.get_chat_member(message.chat.id, (await bot.get_me()).id)
-        return bot_member.is_chat_admin()
-    except:
+        me = await bot.get_me()
+        member = await bot.get_chat_member(message.chat.id, me.id)
+        return member.status in ("administrator", "creator")
+    except Exception:
         return False
 
 # ---------- SEND QUESTION ----------
-async def send_new_question(chat_id):
+async def send_new_question(chat_id: int, bot: Bot):
     questions = load_json(TESKARI_FILE)
-    states = load_json(STATE_FILE)
+    states    = load_json(STATE_FILE)
 
-    used = states.get(str(chat_id), {}).get("used", [])
+    used      = states.get(str(chat_id), {}).get("used", [])
     available = [q for q in questions if q["savol"] not in used]
 
     if not available:
-        used = []
+        used      = []
         available = questions
 
     question = random.choice(available)
     used.append(question["savol"])
 
     states[str(chat_id)] = {
-        "current": question,
+        "current":     question,
         "answered_by": None,
-        "chat_id": chat_id,
-        "start_time": datetime.now().timestamp(),
-        "used": used
+        "chat_id":     chat_id,
+        "start_time":  datetime.now().timestamp(),
+        "used":        used,
     }
-
     save_json(STATE_FILE, states)
-
     await bot.send_message(chat_id, f"🔄 Toping:\n{question['savol']}")
 
+# ---------- /start ----------
+@router.message(Command("start"))
+async def start_cmd(message: types.Message):
+    await message.answer(
+        "👋 Salom! Men <b>Teskari Tezlik</b> botiman.\n\n"
+        "📋 <b>Mavjud komandalar:</b>\n"
+        "/boshla — Teskari tezlik o'yinini boshlash\n"
+        "/rasm — 🎨 Rasm chizish o'yinini boshlash\n"
+        "/add — Yangi savol qo'shish (admin)\n\n"
+        "🎮 <b>Qanday o'ynash:</b>\n"
+        "• <b>Teskari tezlik:</b> Teskari yozilgan so'zni toping!\n"
+        "• <b>Rasm o'yini:</b> So'zni rasm chizib ko'rsating, boshqalar topsun!",
+        parse_mode="HTML",
+    )
+
 # ---------- /boshla ----------
-@dp.message_handler(commands=["boshla"])
-async def boshla(message: types.Message):
-    if not await check_bot_admin(message):
+@router.message(Command("boshla"))
+async def boshla(message: types.Message, bot: Bot):
+    if not await check_bot_admin(message, bot):
         await message.answer("❌ Botni admin qiling.")
         return
-    await send_new_question(message.chat.id)
+    await send_new_question(message.chat.id, bot)
 
 # ---------- /add ----------
-@dp.message_handler(commands=["add"])
-async def add_question(message: types.Message):
+@router.message(Command("add"))
+async def add_question_cmd(message: types.Message):
     if message.from_user.id not in RUXSAT_ETILGANLAR:
-        await message.answer("❌ Sizda huquq yo‘q.")
+        await message.answer("❌ Sizda huquq yo'q.")
         return
 
-    text = message.text[4:].strip()
+    text = (message.text or "")[4:].strip()
     if "||" not in text:
         await message.answer("Format: /add savol || javob")
         return
 
     savol, javob = map(str.strip, text.split("||", 1))
-    questions = load_json(TESKARI_FILE)
+    questions    = load_json(TESKARI_FILE)
     if not isinstance(questions, list):
         questions = []
 
     questions.append({"savol": savol, "javob": javob})
     save_json(TESKARI_FILE, questions)
-    await message.answer("✅ Savol qo‘shildi")
+    await message.answer("✅ Savol qo'shildi")
 
-# ---------- ANSWER CHECK ----------
-@dp.message_handler()
-async def check_answer(message: types.Message):
-    if not await check_bot_admin(message):
+# ---------- UMUMIY XABAR HANDLER ----------
+@router.message()
+async def check_answer(message: types.Message, bot: Bot):
+    if not message.text:
         return
 
-    states = load_json(STATE_FILE)
+    # 1) Shaxsiy chatda custom so'z kiritish (rasm o'yini)
+    if message.chat.type == "private":
+        handled = await rasm_oyini.handle_private_custom_word(message)
+        if handled:
+            return
+
+    # 2) Rasm o'yini javob tekshiruvi (guruhda)
+    if message.chat.type != "private":
+        draw_correct = await rasm_oyini.check_drawing_answer(message, bot)
+        if draw_correct:
+            return
+
+    # 3) Teskari tezlik javob tekshiruvi
+    if not await check_bot_admin(message, bot):
+        return
+
+    states  = load_json(STATE_FILE)
     chat_id = str(message.chat.id)
     user_id = str(message.from_user.id)
 
@@ -143,23 +180,22 @@ async def check_answer(message: types.Message):
         return
 
     state = states[chat_id]
-
     if state.get("answered_by"):
         return
 
     user_answer = normalize_answer(message.text)
     correct_raw = state["current"]["javob"]
 
-    # List yoki string bilan ishlash
-    if isinstance(correct_raw, list):
-        correct_list = [normalize_answer(j) for j in correct_raw]
-    else:
-        correct_list = [normalize_answer(correct_raw)]
+    correct_list = (
+        [normalize_answer(j) for j in correct_raw]
+        if isinstance(correct_raw, list)
+        else [normalize_answer(correct_raw)]
+    )
 
     if user_answer in correct_list:
-        seconds = int(datetime.now().timestamp() - state["start_time"])
+        seconds              = int(datetime.now().timestamp() - state["start_time"])
         state["answered_by"] = user_id
-        states[chat_id] = state
+        states[chat_id]      = state
         save_json(STATE_FILE, states)
 
         scores = load_json(SCORE_FILE)
@@ -168,30 +204,29 @@ async def check_answer(message: types.Message):
         scores[chat_id][user_id] = scores[chat_id].get(user_id, 0) + 1
         save_json(SCORE_FILE, scores)
 
-        top = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
+        top     = sorted(scores[chat_id].items(), key=lambda x: x[1], reverse=True)[:10]
         reyting = ""
         for i, (uid, ball) in enumerate(top):
             try:
                 member = await bot.get_chat_member(message.chat.id, int(uid))
-                name = member.user.first_name
-            except:
+                name   = member.user.first_name
+            except Exception:
                 name = "👤 Nomaʼlum"
             reyting += f"{i+1}. {name} — {ball}\n"
 
         javob_text = "\n".join(correct_raw) if isinstance(correct_raw, list) else correct_raw
 
         await message.answer(
-            f"🎯 To‘g‘ri javob: {javob_text}\n"
+            f"🎯 To'g'ri javob: {javob_text}\n"
             f"⚡ {message.from_user.full_name} {seconds} soniyada topdi\n"
-            f"🎉 1 ball qo‘shildi!\n\n"
+            f"🎉 1 ball qo'shildi!\n\n"
             f"🏆 Reyting (top 10):\n{reyting}"
         )
-
-        await send_new_question(message.chat.id)
+        await send_new_question(message.chat.id, bot)
 
 # ---------- DAILY WINNER ----------
 async def daily_reset():
-    scores = load_json(SCORE_FILE)
+    scores       = load_json(SCORE_FILE)
     winner_count = load_json(WINNER_FILE)
 
     for chat_id, users in scores.items():
@@ -199,20 +234,19 @@ async def daily_reset():
             continue
         winner_id, max_score = max(users.items(), key=lambda x: x[1])
         try:
-            name = (await bot.get_chat_member(int(chat_id), int(winner_id))).user.first_name
-        except:
+            member = await bot.get_chat_member(int(chat_id), int(winner_id))
+            name   = member.user.first_name
+        except Exception:
             name = "👤 Nomaʼlum"
 
-        msg = f"""
-🌙━━━━━━━━━━━━━━━━🌙
-      🏆 KUN BILIMDONI 🏆
-🌙━━━━━━━━━━━━━━━━🌙
-
-🥇 G‘olib: {name}
-📊 Ball: {max_score}
-
-🎉 Tabriklaymiz!
-"""
+        msg = (
+            "\n🌙━━━━━━━━━━━━━━━━🌙\n"
+            "      🏆 KUN BILIMDONI 🏆\n"
+            "🌙━━━━━━━━━━━━━━━━🌙\n\n"
+            f"🥇 G'olib: {name}\n"
+            f"📊 Ball: {max_score}\n\n"
+            "🎉 Tabriklaymiz!\n"
+        )
         await bot.send_message(int(chat_id), msg)
         winner_count[str(winner_id)] = winner_count.get(str(winner_id), 0) + 1
 
@@ -222,10 +256,18 @@ async def daily_reset():
 # ---------- STARTUP ----------
 @app.on_event("startup")
 async def startup():
-    Bot.set_current(bot)
-    Dispatcher.set_current(dp)
+    # Rasm o'yini modulini sozlash
+    rasm_oyini.setup(bot=bot, app=app, dp=dp)
 
-    # Webhook o‘rnatish
+    # Bot komandalarini o'rnatish
+    await bot.set_my_commands([
+        BotCommand(command="boshla", description="Teskari tezlik o'yinini boshlash"),
+        BotCommand(command="rasm",   description="🎨 Rasm chizish o'yinini boshlash"),
+        BotCommand(command="add",    description="Yangi savol qo'shish (admin)"),
+        BotCommand(command="start",  description="Botni ishga tushirish / komandalar"),
+    ])
+
+    # Webhook
     await bot.set_webhook(WEBHOOK_URL)
 
     # Kunlik scheduler
@@ -236,14 +278,12 @@ async def startup():
 # ---------- WEBHOOK ----------
 @app.post(WEBHOOK_PATH)
 async def webhook(request: Request):
-    Bot.set_current(bot)
-    Dispatcher.set_current(dp)
-    data = await request.json()
-    update = types.Update(**data)
-    await dp.process_update(update)
+    data   = await request.json()
+    update = Update.model_validate(data)
+    await dp.feed_update(bot=bot, update=update)
     return {"ok": True}
 
 # ---------- ROOT ----------
 @app.get("/")
 async def root():
-    return {"status": "Bot ishlayapti ✅"}
+    return {"status": "Bot ishlayapti ✅", "commands": ["/boshla", "/rasm", "/add"]}
