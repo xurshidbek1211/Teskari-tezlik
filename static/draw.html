@@ -338,9 +338,22 @@ body {
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
-const params    = new URLSearchParams(location.search);
-const SESSION   = params.get('session')  || '';
-const CHAT_ID   = params.get('chat_id') || '';
+const params = new URLSearchParams(location.search);
+
+// Mini App t.me/bot/draw?startapp=SESSION__CHATID orqali ochilganda
+// start_param "SESSION__CHATID" ko'rinishida keladi
+let SESSION  = params.get('session')  || '';
+let CHAT_ID  = params.get('chat_id') || '';
+
+if ((!SESSION || !CHAT_ID) && tg) {
+  const sp = tg.initDataUnsafe?.start_param || '';
+  if (sp.includes('__')) {
+    const idx  = sp.indexOf('__');
+    SESSION  = sp.slice(0, idx);
+    CHAT_ID  = sp.slice(idx + 2);
+  }
+}
+
 const INIT_DATA = tg ? tg.initData : '';
 
 // ─── CANVAS SETUP ────────────────────────────────────────────────────────

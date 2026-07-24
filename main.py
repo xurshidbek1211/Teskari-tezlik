@@ -279,7 +279,7 @@ async def daily_reset():
 @app.on_event("startup")
 async def startup():
     # rasm_oyini ga bot havolasini berish va FastAPI routelarini qo'shish
-    rasm_oyini.setup_fastapi(bot=bot, app=app)
+    await rasm_oyini.setup_fastapi(bot=bot, app=app)
 
     # Bot "/" menyusida ko'rinadigan komandalar
     await bot.set_my_commands([

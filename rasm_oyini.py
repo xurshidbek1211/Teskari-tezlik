@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 
 # ── Modul darajasida bot havolasi (setup() tomonidan o'rnatiladi) ─────────────
 _bot: Bot | None = None
+_bot_username: str | None = None   # startup'da to'ldiriladi
 
 # ─── FAYLLAR ──────────────────────────────────────────────────────────────────
 WORDS_FILE       = "rasm_sozlar.json"
@@ -401,14 +402,11 @@ async def cb_draw_start(query: types.CallbackQuery, bot: Bot):
     state["status"] = "waiting"
     _set_state(chat_id, state)
 
-    # Guruh xabarini yangilash — WebApp tugmasi to'g'ridan guruhda
-    base_url = _base_url()
-    draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
-
+    # Guruh xabarini yangilash — callback orqali Mini App ochadigan tugma
     group_kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text    = "🎨 Chizishni boshlash",
-            web_app = WebAppInfo(url=draw_url),
+            text          = "🎨 Chizishni boshlash",
+            callback_data = f"draw_open:{chat_id}:{session_id}",
         )],
         [InlineKeyboardButton(
             text          = "❌ Chizishni rad etish",
@@ -435,6 +433,43 @@ async def cb_draw_start(query: types.CallbackQuery, bot: Bot):
             log.warning("edit group msg error: %s", e)
 
     await query.answer("✅ Boshlang!")
+
+# ─── 🎨 MINI APP OCHISH (guruhdan) ───────────────────────────────────────────
+@rasm_router.callback_query(F.data.startswith("draw_open:"))
+async def cb_draw_open_app(query: types.CallbackQuery):
+    """
+    Guruh xabarida "🎨 Chizishni boshlash" bosilganda chaqiriladi.
+    query.answer(url=...) orqali Telegram ichida Mini App ochiladi.
+    """
+    parts      = query.data.split(":")
+    chat_id    = int(parts[1])
+    session_id = parts[2]
+
+    state = _get_state(chat_id)
+    if not state or state.get("session_id") != session_id:
+        await query.answer("❌ O'yin sessiyasi topilmadi.", show_alert=True)
+        return
+    if state.get("status") not in ("waiting",):
+        await query.answer("❌ O'yin boshlash uchun avval so'z tanlang.", show_alert=True)
+        return
+    if str(query.from_user.id) != state.get("drawer_id"):
+        await query.answer("❌ Faqat chizuvchi boshlaydi.", show_alert=True)
+        return
+
+    bot_username  = _bot_username or ""
+    app_shortname = os.getenv("BOT_APP_SHORTNAME", "draw")
+
+    if not bot_username:
+        await query.answer("⚠️ Bot username sozlanmagan.", show_alert=True)
+        return
+
+    # start_param: faqat [A-Za-z0-9_-], max 64 belgi
+    # UUID (36) + "__" (2) + chat_id (maks 14) = maks 52 belgi ✓
+    start_param  = f"{session_id}__{chat_id}"
+    mini_app_url = f"https://t.me/{bot_username}/{app_shortname}?startapp={start_param}"
+
+    # url= bilan javob berish — Telegram Mini App'ni ichida ochadi
+    await query.answer(url=mini_app_url)
 
 # ─── 👍 LAYK ──────────────────────────────────────────────────────────────────
 @rasm_router.callback_query(F.data.startswith("draw_like:"))
@@ -697,15 +732,13 @@ async def handle_private_custom_word(message: types.Message) -> bool:
     chat_id_int = int(found_chat)
     _set_state(chat_id_int, state)
 
-    # Guruh xabarini yangilash — WebApp tugmasi to'g'ridan guruhda
+    # Guruh xabarini yangilash — callback orqali Mini App ochadigan tugma
     session_id = state.get("session_id")
-    base_url   = _base_url()
-    draw_url   = f"{base_url}/draw?session={session_id}&chat_id={found_chat}"
 
     group_kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text    = "🎨 Chizishni boshlash",
-            web_app = WebAppInfo(url=draw_url),
+            text          = "🎨 Chizishni boshlash",
+            callback_data = f"draw_open:{chat_id_int}:{session_id}",
         )],
         [InlineKeyboardButton(
             text          = "❌ Chizishni rad etish",
@@ -856,12 +889,20 @@ async def _serve_draw(request):
     return FileResponse("static/draw.html")
 
 # ─── SETUP ────────────────────────────────────────────────────────────────────
-def setup_fastapi(bot: Bot, app):
+async def setup_fastapi(bot: Bot, app):
     """
-    main.py startup() ichidan chaqiriladi.
+    main.py startup() ichidan chaqiriladi (async).
     """
-    global _bot
+    global _bot, _bot_username
     _bot = bot
+
+    # Bot username — Mini App URL uchun kerak
+    try:
+        me = await bot.get_me()
+        _bot_username = me.username
+        log.info("✅ Bot username: @%s", _bot_username)
+    except Exception as e:
+        log.warning("Bot username olinmadi: %s", e)
 
     app.add_route("/api/draw/word",   _api_draw_word,   methods=["GET"])
     app.add_route("/api/draw/submit", _api_draw_submit, methods=["POST"])
@@ -871,5 +912,5 @@ def setup_fastapi(bot: Bot, app):
     log.info("✅ rasm_oyini FastAPI endpointlari sozlandi")
 
 # Eskiga muvofiqlash uchun
-def setup(bot: Bot, app, dp: Dispatcher):
-    setup_fastapi(bot=bot, app=app)
+async def setup(bot: Bot, app, dp: Dispatcher):
+    await setup_fastapi(bot=bot, app=app)
