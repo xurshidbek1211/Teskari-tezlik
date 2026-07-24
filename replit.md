@@ -1,44 +1,49 @@
-# [Project name]
+# Teskari Tezlik — Telegram Bot
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Telegram guruh o'yinlari boti. Ikki o'yin rejimi mavjud: Teskari Tezlik va Rasm Chizish O'yini.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `uvicorn main:app --host 0.0.0.0 --port 5000` — botni ishga tushirish
+- Required env: `API_TOKEN` — BotFather dan olingan Telegram bot tokeni
+- Required env: `RENDER_EXTERNAL_URL` — Webhook URL manzili
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- **Python 3.12** + **aiogram 3.x** (Telegram bot framework)
+- **FastAPI** + **uvicorn** (webhook server + Mini App)
+- **APScheduler** (kunlik g'olib e'loni)
+- **JSON fayllar** (ma'lumotlar saqlash)
 
-## Where things live
+## Loyiha haqida
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+### 1. 🔄 Teskari Tezlik
+- `/boshla` — teskari yozilgan so'zni toping
+- `/add savol || javob` — yangi savol qo'shish (admin)
 
-## Architecture decisions
+### 2. 🎨 Rasm Chizish O'yini
+- `/rasm` — Paint-ga o'xshash veb-interfeysda so'z chiziladi, boshqalar topadi
+- Mini App (WebApp) orqali ishlanadi
+- Layk tizimi: `+1⭐` chizuvchiga
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+## Fayl tuzilmasi
 
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+```
+main.py                        — asosiy bot va FastAPI server
+rasm_oyini.py                  — rasm chizish o'yini moduli
+static/draw.html               — rasm chizish Mini App (WebApp)
+rasm_sozlar.json               — rasm o'yini so'zlar bazasi
+teskari_tezlik_savollar.json   — teskari tezlik savollari
+user_scores.json               — teskari tezlik ballari
+render.yaml                    — Render deploy konfiguratsiyasi
+requirements.txt               — Python paketlari
+```
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Bot kodi Uzbek tilida, o'zgaruvchi nomlar va mantiq Uzbek dasturlash uslubida
+- Mavjud JSON fayl tizimidan foydalanish (SQL DB ga o'tkazmaslik)
+- Modular arxitektura: har bir o'yin alohida `.py` faylda
 
 ## Pointers
 
