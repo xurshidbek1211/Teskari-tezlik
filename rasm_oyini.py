@@ -235,11 +235,7 @@ async def cmd_rasm(message: types.Message, bot: Bot):
     sent = await message.answer(
         f"🎨 <b>Rasm chizish o'yini!</b>\n\n"
         f"🖊️ <b>Chizuvchi:</b> {user.full_name}\n\n"
-        f"📝 <b>So'z tanlang:</b>\n"
-        f"• ◀️ <b>Oldingi</b> / ▶️ <b>Keyingi</b> — boshqa so'z ko'rish\n"
-        f"• 👀 <b>Ko'rish</b> — hozirgi so'zni ko'rish\n"
-        f"• ✅ — so'zni tanlab, chizishni boshlash\n\n"
-        f"<i>So'z faqat sizga ko'rinadi!</i>",
+        f"📝 <b>So'z tanlang:</b>",
         reply_markup=kb,
         parse_mode="HTML",
     )
@@ -405,50 +401,40 @@ async def cb_draw_start(query: types.CallbackQuery, bot: Bot):
     state["status"] = "waiting"
     _set_state(chat_id, state)
 
-    # Guruh xabarini yangilash
+    # Guruh xabarini yangilash — WebApp tugmasi to'g'ridan guruhda
+    base_url = _base_url()
+    draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
+
+    group_kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text    = "🎨 Chizishni boshlash",
+            web_app = WebAppInfo(url=draw_url),
+        )],
+        [InlineKeyboardButton(
+            text          = "❌ Chizishni rad etish",
+            callback_data = f"draw_decline:{chat_id}:{session_id}",
+        )],
+    ])
+
     game_msg_id = state.get("game_message_id")
     if game_msg_id:
         try:
             await bot.edit_message_text(
-                chat_id    = chat_id,
-                message_id = game_msg_id,
-                text       = (
+                chat_id      = chat_id,
+                message_id   = game_msg_id,
+                text         = (
                     f"🎨 <b>Rasm chizish o'yini!</b>\n\n"
                     f"🖊️ <b>Chizuvchi:</b> {state['drawer_name']}\n\n"
                     f"⏳ <b>Chizuvchi rasm chizmoqda...</b>\n"
                     f"Rasm yuborilgandan so'ng so'zni topishga harakat qiling! 🤔"
                 ),
-                reply_markup = _waiting_keyboard(chat_id),
+                reply_markup = group_kb,
                 parse_mode   = "HTML",
             )
         except Exception as e:
             log.warning("edit group msg error: %s", e)
 
-    # Shaxsiy chatga WebApp tugmasi yuborish
-    base_url = _base_url()
-    draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
-
-    private_kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text    = "🎨 Chizishni boshlash",
-            web_app = WebAppInfo(url=draw_url),
-        )]
-    ])
-
-    try:
-        await bot.send_message(
-            query.from_user.id,
-            f"✅ <b>So'zingiz:</b> {word}\n\n"
-            f"Quyidagi tugmani bosib Telegram ichida rasm chizing:",
-            reply_markup = private_kb,
-            parse_mode   = "HTML",
-        )
-        await query.answer("✅ Shaxsiy chatga xabar yubordik!")
-    except Exception:
-        await query.answer(
-            "⚠️ Avval botga /start yuboring, so'ng qaytadan urinib ko'ring.",
-            show_alert=True,
-        )
+    await query.answer("✅ Boshlang!")
 
 # ─── 👍 LAYK ──────────────────────────────────────────────────────────────────
 @rasm_router.callback_query(F.data.startswith("draw_like:"))
@@ -664,9 +650,7 @@ async def check_drawing_answer(message: types.Message, bot: Bot) -> bool:
         f"🎯 <b>To'g'ri javob!</b>\n\n"
         f"🖼️ So'z: <b>{word}</b>\n"
         f"🏆 Topdi: <b>{user.full_name}</b>\n"
-        f"🎨 Chizgan: <b>{drawer_name}</b>\n\n"
-        f"👍 Rasmni yoqtirgan bo'lsangiz layk bering — chizuvchi ⭐ oladi!\n"
-        f"🎨 Keyingi chizuvchi bo'lmoqchimisiz? Yuqoridagi tugmani bosing!",
+        f"🎨 Chizgan: <b>{drawer_name}</b>",
         parse_mode="HTML",
     )
     return True
@@ -713,38 +697,40 @@ async def handle_private_custom_word(message: types.Message) -> bool:
     chat_id_int = int(found_chat)
     _set_state(chat_id_int, state)
 
-    # Shaxsiy chatga WebApp tugmasi yuborish
+    # Guruh xabarini yangilash — WebApp tugmasi to'g'ridan guruhda
     session_id = state.get("session_id")
     base_url   = _base_url()
     draw_url   = f"{base_url}/draw?session={session_id}&chat_id={found_chat}"
 
-    private_kb = InlineKeyboardMarkup(inline_keyboard=[
+    group_kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text    = "🎨 Chizishni boshlash",
             web_app = WebAppInfo(url=draw_url),
-        )]
+        )],
+        [InlineKeyboardButton(
+            text          = "❌ Chizishni rad etish",
+            callback_data = f"draw_decline:{chat_id_int}:{session_id}",
+        )],
     ])
 
     await message.answer(
         f"✅ So'zingiz qabul qilindi: <b>{custom_word}</b>\n\n"
-        f"Quyidagi tugmani bosib Telegram ichida rasm chizing:",
-        reply_markup = private_kb,
-        parse_mode   = "HTML",
+        f"Guruhga qayting va \"🎨 Chizishni boshlash\" tugmasini bosing.",
+        parse_mode = "HTML",
     )
 
-    # Guruh xabarini yangilash
     if _bot and state.get("game_message_id"):
         try:
             await _bot.edit_message_text(
-                chat_id    = chat_id_int,
-                message_id = state["game_message_id"],
-                text       = (
+                chat_id      = chat_id_int,
+                message_id   = state["game_message_id"],
+                text         = (
                     f"🎨 <b>Rasm chizish o'yini!</b>\n\n"
                     f"🖊️ <b>Chizuvchi:</b> {state['drawer_name']}\n\n"
                     f"⏳ <b>Chizuvchi rasm chizmoqda...</b>\n"
                     f"Rasm yuborilgandan so'ng so'zni topishga harakat qiling! 🤔"
                 ),
-                reply_markup = _waiting_keyboard(chat_id_int),
+                reply_markup = group_kb,
                 parse_mode   = "HTML",
             )
         except Exception as e:
