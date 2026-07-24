@@ -139,9 +139,10 @@ def _base_url() -> str:
 def _start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     base_url = _base_url()
     draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
+    # web_app= faqat shaxsiy chatda ishlaydi; guruhlar uchun url= ishlatiladi.
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎨 Chizishni boshlash",
-                              web_app=WebAppInfo(url=draw_url))],
+                              url=draw_url)],
         [InlineKeyboardButton(text="✍️ O'z so'zimni kiritish",
                               callback_data=f"draw_custom:{chat_id}:{session_id}")],
         [InlineKeyboardButton(text="ℹ️ Qanday chizish kerak?",
