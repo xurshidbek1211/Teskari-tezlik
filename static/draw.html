@@ -6,229 +6,216 @@
 <title>🎨 Rasm Chizish</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --tg-theme-bg-color: #fff;
-    --tg-theme-text-color: #222;
-    --tg-theme-button-color: #2ea6ff;
-    --tg-theme-button-text-color: #fff;
-    --tg-theme-secondary-bg-color: #f0f0f0;
-  }
-  body {
-    background: var(--tg-theme-bg-color);
-    color: var(--tg-theme-text-color);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
-    user-select: none;
-  }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#fff; --txt:#222; --btn:#2ea6ff; --btn-txt:#fff;
+  --panel:#f2f2f7; --border:rgba(0,0,0,.12);
+  --act-border:#2ea6ff; --act-bg:#e3f2fd;
+}
+body {
+  background:var(--bg); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex; flex-direction:column; height:100vh;
+  overflow:hidden; user-select:none; -webkit-user-select:none;
+}
 
-  /* ── TOP BAR ── */
-  #topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 8px;
-    background: var(--tg-theme-secondary-bg-color);
-    border-bottom: 1px solid rgba(0,0,0,.1);
-    flex-shrink: 0;
-    gap: 6px;
-  }
-  #topbar button {
-    border: none;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity .15s;
-    white-space: nowrap;
-  }
-  #topbar button:active { opacity: .7; }
-  #btn-see-word {
-    background: #ffd600;
-    color: #222;
-  }
-  #btn-new-word {
-    background: #43a047;
-    color: #fff;
-  }
-  #btn-send {
-    background: var(--tg-theme-button-color);
-    color: var(--tg-theme-button-text-color);
-    margin-left: auto;
-  }
+/* ── TOPBAR ── */
+#topbar {
+  display:flex; align-items:center; gap:5px;
+  padding:5px 8px; background:var(--panel);
+  border-bottom:1px solid var(--border); flex-shrink:0;
+}
+#topbar button {
+  border:none; border-radius:8px; padding:7px 10px;
+  font-size:12px; font-weight:700; cursor:pointer;
+  white-space:nowrap; transition:opacity .15s;
+}
+#topbar button:active { opacity:.7; }
+#btn-see  { background:#ffd600; color:#222; }
+#btn-new  { background:#43a047; color:#fff; }
+#btn-send { background:var(--btn); color:var(--btn-txt); margin-left:auto; padding:7px 14px; }
 
-  /* ── WORD OVERLAY ── */
-  #word-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.65);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
-  }
-  #word-overlay.show { display: flex; }
-  #word-box {
-    background: #fff;
-    border-radius: 16px;
-    padding: 28px 36px;
-    text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,.3);
-    max-width: 90vw;
-  }
-  #word-box .label { font-size: 13px; color: #888; margin-bottom: 8px; }
-  #word-box .word  { font-size: 28px; font-weight: 800; color: #1a1a2e; }
-  #word-box .hint  { font-size: 12px; color: #aaa; margin-top: 8px; }
-  #btn-close-word  {
-    background: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 28px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,.2);
-  }
+/* ── WORD OVERLAY ── */
+#word-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.65); z-index:999;
+  align-items:center; justify-content:center;
+  flex-direction:column; gap:16px;
+}
+#word-overlay.show { display:flex; }
+#word-box {
+  background:#fff; border-radius:16px; padding:24px 32px;
+  text-align:center; box-shadow:0 8px 32px rgba(0,0,0,.3); max-width:90vw;
+}
+#word-box .lbl  { font-size:13px; color:#888; margin-bottom:8px; }
+#word-box .word { font-size:28px; font-weight:800; color:#1a1a2e; }
+#word-box .hint { font-size:12px; color:#aaa; margin-top:8px; }
+#btn-close-word {
+  background:#fff; border:none; border-radius:12px;
+  padding:10px 28px; font-size:15px; font-weight:700;
+  cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
 
-  /* ── CANVAS WRAPPER ── */
-  #canvas-wrap {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    background: #fff;
-    cursor: crosshair;
-  }
-  canvas#draw-canvas {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    display: block;
-    touch-action: none;
-  }
+/* ── CANVAS ── */
+#canvas-wrap {
+  flex:1; position:relative; overflow:hidden; background:#fff;
+}
+#canvas-wrap canvas {
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block; touch-action:none;
+}
+#bg-canvas  { z-index:1; }
+#obj-canvas { z-index:2; background:transparent; }
 
-  /* ── TOOLBAR ── */
-  #toolbar {
-    background: var(--tg-theme-secondary-bg-color);
-    border-top: 1px solid rgba(0,0,0,.1);
-    padding: 6px 6px 8px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .tool-row {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .tool-btn {
-    border: 2px solid transparent;
-    border-radius: 10px;
-    width: 44px; height: 44px;
-    font-size: 20px;
-    background: #fff;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: border-color .15s, background .15s;
-    box-shadow: 0 1px 4px rgba(0,0,0,.12);
-    flex-shrink: 0;
-  }
-  .tool-btn:active { opacity: .75; }
-  .tool-btn.active { border-color: var(--tg-theme-button-color); background: #e8f4ff; }
+/* ── TOOLBAR ── */
+#toolbar {
+  background:var(--panel); border-top:1px solid var(--border);
+  flex-shrink:0; padding-bottom:env(safe-area-inset-bottom,2px);
+}
 
-  /* Size slider */
-  #size-slider {
-    flex: 1;
-    min-width: 80px;
-    max-width: 140px;
-    height: 4px;
-    accent-color: var(--tg-theme-button-color);
-    cursor: pointer;
-  }
-  #size-preview {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: #222;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  #size-dot {
-    border-radius: 50%;
-    background: #333;
-    transition: width .1s, height .1s;
-  }
+/* Mode tabs */
+#mode-tabs { display:flex; border-bottom:1px solid var(--border); }
+.mode-tab {
+  flex:1; padding:7px 4px; text-align:center;
+  font-size:12px; font-weight:700; cursor:pointer;
+  border:none; background:none; color:#888;
+  border-bottom:3px solid transparent;
+  transition:color .15s, border-color .15s;
+}
+.mode-tab.active { color:var(--act-border); border-bottom-color:var(--act-border); }
 
-  /* Color palette */
-  .color-swatch {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    cursor: pointer;
-    transition: border-color .1s, transform .1s;
-    flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
-  }
-  .color-swatch:active { transform: scale(.88); }
-  .color-swatch.active { border-color: #1a1a2e; transform: scale(1.15); }
-  #color-picker-btn {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 3px solid #ccc;
-    background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
-    cursor: pointer;
-    flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
-  }
-  #color-picker-input {
-    position: absolute; left: -9999px; opacity: 0;
-    width: 1px; height: 1px;
-  }
+/* Panel sections */
+.tb-panel { display:none; flex-direction:column; gap:4px; padding:5px 6px 2px; }
+.tb-panel.visible { display:flex; }
 
-  /* Toast */
-  #toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    background: rgba(0,0,0,.75); color: #fff;
-    border-radius: 20px; padding: 8px 18px;
-    font-size: 13px; font-weight: 600;
-    opacity: 0; transition: opacity .3s;
-    pointer-events: none; z-index: 1000;
-    white-space: nowrap;
-  }
-  #toast.show { opacity: 1; }
+.tool-row {
+  display:flex; align-items:center; gap:4px;
+  justify-content:center; flex-wrap:wrap;
+}
 
-  /* Loading overlay */
-  #loading {
-    position: fixed; inset: 0;
-    background: rgba(255,255,255,.9);
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 12px; z-index: 2000;
-    font-size: 15px; color: #666;
-  }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 4px solid #ddd;
-    border-top-color: var(--tg-theme-button-color);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Shape scroll row */
+#shape-scroll {
+  display:flex; gap:4px; overflow-x:auto; padding:2px 0;
+  scrollbar-width:none;
+}
+#shape-scroll::-webkit-scrollbar { display:none; }
+
+/* Tool button */
+.tool-btn {
+  border:2px solid transparent; border-radius:9px;
+  min-width:40px; height:40px; font-size:18px;
+  background:#fff; cursor:pointer; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:border-color .12s, background .12s;
+  box-shadow:0 1px 3px rgba(0,0,0,.12); padding:0 4px;
+}
+.tool-btn.active { border-color:var(--act-border); background:var(--act-bg); }
+.tool-btn:active { opacity:.7; }
+
+/* Shape button */
+.sh-btn {
+  border:2px solid transparent; border-radius:8px;
+  width:44px; height:34px; font-size:15px;
+  background:#fff; cursor:pointer; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+  transition:border-color .12s, background .12s;
+}
+.sh-btn.active { border-color:var(--act-border); background:var(--act-bg); }
+.sh-btn:active { opacity:.7; }
+
+/* Size + color row */
+#size-row {
+  display:flex; align-items:center; gap:5px;
+  padding:3px 6px 1px; flex-wrap:nowrap; overflow-x:auto;
+  scrollbar-width:none;
+}
+#size-row::-webkit-scrollbar { display:none; }
+#size-slider {
+  width:90px; min-width:60px;
+  height:4px; accent-color:var(--btn); cursor:pointer; flex-shrink:0;
+}
+#size-dot {
+  width:22px; height:22px; border-radius:50%; background:#333;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+#size-inner { border-radius:50%; background:#333; transition:all .1s; }
+.clr-sep { width:1px; height:22px; background:var(--border); flex-shrink:0; }
+.color-swatch {
+  width:26px; height:26px; border-radius:50%;
+  border:3px solid transparent; cursor:pointer; flex-shrink:0;
+  transition:border-color .1s, transform .1s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.color-swatch:active { transform:scale(.85); }
+.color-swatch.active { border-color:#111; transform:scale(1.15); }
+#cpick-btn {
+  width:26px; height:26px; border-radius:50%; flex-shrink:0; cursor:pointer;
+  border:3px solid #ccc;
+  background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+#cpick-input { position:absolute; left:-9999px; opacity:0; width:1px; height:1px; }
+
+/* Fill button */
+#fill-btn {
+  font-size:11px; padding:2px 7px; height:26px;
+  border:2px solid #ccc; border-radius:6px;
+  background:#fff; cursor:pointer; font-weight:700;
+  flex-shrink:0; color:#555; white-space:nowrap;
+}
+#fill-btn.on { border-color:var(--btn); color:var(--btn); background:var(--act-bg); }
+
+/* Action row */
+#action-row {
+  display:flex; gap:4px; padding:2px 6px 4px;
+  justify-content:flex-end; align-items:center;
+}
+.act-btn {
+  border:none; border-radius:8px; padding:5px 9px;
+  font-size:12px; cursor:pointer; font-weight:700;
+  transition:opacity .15s; white-space:nowrap;
+}
+.act-btn:active { opacity:.7; }
+#btn-undo  { background:#e3f2fd; color:#1565c0; }
+#btn-redo  { background:#e8f5e9; color:#2e7d32; }
+#btn-del   { background:#fce4ec; color:#c62828; }
+#btn-clear { background:#fff3e0; color:#e65100; }
+#sel-info  { font-size:11px; color:#888; flex:1; }
+
+/* Toast */
+#toast {
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.78); color:#fff;
+  border-radius:20px; padding:8px 18px;
+  font-size:13px; font-weight:600; opacity:0;
+  transition:opacity .3s; pointer-events:none; z-index:1000;
+  white-space:nowrap;
+}
+#toast.show { opacity:1; }
+
+/* Loading */
+#loading {
+  position:fixed; inset:0; background:rgba(255,255,255,.93);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:12px; z-index:2000; font-size:15px; color:#666;
+}
+.spinner {
+  width:36px; height:36px; border:4px solid #ddd;
+  border-top-color:var(--btn); border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading"><div class="spinner"></div><span>Yuklanmoqda...</span></div>
 
 <!-- WORD OVERLAY -->
 <div id="word-overlay">
   <div id="word-box">
-    <div class="label">🎨 Siz chizishingiz kerak:</div>
+    <div class="lbl">🎨 Siz chizishingiz kerak:</div>
     <div class="word" id="current-word">...</div>
     <div class="hint">Bu so'zni chizing — yozib bo'lmaydi!</div>
   </div>
@@ -237,398 +224,975 @@
 
 <!-- TOP BAR -->
 <div id="topbar">
-  <button id="btn-see-word">👀 Ko'rish</button>
-  <button id="btn-new-word">⏩ Yangi</button>
+  <button id="btn-see">👀 Ko'rish</button>
+  <button id="btn-new">⏩ Yangi</button>
   <button id="btn-send">📤 Yuborish</button>
 </div>
 
 <!-- CANVAS -->
 <div id="canvas-wrap">
-  <canvas id="draw-canvas"></canvas>
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="obj-canvas"></canvas>
 </div>
 
 <!-- TOOLBAR -->
 <div id="toolbar">
-  <!-- Row 1: tools + size -->
-  <div class="tool-row">
-    <button class="tool-btn active" id="tool-pen"    title="Qalam">✏️</button>
-    <button class="tool-btn"        id="tool-brush"  title="Mo'yqalam">🖌️</button>
-    <button class="tool-btn"        id="tool-line"   title="Chiziq">📏</button>
-    <button class="tool-btn"        id="tool-rect"   title="To'rtburchak">⬜</button>
-    <button class="tool-btn"        id="tool-circle" title="Doira">⭕</button>
-    <button class="tool-btn"        id="tool-eraser" title="O'chirg'ich">🧽</button>
-    <div style="flex:1"></div>
-    <div id="size-preview"><div id="size-dot" style="width:6px;height:6px"></div></div>
-    <input type="range" id="size-slider" min="1" max="40" value="6">
+
+  <div id="mode-tabs">
+    <button class="mode-tab active" data-mode="free">✏️ Erkin chizish</button>
+    <button class="mode-tab" data-mode="shape">🔷 Shakllar</button>
   </div>
 
-  <!-- Row 2: colors + undo/redo/clear -->
-  <div class="tool-row">
+  <!-- FREE DRAW panel -->
+  <div class="tb-panel visible" id="pan-free">
+    <div class="tool-row">
+      <button class="tool-btn active" data-ftool="pen"    title="Qalam">✏️</button>
+      <button class="tool-btn"        data-ftool="brush"  title="Mo'yqalam">🖌️</button>
+      <button class="tool-btn"        data-ftool="spray"  title="Sprey">💨</button>
+      <button class="tool-btn"        data-ftool="eraser" title="O'chirg'ich">🧽</button>
+      <div style="width:1px;height:30px;background:var(--border);margin:0 2px;flex-shrink:0"></div>
+      <button class="tool-btn"        data-ftool="line"   title="Chiziq" style="font-size:16px">─</button>
+      <button class="tool-btn"        data-ftool="arrow"  title="Strelka" style="font-size:16px">→</button>
+      <button class="tool-btn"        data-ftool="rect"   title="To'rtburchak">▭</button>
+      <button class="tool-btn"        data-ftool="ellipse" title="Ellips">⬭</button>
+    </div>
+  </div>
+
+  <!-- SHAPE panel -->
+  <div class="tb-panel" id="pan-shape">
+    <div id="shape-scroll">
+      <button class="sh-btn active" data-shape="rect">▭</button>
+      <button class="sh-btn" data-shape="square">◻</button>
+      <button class="sh-btn" data-shape="roundrect">▢</button>
+      <button class="sh-btn" data-shape="ellipse">⬭</button>
+      <button class="sh-btn" data-shape="circle">⚪</button>
+      <button class="sh-btn" data-shape="triangle">▲</button>
+      <button class="sh-btn" data-shape="rtriangle">◺</button>
+      <button class="sh-btn" data-shape="diamond">◆</button>
+      <button class="sh-btn" data-shape="pentagon">⬠</button>
+      <button class="sh-btn" data-shape="hexagon">⬡</button>
+      <button class="sh-btn" data-shape="octagon">⯃</button>
+      <button class="sh-btn" data-shape="star5">⭐</button>
+      <button class="sh-btn" data-shape="star4">✦</button>
+      <button class="sh-btn" data-shape="star6">✡</button>
+      <button class="sh-btn" data-shape="heart">❤️</button>
+      <button class="sh-btn" data-shape="cloud">☁️</button>
+      <button class="sh-btn" data-shape="lightning">⚡</button>
+      <button class="sh-btn" data-shape="arrow">➡️</button>
+      <button class="sh-btn" data-shape="dblarrow" style="font-size:12px">⟺</button>
+      <button class="sh-btn" data-shape="curvarrow" style="font-size:13px">↩</button>
+      <button class="sh-btn" data-shape="plus">➕</button>
+      <button class="sh-btn" data-shape="minus">➖</button>
+      <button class="sh-btn" data-shape="cross" style="font-size:13px">✕</button>
+      <button class="sh-btn" data-shape="line" style="font-size:16px">─</button>
+      <button class="sh-btn" data-shape="moon">🌙</button>
+      <button class="sh-btn" data-shape="sun">☀️</button>
+      <button class="sh-btn" data-shape="speech">💬</button>
+      <button class="sh-btn" data-shape="bang">💥</button>
+      <button class="sh-btn" data-shape="cylinder" style="font-size:12px">⌀</button>
+      <button class="sh-btn" data-shape="parallelogram" style="font-size:11px">▱</button>
+      <button class="sh-btn" data-shape="trapezoid" style="font-size:11px">⏢</button>
+    </div>
+    <div class="tool-row" style="gap:8px;padding:1px 0">
+      <button class="tool-btn active" id="btn-sdraw"   style="font-size:12px;min-width:56px" title="Yangi shakl chiz">✏️ Chiz</button>
+      <button class="tool-btn"        id="btn-sselect" style="font-size:12px;min-width:60px" title="Shaklni tanlash">🖱️ Tanlash</button>
+      <button id="fill-btn">▣ To'ldir</button>
+    </div>
+  </div>
+
+  <!-- SIZE + COLOR (always) -->
+  <div id="size-row">
+    <span style="font-size:13px;flex-shrink:0">📏</span>
+    <input type="range" id="size-slider" min="1" max="40" value="5">
+    <div id="size-dot"><div id="size-inner" style="width:5px;height:5px"></div></div>
+    <div class="clr-sep"></div>
     <div class="color-swatch active" data-color="#000000" style="background:#000"></div>
-    <div class="color-swatch" data-color="#ffffff" style="background:#fff; border-color:#ccc !important"></div>
-    <div class="color-swatch" data-color="#e53935" style="background:#e53935"></div>
-    <div class="color-swatch" data-color="#fb8c00" style="background:#fb8c00"></div>
-    <div class="color-swatch" data-color="#fdd835" style="background:#fdd835"></div>
-    <div class="color-swatch" data-color="#43a047" style="background:#43a047"></div>
-    <div class="color-swatch" data-color="#1e88e5" style="background:#1e88e5"></div>
-    <div class="color-swatch" data-color="#8e24aa" style="background:#8e24aa"></div>
-    <div class="color-swatch" data-color="#795548" style="background:#795548"></div>
-    <div id="color-picker-btn" title="Rang tanlash"></div>
-    <input type="color" id="color-picker-input" value="#000000">
-    <div style="flex:1"></div>
-    <button class="tool-btn" id="btn-undo"  title="Bekor qilish">↩️</button>
-    <button class="tool-btn" id="btn-redo"  title="Qaytarish">↪️</button>
-    <button class="tool-btn" id="btn-clear" title="Tozalash">🗑️</button>
+    <div class="color-swatch"        data-color="#ffffff" style="background:#fff;box-shadow:0 0 0 1px #ccc inset"></div>
+    <div class="color-swatch"        data-color="#e53935" style="background:#e53935"></div>
+    <div class="color-swatch"        data-color="#fb8c00" style="background:#fb8c00"></div>
+    <div class="color-swatch"        data-color="#fdd835" style="background:#fdd835"></div>
+    <div class="color-swatch"        data-color="#43a047" style="background:#43a047"></div>
+    <div class="color-swatch"        data-color="#1e88e5" style="background:#1e88e5"></div>
+    <div class="color-swatch"        data-color="#8e24aa" style="background:#8e24aa"></div>
+    <div class="color-swatch"        data-color="#795548" style="background:#795548"></div>
+    <div class="color-swatch"        data-color="#546e7a" style="background:#546e7a"></div>
+    <div id="cpick-btn" title="Boshqa rang"></div>
+    <input type="color" id="cpick-input" value="#000000">
   </div>
-</div>
 
-<!-- TOAST -->
+  <!-- ACTION ROW -->
+  <div id="action-row">
+    <span id="sel-info"></span>
+    <button class="act-btn" id="btn-undo">↩️ Bekor</button>
+    <button class="act-btn" id="btn-redo">↪️ Qayta</button>
+    <button class="act-btn" id="btn-del">✕ O'chir</button>
+    <button class="act-btn" id="btn-clear">🗑️ Tozala</button>
+  </div>
+
+</div><!-- /toolbar -->
+
 <div id="toast"></div>
-
-<!-- COLOR PICKER (hidden) -->
 
 <script>
 (function(){
-  const tg = window.Telegram?.WebApp;
-  if (tg) { tg.ready(); tg.expand(); }
+'use strict';
 
-  // ── PARAMS ────────────────────────────────────────────────────────────────
-  const params  = new URLSearchParams(location.search);
-  const SESSION = params.get("session") || "";
-  const CHAT_ID = params.get("chat_id") || "";
-  const INIT_DATA = tg ? tg.initData : "";
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
 
-  // ── CANVAS SETUP ──────────────────────────────────────────────────────────
-  const wrap   = document.getElementById("canvas-wrap");
-  const canvas = document.getElementById("draw-canvas");
-  const ctx    = canvas.getContext("2d");
+const params    = new URLSearchParams(location.search);
+const SESSION   = params.get('session')  || '';
+const CHAT_ID   = params.get('chat_id') || '';
+const INIT_DATA = tg ? tg.initData : '';
 
-  let W, H;
-  function resize() {
-    W = canvas.width  = wrap.clientWidth;
-    H = canvas.height = wrap.clientHeight;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, W, H);
-    redrawHistory();
+// ─── CANVAS SETUP ────────────────────────────────────────────────────────
+const wrap   = document.getElementById('canvas-wrap');
+const bgC    = document.getElementById('bg-canvas');
+const objC   = document.getElementById('obj-canvas');
+const bgCtx  = bgC.getContext('2d');
+const objCtx = objC.getContext('2d');
+let W, H;
+
+function resize() {
+  W = bgC.width = objC.width  = wrap.clientWidth;
+  H = bgC.height = objC.height = wrap.clientHeight;
+  // restore latest bg snapshot (resize clears canvas)
+  if (histIdx >= 0) {
+    bgCtx.putImageData(hist[histIdx].bg, 0, 0);
+  } else {
+    bgCtx.fillStyle = '#fff';
+    bgCtx.fillRect(0, 0, W, H);
   }
-  window.addEventListener("resize", resize);
+  renderObjs();
+}
+window.addEventListener('resize', resize);
 
-  // ── STATE ─────────────────────────────────────────────────────────────────
-  let tool       = "pen";
-  let color      = "#000000";
-  let lineWidth  = 6;
-  let drawing    = false;
-  let startX=0, startY=0, lastX=0, lastY=0;
-  let currentWord = null;
+// ─── STATE ───────────────────────────────────────────────────────────────
+let mode      = 'free';        // 'free' | 'shape'
+let freeTool  = 'pen';         // pen brush spray eraser line arrow rect ellipse
+let shapeTool = 'draw';        // 'draw' | 'select'
+let shapeType = 'rect';
+let color     = '#000000';
+let lw        = 5;             // line width
+let fillOn    = false;
+let currentWord = null;
 
-  // History (undo/redo)
-  const MAX_HIST = 40;
-  let history    = [];   // array of ImageData
-  let redoStack  = [];
+// Shape objects
+let objs       = [];           // [{id,type,x,y,w,h,color,lw,fill}]
+let selId      = null;
 
-  function saveHistory() {
-    history.push(ctx.getImageData(0, 0, W, H));
-    if (history.length > MAX_HIST) history.shift();
-    redoStack = [];
+// Drag state
+let drag      = false;
+let dragMode  = null;          // 'move'|'resize-tl'|'resize-tr'|'resize-bl'|'resize-br'|'draw'
+let dragBase  = null;          // snapshot of dragged obj at drag start
+let dragP0    = null;          // pointer at drag start
+
+// Freehand
+let painting  = false;
+let freeSnap  = null;          // ImageData snapshot for shape preview
+let sx=0, sy=0;                // stroke start
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────
+const MAX_H = 40;
+let hist    = [];              // [{bg: ImageData, objs: [...]}]
+let histIdx = -1;
+
+function pushSnap() {
+  hist = hist.slice(0, histIdx + 1);
+  hist.push({ bg: bgCtx.getImageData(0, 0, W, H), objs: JSON.parse(JSON.stringify(objs)) });
+  if (hist.length > MAX_H) hist.shift();
+  histIdx = hist.length - 1;
+}
+
+function applyHist(idx) {
+  if (idx < 0 || idx >= hist.length) return;
+  const s = hist[idx];
+  bgCtx.putImageData(s.bg, 0, 0);
+  objs = JSON.parse(JSON.stringify(s.objs));
+  selId = null;
+  histIdx = idx;
+  renderObjs();
+  updSelInfo();
+}
+
+function doUndo() { applyHist(histIdx - 1); }
+function doRedo() { applyHist(histIdx + 1); }
+
+// ─── OBJECT RENDERING ────────────────────────────────────────────────────
+const HS = 9; // handle half-size px
+
+function renderObjs() {
+  objCtx.clearRect(0, 0, W, H);
+  for (const o of objs) renderShape(objCtx, o);
+  const s = objs.find(o => o.id === selId);
+  if (s) drawHandles(s);
+}
+
+function drawHandles(o) {
+  objCtx.save();
+  objCtx.strokeStyle = '#2ea6ff';
+  objCtx.lineWidth = 1.5;
+  objCtx.setLineDash([4, 3]);
+  objCtx.strokeRect(o.x - 1, o.y - 1, o.w + 2, o.h + 2);
+  objCtx.setLineDash([]);
+  for (const [cx, cy] of [[o.x,o.y],[o.x+o.w,o.y],[o.x,o.y+o.h],[o.x+o.w,o.y+o.h]]) {
+    objCtx.fillStyle = '#fff';
+    objCtx.fillRect(cx - HS, cy - HS, HS*2, HS*2);
+    objCtx.strokeStyle = '#2ea6ff';
+    objCtx.lineWidth = 2;
+    objCtx.strokeRect(cx - HS, cy - HS, HS*2, HS*2);
   }
-  function undo() {
-    if (!history.length) return;
-    redoStack.push(ctx.getImageData(0, 0, W, H));
-    ctx.putImageData(history.pop(), 0, 0);
+  objCtx.restore();
+}
+
+// ─── SHAPE DRAWING ───────────────────────────────────────────────────────
+function renderShape(ctx, o) {
+  ctx.save();
+  ctx.strokeStyle = o.color;
+  ctx.fillStyle   = o.color;
+  ctx.lineWidth   = o.lw;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  const {type, x, y, w, h} = o;
+  const cx = x + w/2, cy = y + h/2;
+  const rx = Math.abs(w/2), ry = Math.abs(h/2);
+
+  // Special shapes that need multi-pass rendering
+  if (type === 'sun') {
+    drawSun(ctx, cx, cy, Math.min(rx, ry), o.color, o.lw, o.fill);
+    ctx.restore(); return;
   }
-  function redo() {
-    if (!redoStack.length) return;
-    history.push(ctx.getImageData(0, 0, W, H));
-    ctx.putImageData(redoStack.pop(), 0, 0);
+  if (type === 'speech') {
+    drawSpeech(ctx, x, y, w, h, o.color, o.lw, o.fill);
+    ctx.restore(); return;
   }
-  function redrawHistory() {
-    if (history.length) {
-      ctx.putImageData(history[history.length - 1], 0, 0);
-    } else {
-      ctx.fillStyle = "#fff"; ctx.fillRect(0,0,W,H);
+  if (type === 'cylinder') {
+    drawCylinder(ctx, x, y, w, h, o.color, o.lw, o.fill);
+    ctx.restore(); return;
+  }
+
+  ctx.beginPath();
+  switch (type) {
+    case 'rect':
+      ctx.rect(x, y, w, h); break;
+    case 'square': {
+      const s = Math.min(Math.abs(w), Math.abs(h));
+      ctx.rect(x, y, s * Math.sign(w), s * Math.sign(h)); break;
     }
-  }
-  function clearCanvas() {
-    saveHistory();
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  // ── DRAWING HELPERS ───────────────────────────────────────────────────────
-  let snapShot = null; // for shapes preview
-
-  function applyTool() {
-    if (tool === "eraser") {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.strokeStyle = "rgba(0,0,0,1)";
-    } else {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.strokeStyle = color;
-      ctx.fillStyle   = color;
+    case 'roundrect':
+      roundRect(ctx, x, y, w, h, Math.min(rx,ry)*0.2); break;
+    case 'ellipse':
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); break;
+    case 'circle': {
+      const r = Math.min(rx, ry);
+      ctx.arc(cx, cy, r, 0, Math.PI*2); break;
     }
-    if (tool === "brush") {
-      ctx.lineWidth = lineWidth * 2.5;
-      ctx.lineCap   = "round";
-      ctx.lineJoin  = "round";
-    } else {
-      ctx.lineWidth = lineWidth;
-      ctx.lineCap   = "round";
-      ctx.lineJoin  = "round";
+    case 'triangle':
+      ctx.moveTo(cx, y); ctx.lineTo(x+w, y+h); ctx.lineTo(x, y+h); ctx.closePath(); break;
+    case 'rtriangle':
+      ctx.moveTo(x, y); ctx.lineTo(x+w, y+h); ctx.lineTo(x, y+h); ctx.closePath(); break;
+    case 'diamond':
+      ctx.moveTo(cx, y); ctx.lineTo(x+w, cy); ctx.lineTo(cx, y+h); ctx.lineTo(x, cy); ctx.closePath(); break;
+    case 'pentagon':  polyPath(ctx, cx, cy, rx, ry, 5, -Math.PI/2); break;
+    case 'hexagon':   polyPath(ctx, cx, cy, rx, ry, 6, 0); break;
+    case 'octagon':   polyPath(ctx, cx, cy, rx, ry, 8, Math.PI/8); break;
+    case 'star5':     starPath(ctx, cx, cy, rx, ry, 5); break;
+    case 'star4':     starPath(ctx, cx, cy, rx, ry, 4); break;
+    case 'star6':     starPath(ctx, cx, cy, rx, ry, 6); break;
+    case 'heart':     heartPath(ctx, cx, cy, rx, ry); break;
+    case 'cloud':     cloudPath(ctx, x, y, w, h); break;
+    case 'lightning': lightningPath(ctx, x, y, w, h); break;
+    case 'arrow':     arrowPath(ctx, x, y, w, h, false); break;
+    case 'dblarrow':  arrowPath(ctx, x, y, w, h, true); break;
+    case 'curvarrow': curvedArrowPath(ctx, x, y, w, h); break;
+    case 'plus':      plusPath(ctx, cx, cy, rx, ry); break;
+    case 'minus':     ctx.rect(x, cy - ry*0.25, w, ry*0.5); break;
+    case 'cross':     crossPath(ctx, cx, cy, rx, ry); break;
+    case 'line':      ctx.moveTo(x, cy); ctx.lineTo(x+w, cy); break;
+    case 'moon':      moonPath(ctx, cx, cy, rx, ry); break;
+    case 'bang':      bangPath(ctx, cx, cy, rx, ry); break;
+    case 'parallelogram': {
+      const sk = rx*0.25;
+      ctx.moveTo(x+sk, y); ctx.lineTo(x+w, y);
+      ctx.lineTo(x+w-sk, y+h); ctx.lineTo(x, y+h); ctx.closePath(); break;
     }
-  }
-
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const src  = e.touches ? e.touches[0] : e;
-    return {
-      x: (src.clientX - rect.left) * (W / rect.width),
-      y: (src.clientY - rect.top)  * (H / rect.height)
-    };
-  }
-
-  function onStart(e) {
-    e.preventDefault();
-    drawing  = true;
-    const p  = getPos(e);
-    startX   = lastX = p.x;
-    startY   = lastY = p.y;
-    applyTool();
-    if (["line","rect","circle"].includes(tool)) {
-      snapShot = ctx.getImageData(0, 0, W, H);
-    } else {
-      saveHistory();
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
+    case 'trapezoid': {
+      const in_ = rx*0.25;
+      ctx.moveTo(x+in_, y); ctx.lineTo(x+w-in_, y);
+      ctx.lineTo(x+w, y+h); ctx.lineTo(x, y+h); ctx.closePath(); break;
     }
+    default:
+      ctx.rect(x, y, w, h);
   }
 
-  function onMove(e) {
-    if (!drawing) return;
-    e.preventDefault();
-    const p = getPos(e);
-    applyTool();
+  if (o.fill) { ctx.fill(); }
+  ctx.stroke();
+  ctx.restore();
+}
 
-    if (tool === "pen" || tool === "brush" || tool === "eraser") {
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-      lastX = p.x; lastY = p.y;
+// ─── SHAPE PATH HELPERS ──────────────────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  r = Math.min(Math.abs(r), Math.abs(w)/2, Math.abs(h)/2);
+  const x2=x+w, y2=y+h;
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x2-r, y); ctx.arcTo(x2, y,  x2, y+r,  r);
+  ctx.lineTo(x2, y2-r); ctx.arcTo(x2, y2, x2-r, y2, r);
+  ctx.lineTo(x+r, y2);  ctx.arcTo(x,  y2, x,  y2-r, r);
+  ctx.lineTo(x, y+r);   ctx.arcTo(x,  y,  x+r, y,   r);
+  ctx.closePath();
+}
 
-    } else if (tool === "line") {
-      ctx.putImageData(snapShot, 0, 0);
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-
-    } else if (tool === "rect") {
-      ctx.putImageData(snapShot, 0, 0);
-      ctx.beginPath();
-      ctx.strokeRect(startX, startY, p.x - startX, p.y - startY);
-
-    } else if (tool === "circle") {
-      ctx.putImageData(snapShot, 0, 0);
-      const rx = Math.abs(p.x - startX) / 2;
-      const ry = Math.abs(p.y - startY) / 2;
-      const cx = Math.min(startX, p.x) + rx;
-      const cy = Math.min(startY, p.y) + ry;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
+function polyPath(ctx, cx, cy, rx, ry, n, off) {
+  for (let i=0; i<n; i++) {
+    const a = off + 2*Math.PI*i/n;
+    const px = cx + rx*Math.cos(a), py = cy + ry*Math.sin(a);
+    i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
   }
+  ctx.closePath();
+}
 
-  function onEnd(e) {
-    if (!drawing) return;
-    drawing = false;
-    if (["line","rect","circle"].includes(tool)) {
-      saveHistory();
-      snapShot = null;
-    }
-    ctx.beginPath();
-    ctx.globalCompositeOperation = "source-over";
+function starPath(ctx, cx, cy, rx, ry, n) {
+  const inner = Math.min(rx, ry) * 0.42;
+  for (let i=0; i<n*2; i++) {
+    const a = -Math.PI/2 + Math.PI*i/n;
+    const r = i%2===0 ? Math.min(rx,ry) : inner;
+    const px = cx + r*Math.cos(a), py = cy + r*Math.sin(a);
+    i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
   }
+  ctx.closePath();
+}
 
-  // Touch & mouse events
-  ["mousedown","touchstart"].forEach(ev => canvas.addEventListener(ev, onStart, {passive:false}));
-  ["mousemove","touchmove" ].forEach(ev => canvas.addEventListener(ev, onMove,  {passive:false}));
-  ["mouseup","touchend","mouseleave","touchcancel"].forEach(ev => canvas.addEventListener(ev, onEnd));
+function heartPath(ctx, cx, cy, rx, ry) {
+  const s = Math.min(rx, ry) * 0.95;
+  ctx.moveTo(cx, cy + s*0.65);
+  ctx.bezierCurveTo(cx - s*2, cy - s*0.4, cx - s*2, cy - s*1.4, cx, cy - s*0.25);
+  ctx.bezierCurveTo(cx + s*2, cy - s*1.4, cx + s*2, cy - s*0.4, cx, cy + s*0.65);
+}
 
-  // ── TOOL BUTTONS ──────────────────────────────────────────────────────────
-  const toolMap = {
-    "tool-pen":    "pen",
-    "tool-brush":  "brush",
-    "tool-line":   "line",
-    "tool-rect":   "rect",
-    "tool-circle": "circle",
-    "tool-eraser": "eraser",
+function cloudPath(ctx, x, y, w, h) {
+  const cx=x+w/2, cy=y+h/2;
+  const rw=w/2, rh=h/2;
+  // bottom flat arc then bumps
+  ctx.arc(cx - rw*0.3, cy + rh*0.15, rw*0.38, Math.PI*0.05, Math.PI, true);
+  ctx.arc(cx - rw*0.6, cy - rh*0.1,  rw*0.3,  Math.PI,      Math.PI*1.85);
+  ctx.arc(cx - rw*0.1, cy - rh*0.45, rw*0.38, Math.PI*1.2,  Math.PI*0.1, false);
+  ctx.arc(cx + rw*0.35,cy - rh*0.3,  rw*0.3,  Math.PI*1.6,  Math.PI*0.2, false);
+  ctx.arc(cx + rw*0.6, cy + rh*0.1,  rw*0.28, Math.PI*1.7,  Math.PI*2.9, false);
+  ctx.closePath();
+}
+
+function lightningPath(ctx, x, y, w, h) {
+  const mx = x + w/2;
+  ctx.moveTo(mx + w*0.1,  y);
+  ctx.lineTo(mx - w*0.15, y + h*0.44);
+  ctx.lineTo(mx + w*0.05, y + h*0.44);
+  ctx.lineTo(mx - w*0.1,  y + h);
+  ctx.lineTo(mx + w*0.15, y + h*0.56);
+  ctx.lineTo(mx - w*0.02, y + h*0.56);
+  ctx.closePath();
+}
+
+function arrowPath(ctx, x, y, w, h, both) {
+  const cy = y + h/2;
+  const hw = Math.abs(h)*0.42, hl = Math.abs(w)*0.28;
+  const tw = hw*0.35;
+  ctx.moveTo(x + (both ? hl : 0), cy - tw);
+  ctx.lineTo(x + w - hl, cy - tw);
+  ctx.lineTo(x + w - hl, cy - hw);
+  ctx.lineTo(x + w,      cy);
+  ctx.lineTo(x + w - hl, cy + hw);
+  ctx.lineTo(x + w - hl, cy + tw);
+  ctx.lineTo(x + (both ? hl : 0), cy + tw);
+  if (both) {
+    ctx.lineTo(x + hl, cy + hw);
+    ctx.lineTo(x,       cy);
+    ctx.lineTo(x + hl, cy - hw);
+    ctx.lineTo(x + hl, cy - tw);
+  }
+  ctx.closePath();
+}
+
+function curvedArrowPath(ctx, x, y, w, h) {
+  const cx = x + w/2, cy = y + h/2;
+  const r  = Math.min(Math.abs(w), Math.abs(h)) * 0.38;
+  const hw = r * 0.45;
+  ctx.arc(cx, cy, r, Math.PI, Math.PI*1.8);
+  const ex = cx + r*Math.cos(Math.PI*1.8);
+  const ey = cy + r*Math.sin(Math.PI*1.8);
+  // arrowhead at end
+  ctx.lineTo(ex + hw, ey - hw*0.5);
+  ctx.moveTo(ex, ey);
+  ctx.lineTo(ex - hw*0.5, ey + hw);
+}
+
+function plusPath(ctx, cx, cy, rx, ry) {
+  const tx = rx*0.38, ty = ry*0.38;
+  ctx.moveTo(cx - tx, cy - ry); ctx.lineTo(cx + tx, cy - ry);
+  ctx.lineTo(cx + tx, cy - ty); ctx.lineTo(cx + rx, cy - ty);
+  ctx.lineTo(cx + rx, cy + ty); ctx.lineTo(cx + tx, cy + ty);
+  ctx.lineTo(cx + tx, cy + ry); ctx.lineTo(cx - tx, cy + ry);
+  ctx.lineTo(cx - tx, cy + ty); ctx.lineTo(cx - rx, cy + ty);
+  ctx.lineTo(cx - rx, cy - ty); ctx.lineTo(cx - tx, cy - ty);
+  ctx.closePath();
+}
+
+function crossPath(ctx, cx, cy, rx, ry) {
+  // X shape
+  const t = Math.min(rx, ry) * 0.3;
+  ctx.moveTo(cx - rx, cy - ry); ctx.lineTo(cx - rx + t, cy - ry);
+  ctx.lineTo(cx, cy - t);       ctx.lineTo(cx + rx - t, cy - ry);
+  ctx.lineTo(cx + rx, cy - ry); ctx.lineTo(cx + rx, cy - ry + t);
+  ctx.lineTo(cx + t, cy);       ctx.lineTo(cx + rx, cy + ry - t);
+  ctx.lineTo(cx + rx, cy + ry); ctx.lineTo(cx + rx - t, cy + ry);
+  ctx.lineTo(cx, cy + t);       ctx.lineTo(cx - rx + t, cy + ry);
+  ctx.lineTo(cx - rx, cy + ry); ctx.lineTo(cx - rx, cy + ry - t);
+  ctx.lineTo(cx - t, cy);       ctx.lineTo(cx - rx, cy - ry + t);
+  ctx.closePath();
+}
+
+function moonPath(ctx, cx, cy, rx, ry) {
+  const r = Math.min(rx, ry);
+  ctx.arc(cx, cy, r, Math.PI*0.3, Math.PI*1.7);
+  ctx.arc(cx - r*0.25, cy, r*0.7, Math.PI*1.7, Math.PI*0.3, true);
+}
+
+function bangPath(ctx, cx, cy, rx, ry) {
+  const n = 12;
+  for (let i=0; i<n*2; i++) {
+    const a  = -Math.PI/2 + Math.PI*i/n;
+    const r  = i%2===0 ? Math.max(rx,ry) : Math.max(rx,ry)*0.72;
+    const px = cx + r*Math.cos(a), py = cy + r*Math.sin(a);
+    i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+  }
+  ctx.closePath();
+}
+
+function drawSun(ctx, cx, cy, r, clr, lw_, filled) {
+  // Core circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r*0.42, 0, Math.PI*2);
+  if (filled) ctx.fill();
+  ctx.stroke();
+  // Rays
+  const rays = 8;
+  ctx.beginPath();
+  for (let i=0; i<rays; i++) {
+    const a = 2*Math.PI*i/rays;
+    ctx.moveTo(cx + r*0.52*Math.cos(a), cy + r*0.52*Math.sin(a));
+    ctx.lineTo(cx + r*0.95*Math.cos(a), cy + r*0.95*Math.sin(a));
+  }
+  ctx.stroke();
+}
+
+function drawSpeech(ctx, x, y, w, h, clr, lw_, filled) {
+  const tailH = Math.abs(h)*0.22;
+  const bh    = h - tailH;
+  const r     = Math.min(Math.abs(w), Math.abs(bh)) * 0.12;
+  ctx.beginPath();
+  roundRect(ctx, x, y, w, bh, r);
+  if (filled) ctx.fill();
+  ctx.stroke();
+  // Tail
+  ctx.beginPath();
+  ctx.moveTo(x + w*0.18, y + bh);
+  ctx.lineTo(x + w*0.08, y + h);
+  ctx.lineTo(x + w*0.34, y + bh);
+  ctx.closePath();
+  if (filled) ctx.fill();
+  ctx.stroke();
+}
+
+function drawCylinder(ctx, x, y, w, h, clr, lw_, filled) {
+  const ry = Math.abs(h)*0.12;
+  const rx2 = Math.abs(w)/2;
+  const cx  = x + w/2;
+  // Body
+  ctx.beginPath();
+  ctx.rect(x, y + ry, w, h - ry*2);
+  if (filled) ctx.fill();
+  ctx.stroke();
+  // Top ellipse
+  ctx.beginPath();
+  ctx.ellipse(cx, y + ry, rx2, ry, 0, 0, Math.PI*2);
+  if (filled) ctx.fill();
+  ctx.stroke();
+  // Bottom ellipse
+  ctx.beginPath();
+  ctx.ellipse(cx, y + h - ry, rx2, ry, 0, 0, Math.PI);
+  ctx.stroke();
+}
+
+// ─── FREE DRAW ───────────────────────────────────────────────────────────
+const FREE_SHAPE_TOOLS = ['line','arrow','rect','ellipse'];
+
+function getPos(e) {
+  const rect = bgC.getBoundingClientRect();
+  const src  = e.changedTouches ? e.changedTouches[0] : (e.touches ? e.touches[0] : e);
+  return {
+    x: (src.clientX - rect.left) * (W / rect.width),
+    y: (src.clientY - rect.top)  * (H / rect.height)
   };
-  document.querySelectorAll(".tool-btn[id^='tool-']").forEach(btn => {
-    btn.addEventListener("click", () => {
-      tool = toolMap[btn.id] || "pen";
-      document.querySelectorAll(".tool-btn[id^='tool-']").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-    });
-  });
+}
 
-  document.getElementById("btn-undo").addEventListener("click", undo);
-  document.getElementById("btn-redo").addEventListener("click", redo);
-  document.getElementById("btn-clear").addEventListener("click", () => {
-    if (confirm("Kanvасni tozalaysizmi?")) clearCanvas();
-  });
-
-  // ── SIZE SLIDER ───────────────────────────────────────────────────────────
-  const slider = document.getElementById("size-slider");
-  const dot    = document.getElementById("size-dot");
-  slider.addEventListener("input", () => {
-    lineWidth = parseInt(slider.value);
-    const s = Math.min(lineWidth * 1.6, 24);
-    dot.style.width = dot.style.height = s + "px";
-    dot.style.background = (tool === "eraser") ? "#ddd" : color;
-  });
-
-  // ── COLOR ─────────────────────────────────────────────────────────────────
-  function setColor(c) {
-    color = c;
-    document.querySelectorAll(".color-swatch").forEach(s => {
-      s.classList.toggle("active", s.dataset.color === c);
-    });
-    dot.style.background = color;
-    if (tool === "eraser") {
-      tool = "pen";
-      document.querySelectorAll(".tool-btn[id^='tool-']").forEach(b=>b.classList.remove("active"));
-      document.getElementById("tool-pen").classList.add("active");
-    }
+function applyFreeCtx() {
+  bgCtx.lineCap  = 'round';
+  bgCtx.lineJoin = 'round';
+  if (freeTool === 'eraser') {
+    bgCtx.globalCompositeOperation = 'destination-out';
+    bgCtx.strokeStyle = 'rgba(0,0,0,1)';
+    bgCtx.lineWidth   = lw * 2;
+    bgCtx.globalAlpha = 1;
+  } else {
+    bgCtx.globalCompositeOperation = 'source-over';
+    bgCtx.strokeStyle = color;
+    bgCtx.fillStyle   = color;
+    bgCtx.lineWidth   = freeTool === 'brush' ? lw * 3 : lw;
+    bgCtx.globalAlpha = freeTool === 'brush' ? 0.35 : 1;
   }
-  document.querySelectorAll(".color-swatch").forEach(sw => {
-    sw.addEventListener("click", () => setColor(sw.dataset.color));
-  });
-  const colorPickerBtn   = document.getElementById("color-picker-btn");
-  const colorPickerInput = document.getElementById("color-picker-input");
-  colorPickerBtn.addEventListener("click", () => colorPickerInput.click());
-  colorPickerInput.addEventListener("input", () => {
-    setColor(colorPickerInput.value);
-    // Remove active from swatches (custom color)
-    document.querySelectorAll(".color-swatch").forEach(s=>s.classList.remove("active"));
-  });
+}
 
-  // ── TOAST ─────────────────────────────────────────────────────────────────
-  let toastTimer;
-  function showToast(msg, ms=2200) {
-    const el = document.getElementById("toast");
-    el.textContent = msg;
-    el.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove("show"), ms);
+function freePointerDown(e) {
+  e.preventDefault();
+  painting = true;
+  const p = getPos(e);
+  sx = p.x; sy = p.y;
+  applyFreeCtx();
+  if (FREE_SHAPE_TOOLS.includes(freeTool)) {
+    freeSnap = bgCtx.getImageData(0, 0, W, H);
+  } else {
+    pushSnap();
+    bgCtx.beginPath();
+    bgCtx.moveTo(p.x, p.y);
+    if (freeTool === 'spray') sprayAt(p.x, p.y);
+  }
+}
+
+function freePointerMove(e) {
+  if (!painting) return;
+  e.preventDefault();
+  const p = getPos(e);
+  applyFreeCtx();
+  switch(freeTool) {
+    case 'pen':
+    case 'brush':
+    case 'eraser':
+      bgCtx.lineTo(p.x, p.y);
+      bgCtx.stroke();
+      break;
+    case 'spray':
+      sprayAt(p.x, p.y);
+      break;
+    case 'line':
+      bgCtx.putImageData(freeSnap, 0, 0);
+      bgCtx.beginPath();
+      bgCtx.moveTo(sx, sy); bgCtx.lineTo(p.x, p.y); bgCtx.stroke();
+      break;
+    case 'arrow': {
+      bgCtx.putImageData(freeSnap, 0, 0);
+      bgCtx.beginPath();
+      bgCtx.moveTo(sx, sy); bgCtx.lineTo(p.x, p.y); bgCtx.stroke();
+      const dx=p.x-sx, dy=p.y-sy, len=Math.sqrt(dx*dx+dy*dy);
+      if (len<5) break;
+      const hl=Math.max(12, len*0.22), ang=Math.atan2(dy,dx);
+      bgCtx.beginPath();
+      bgCtx.moveTo(p.x, p.y);
+      bgCtx.lineTo(p.x-hl*Math.cos(ang-Math.PI/6), p.y-hl*Math.sin(ang-Math.PI/6));
+      bgCtx.moveTo(p.x, p.y);
+      bgCtx.lineTo(p.x-hl*Math.cos(ang+Math.PI/6), p.y-hl*Math.sin(ang+Math.PI/6));
+      bgCtx.stroke();
+      break;
+    }
+    case 'rect':
+      bgCtx.putImageData(freeSnap, 0, 0);
+      bgCtx.beginPath();
+      bgCtx.rect(sx, sy, p.x-sx, p.y-sy); bgCtx.stroke();
+      break;
+    case 'ellipse':
+      bgCtx.putImageData(freeSnap, 0, 0);
+      bgCtx.beginPath();
+      bgCtx.ellipse(sx+(p.x-sx)/2, sy+(p.y-sy)/2,
+        Math.abs(p.x-sx)/2, Math.abs(p.y-sy)/2, 0, 0, Math.PI*2);
+      bgCtx.stroke();
+      break;
+  }
+}
+
+function freePointerUp(e) {
+  if (!painting) return;
+  painting = false;
+  if (FREE_SHAPE_TOOLS.includes(freeTool)) {
+    pushSnap();
+    freeSnap = null;
+  }
+  bgCtx.globalAlpha = 1;
+  bgCtx.globalCompositeOperation = 'source-over';
+  bgCtx.beginPath();
+}
+
+function sprayAt(x, y) {
+  bgCtx.globalCompositeOperation = 'source-over';
+  bgCtx.globalAlpha = 1;
+  bgCtx.fillStyle = color;
+  const density = lw * 3, radius = lw * 4;
+  for (let i=0; i<density; i++) {
+    const a = Math.random()*Math.PI*2, r = Math.random()*radius;
+    bgCtx.beginPath();
+    bgCtx.arc(x + r*Math.cos(a), y + r*Math.sin(a), 0.7, 0, Math.PI*2);
+    bgCtx.fill();
+  }
+}
+
+// ─── SHAPE OBJECT INTERACTION ────────────────────────────────────────────
+function hitObj(o, px, py) {
+  return px >= o.x && px <= o.x+o.w && py >= o.y && py <= o.y+o.h;
+}
+
+function hitHandle(o, px, py) {
+  const corners = [
+    ['resize-tl', o.x,     o.y    ],
+    ['resize-tr', o.x+o.w, o.y    ],
+    ['resize-bl', o.x,     o.y+o.h],
+    ['resize-br', o.x+o.w, o.y+o.h],
+  ];
+  for (const [m, hx, hy] of corners) {
+    if (Math.abs(px-hx) < HS+2 && Math.abs(py-hy) < HS+2) return m;
+  }
+  return hitObj(o, px, py) ? 'move' : null;
+}
+
+function shapePointerDown(e) {
+  e.preventDefault();
+  const p = getPos(e);
+
+  if (shapeTool === 'select') {
+    const sel = objs.find(o => o.id === selId);
+    if (sel) {
+      const m = hitHandle(sel, p.x, p.y);
+      if (m) { drag=true; dragMode=m; dragBase={...sel}; dragP0=p; return; }
+    }
+    let found = null;
+    for (let i=objs.length-1; i>=0; i--) {
+      if (hitObj(objs[i], p.x, p.y)) { found=objs[i]; break; }
+    }
+    selId = found ? found.id : null;
+    if (found) { drag=true; dragMode='move'; dragBase={...found}; dragP0=p; }
+    renderObjs(); updSelInfo();
+    return;
   }
 
-  // ── WORD OVERLAY ──────────────────────────────────────────────────────────
-  document.getElementById("btn-close-word").addEventListener("click", () => {
-    document.getElementById("word-overlay").classList.remove("show");
-  });
-  document.getElementById("word-overlay").addEventListener("click", (e) => {
-    if (e.target === document.getElementById("word-overlay")) {
-      document.getElementById("word-overlay").classList.remove("show");
-    }
-  });
+  // draw mode
+  drag = true; dragMode = 'draw'; dragP0 = p;
+  sx = p.x; sy = p.y;
+}
 
-  async function fetchWord() {
-    const url = `/api/draw/word?session=${encodeURIComponent(SESSION)}&chat_id=${encodeURIComponent(CHAT_ID)}&init_data=${encodeURIComponent(INIT_DATA)}`;
+function shapePointerMove(e) {
+  if (!drag) return;
+  e.preventDefault();
+  const p = getPos(e);
+
+  if (dragMode === 'draw') {
+    renderObjs();
+    const bx=Math.min(p.x,sx), by=Math.min(p.y,sy);
+    const bw=Math.abs(p.x-sx), bh=Math.abs(p.y-sy);
+    if (bw<4 || bh<4) return;
+    renderShape(objCtx, {id:'__prev',type:shapeType,x:bx,y:by,w:bw,h:bh,color,lw,fill:fillOn});
+    return;
+  }
+
+  const obj = objs.find(o => o.id === selId);
+  if (!obj || !dragBase) return;
+  const dx = p.x - dragP0.x, dy = p.y - dragP0.y;
+  if (dragMode === 'move') {
+    obj.x = dragBase.x + dx; obj.y = dragBase.y + dy;
+  } else if (dragMode === 'resize-br') {
+    obj.w = Math.max(10, dragBase.w + dx); obj.h = Math.max(10, dragBase.h + dy);
+  } else if (dragMode === 'resize-tr') {
+    obj.w = Math.max(10, dragBase.w + dx);
+    obj.y = dragBase.y + dy; obj.h = Math.max(10, dragBase.h - dy);
+  } else if (dragMode === 'resize-bl') {
+    obj.x = dragBase.x + dx; obj.w = Math.max(10, dragBase.w - dx);
+    obj.h = Math.max(10, dragBase.h + dy);
+  } else if (dragMode === 'resize-tl') {
+    obj.x = dragBase.x + dx; obj.y = dragBase.y + dy;
+    obj.w = Math.max(10, dragBase.w - dx); obj.h = Math.max(10, dragBase.h - dy);
+  }
+  renderObjs();
+}
+
+function shapePointerUp(e) {
+  if (!drag) return;
+  drag = false;
+
+  if (dragMode === 'draw') {
+    const p = getPos(e);
+    const bx=Math.min(p.x,sx), by=Math.min(p.y,sy);
+    const bw=Math.abs(p.x-sx), bh=Math.abs(p.y-sy);
+    if (bw >= 6 && bh >= 6) {
+      objs.push({id: genId(), type:shapeType, x:bx, y:by, w:bw, h:bh, color, lw, fill:fillOn});
+      selId = objs[objs.length-1].id;
+      pushSnap();
+    }
+  } else if (dragMode) {
+    pushSnap();
+  }
+
+  dragMode = null; dragBase = null; dragP0 = null;
+  renderObjs(); updSelInfo();
+}
+
+// ─── CANVAS EVENT ROUTING ─────────────────────────────────────────────────
+function onDown(e) { mode==='free' ? freePointerDown(e) : shapePointerDown(e); }
+function onMove(e) { mode==='free' ? freePointerMove(e) : shapePointerMove(e); }
+function onUp(e)   { mode==='free' ? freePointerUp(e)   : shapePointerUp(e);   }
+
+['mousedown','touchstart'].forEach(ev => objC.addEventListener(ev, onDown, {passive:false}));
+['mousemove','touchmove' ].forEach(ev => objC.addEventListener(ev, onMove, {passive:false}));
+['mouseup','touchend','mouseleave','touchcancel'].forEach(ev => objC.addEventListener(ev, onUp));
+
+// ─── BAKE OBJECTS → BG ───────────────────────────────────────────────────
+function bakeObjs() {
+  if (!objs.length) return;
+  for (const o of objs) renderShape(bgCtx, o);
+  objs = []; selId = null;
+  renderObjs();
+  pushSnap();
+}
+
+// ─── CLEAR ────────────────────────────────────────────────────────────────
+function clearAll() {
+  bgCtx.fillStyle = '#fff'; bgCtx.fillRect(0,0,W,H);
+  objs = []; selId = null;
+  renderObjs(); updSelInfo();
+  pushSnap();
+}
+
+// ─── DELETE SELECTED ─────────────────────────────────────────────────────
+function deleteSelected() {
+  if (!selId) { showToast('⚠️ Avval shaklni tanlang'); return; }
+  objs = objs.filter(o => o.id !== selId);
+  selId = null;
+  renderObjs(); updSelInfo(); pushSnap();
+}
+
+function updSelInfo() {
+  const el = document.getElementById('sel-info');
+  const s  = objs.find(o => o.id === selId);
+  el.textContent = s ? `✅ ${SHAPE_NAMES[s.type]||s.type} tanlangan` :
+                   objs.length ? `${objs.length} shakl` : '';
+}
+
+const SHAPE_NAMES = {
+  rect:'To\'rtburchak', square:'Kvadrat', roundrect:'Yumaloq', ellipse:'Ellips',
+  circle:'Doira', triangle:'Uchburchak', rtriangle:'To\'g\'ri burchak', diamond:'Romb',
+  pentagon:'Beshburchak', hexagon:'Olti burchak', octagon:'Sakkiz burchak',
+  star5:'Yulduz', star4:'4-Yulduz', star6:'6-Yulduz',
+  heart:'Yurak', cloud:'Bulut', lightning:'Chaqmoq',
+  arrow:'Strelka', dblarrow:'Ikki strelka', curvarrow:'Egri strelka',
+  plus:'Plus', minus:'Minus', cross:'X-Belgi', line:'Chiziq',
+  moon:'Oy', sun:'Quyosh', speech:'Nutq pufagi', bang:'Portlash',
+  cylinder:'Silindr', parallelogram:'Parallelogramm', trapezoid:'Trapetsiya'
+};
+
+// ─── MODE TABS ────────────────────────────────────────────────────────────
+document.querySelectorAll('.mode-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const nm = btn.dataset.mode;
+    if (nm === mode) return;
+    if (mode === 'shape') bakeObjs();
+    mode = nm;
+    document.querySelectorAll('.mode-tab').forEach(b => b.classList.toggle('active', b.dataset.mode===nm));
+    document.getElementById('pan-free').classList.toggle('visible', nm==='free');
+    document.getElementById('pan-shape').classList.toggle('visible', nm==='shape');
+    objC.style.cursor = nm==='shape' && shapeTool==='select' ? 'default' : 'crosshair';
+  });
+});
+
+// ─── FREE TOOL BUTTONS ────────────────────────────────────────────────────
+document.querySelectorAll('[data-ftool]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    freeTool = btn.dataset.ftool;
+    document.querySelectorAll('[data-ftool]').forEach(b => b.classList.toggle('active', b===btn));
+    sizeInner.style.background = freeTool==='eraser' ? '#ccc' : color;
+  });
+});
+
+// ─── SHAPE DRAW / SELECT BUTTONS ──────────────────────────────────────────
+const btnSD = document.getElementById('btn-sdraw');
+const btnSS = document.getElementById('btn-sselect');
+function setShapeTool(t) {
+  shapeTool = t;
+  btnSD.classList.toggle('active', t==='draw');
+  btnSS.classList.toggle('active', t==='select');
+  objC.style.cursor = t==='select' ? 'default' : 'crosshair';
+}
+btnSD.addEventListener('click', () => setShapeTool('draw'));
+btnSS.addEventListener('click', () => setShapeTool('select'));
+
+// ─── SHAPE BUTTONS ────────────────────────────────────────────────────────
+document.querySelectorAll('.sh-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    shapeType = btn.dataset.shape;
+    document.querySelectorAll('.sh-btn').forEach(b => b.classList.toggle('active', b===btn));
+    setShapeTool('draw');
+  });
+});
+
+// ─── FILL BUTTON ──────────────────────────────────────────────────────────
+const fillBtn = document.getElementById('fill-btn');
+fillBtn.addEventListener('click', () => {
+  fillOn = !fillOn;
+  fillBtn.classList.toggle('on', fillOn);
+  fillBtn.textContent = fillOn ? '■ To\'ldirilgan' : '▣ To\'ldir';
+  const s = objs.find(o => o.id===selId);
+  if (s) { s.fill = fillOn; renderObjs(); pushSnap(); }
+});
+
+// ─── SIZE SLIDER ──────────────────────────────────────────────────────────
+const slider   = document.getElementById('size-slider');
+const sizeInner = document.getElementById('size-inner');
+slider.addEventListener('input', () => {
+  lw = parseInt(slider.value);
+  const s = Math.min(lw*1.6, 20);
+  sizeInner.style.width = sizeInner.style.height = s + 'px';
+  const sel = objs.find(o => o.id===selId);
+  if (sel) { sel.lw = lw; renderObjs(); }
+});
+
+// ─── COLOR ────────────────────────────────────────────────────────────────
+function setColor(c) {
+  color = c;
+  document.querySelectorAll('.color-swatch').forEach(s =>
+    s.classList.toggle('active', s.dataset.color === c)
+  );
+  sizeInner.style.background = freeTool==='eraser' ? '#ccc' : color;
+  if (freeTool === 'eraser') {
+    freeTool = 'pen';
+    document.querySelectorAll('[data-ftool]').forEach(b =>
+      b.classList.toggle('active', b.dataset.ftool==='pen')
+    );
+  }
+  const sel = objs.find(o => o.id===selId);
+  if (sel) { sel.color = color; renderObjs(); }
+}
+
+document.querySelectorAll('.color-swatch').forEach(sw =>
+  sw.addEventListener('click', () => setColor(sw.dataset.color))
+);
+const cpickBtn   = document.getElementById('cpick-btn');
+const cpickInput = document.getElementById('cpick-input');
+cpickBtn.addEventListener('click', () => cpickInput.click());
+cpickInput.addEventListener('input', () => {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  setColor(cpickInput.value);
+});
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────
+document.getElementById('btn-undo').addEventListener('click',  doUndo);
+document.getElementById('btn-redo').addEventListener('click',  doRedo);
+document.getElementById('btn-del').addEventListener('click',   deleteSelected);
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (confirm('Kanvasni tozalaysizmi?')) clearAll();
+});
+
+// ─── TOAST ────────────────────────────────────────────────────────────────
+let toastT;
+function showToast(msg, ms=2200) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+// ─── WORD OVERLAY ─────────────────────────────────────────────────────────
+document.getElementById('btn-close-word').addEventListener('click', () =>
+  document.getElementById('word-overlay').classList.remove('show')
+);
+document.getElementById('word-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('word-overlay'))
+    document.getElementById('word-overlay').classList.remove('show');
+});
+
+async function fetchWord() {
+  const url = `/api/draw/word?session=${encodeURIComponent(SESSION)}&chat_id=${encodeURIComponent(CHAT_ID)}&init_data=${encodeURIComponent(INIT_DATA)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(res.status);
+  return (await res.json()).word;
+}
+
+document.getElementById('btn-see').addEventListener('click', async () => {
+  if (currentWord) {
+    document.getElementById('current-word').textContent = currentWord;
+    document.getElementById('word-overlay').classList.add('show');
+    return;
+  }
+  try {
+    currentWord = await fetchWord();
+    document.getElementById('current-word').textContent = currentWord;
+    document.getElementById('word-overlay').classList.add('show');
+  } catch { showToast('❌ So\'zni yuklab bo\'lmadi.'); }
+});
+
+document.getElementById('btn-new').addEventListener('click', async () => {
+  try {
+    const url = `/api/draw/new_word?session=${encodeURIComponent(SESSION)}&chat_id=${encodeURIComponent(CHAT_ID)}&init_data=${encodeURIComponent(INIT_DATA)}`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error("word fetch failed: " + res.status);
-    const data = await res.json();
-    return data.word;
+    if (!res.ok) throw new Error(res.status);
+    currentWord = (await res.json()).word;
+    showToast('⏩ Yangi so\'z berildi!');
+  } catch { showToast('❌ Yangi so\'z olishda xatolik.'); }
+});
+
+// ─── SEND ─────────────────────────────────────────────────────────────────
+document.getElementById('btn-send').addEventListener('click', async () => {
+  bakeObjs(); // finalize any remaining shape objects
+
+  const tmp = document.createElement('canvas');
+  tmp.width = W; tmp.height = H;
+  tmp.getContext('2d').fillStyle = '#fff';
+  tmp.getContext('2d').fillRect(0,0,W,H);
+  if (bgC.toDataURL() === tmp.toDataURL()) {
+    showToast('⚠️ Kanvas bo\'sh! Avval rasm chizing.'); return;
   }
 
-  document.getElementById("btn-see-word").addEventListener("click", async () => {
-    if (currentWord) {
-      document.getElementById("current-word").textContent = currentWord;
-      document.getElementById("word-overlay").classList.add("show");
-      return;
-    }
-    try {
-      currentWord = await fetchWord();
-      document.getElementById("current-word").textContent = currentWord;
-      document.getElementById("word-overlay").classList.add("show");
-    } catch(e) {
-      showToast("❌ So'zni yuklab bo'lmadi. Sessiya topilmadi.");
-    }
-  });
+  const btn = document.getElementById('btn-send');
+  btn.disabled = true; btn.textContent = '⏳...';
+  showToast('📤 Rasm guruhga yuborilmoqda...', 4000);
 
-  // ── NEW WORD ──────────────────────────────────────────────────────────────
-  document.getElementById("btn-new-word").addEventListener("click", async () => {
-    try {
-      const url = `/api/draw/new_word?session=${encodeURIComponent(SESSION)}&chat_id=${encodeURIComponent(CHAT_ID)}&init_data=${encodeURIComponent(INIT_DATA)}`;
-      const res  = await fetch(url);
-      if (!res.ok) throw new Error(res.status);
-      const data = await res.json();
-      currentWord = data.word;
-      showToast("⏩ Yangi so'z berildi!");
-    } catch(e) {
-      showToast("❌ Yangi so'z olishda xatolik.");
-    }
-  });
-
-  // ── SEND ──────────────────────────────────────────────────────────────────
-  document.getElementById("btn-send").addEventListener("click", async () => {
-    // Canvas bo'shmi?
-    const tempCtx = document.createElement("canvas");
-    tempCtx.width = W; tempCtx.height = H;
-    const tctx = tempCtx.getContext("2d");
-    tctx.fillStyle = "#fff"; tctx.fillRect(0,0,W,H);
-    const blank = tempCtx.toDataURL();
-    if (canvas.toDataURL() === blank) {
-      showToast("⚠️ Kanvas bo'sh! Avval rasm chizing.");
-      return;
-    }
-
-    document.getElementById("btn-send").disabled = true;
-    document.getElementById("btn-send").textContent = "⏳...";
-    showToast("📤 Rasm guruhga yuborilmoqda...", 4000);
-
-    try {
-      const imageBase64 = canvas.toDataURL("image/png");
-      const body = {
-        session_id:   SESSION,
-        chat_id:      CHAT_ID,
-        init_data:    INIT_DATA,
-        image_base64: imageBase64
-      };
-      const res = await fetch("/api/draw/submit", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(body)
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(()=>({}));
-        throw new Error(err.error || res.status);
-      }
-      showToast("✅ Rasm guruhga yuborildi!", 3000);
-      setTimeout(() => {
-        if (tg) tg.close();
-      }, 2500);
-    } catch(e) {
-      showToast("❌ Xatolik: " + e.message, 3500);
-      document.getElementById("btn-send").disabled = false;
-      document.getElementById("btn-send").textContent = "📤 Yuborish";
-    }
-  });
-
-  // ── INIT ──────────────────────────────────────────────────────────────────
-  async function init() {
-    resize();
-    // Hide loading
-    document.getElementById("loading").style.display = "none";
-    // Auto-show word on open
-    try {
-      currentWord = await fetchWord();
-      document.getElementById("current-word").textContent = currentWord;
-      document.getElementById("word-overlay").classList.add("show");
-    } catch(e) {
-      // non-fatal: user can press 👀 Ko'rish
-    }
+  try {
+    const res = await fetch('/api/draw/submit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        session_id: SESSION, chat_id: CHAT_ID,
+        init_data: INIT_DATA, image_base64: bgC.toDataURL('image/png')
+      })
+    });
+    if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error||res.status); }
+    showToast('✅ Rasm guruhga yuborildi!', 3000);
+    setTimeout(() => { if (tg) tg.close(); }, 2500);
+  } catch(err) {
+    showToast('❌ Xatolik: '+err.message, 3500);
+    btn.disabled = false; btn.textContent = '📤 Yuborish';
   }
+});
 
-  init();
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function genId() { return Math.random().toString(36).slice(2,9); }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+async function init() {
+  resize();
+  pushSnap(); // blank canvas as first history entry
+  document.getElementById('loading').style.display = 'none';
+  try {
+    currentWord = await fetchWord();
+    document.getElementById('current-word').textContent = currentWord;
+    document.getElementById('word-overlay').classList.add('show');
+  } catch { /* non-fatal */ }
+}
+
+init();
 })();
 </script>
 </body>
