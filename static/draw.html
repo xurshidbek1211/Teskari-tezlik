@@ -32,7 +32,6 @@ body {
 }
 #topbar button:active { opacity:.7; }
 #btn-see  { background:#ffd600; color:#222; }
-#btn-new  { background:#43a047; color:#fff; }
 #btn-send { background:var(--btn); color:var(--btn-txt); margin-left:auto; padding:7px 14px; }
 
 /* ── WORD OVERLAY ── */
@@ -224,8 +223,7 @@ body {
 
 <!-- TOP BAR -->
 <div id="topbar">
-  <button id="btn-see">👀 Ko'rish</button>
-  <button id="btn-new">⏩ Yangi</button>
+  <button id="btn-see">👀 So'zni ko'rish</button>
   <button id="btn-send">📤 Yuborish</button>
 </div>
 
@@ -1133,47 +1131,57 @@ document.getElementById('btn-see').addEventListener('click', async () => {
   } catch { showToast('❌ So\'zni yuklab bo\'lmadi.'); }
 });
 
-document.getElementById('btn-new').addEventListener('click', async () => {
-  try {
-    const url = `/api/draw/new_word?session=${encodeURIComponent(SESSION)}&chat_id=${encodeURIComponent(CHAT_ID)}&init_data=${encodeURIComponent(INIT_DATA)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(res.status);
-    currentWord = (await res.json()).word;
-    showToast('⏩ Yangi so\'z berildi!');
-  } catch { showToast('❌ Yangi so\'z olishda xatolik.'); }
-});
-
 // ─── SEND ─────────────────────────────────────────────────────────────────
 document.getElementById('btn-send').addEventListener('click', async () => {
   bakeObjs(); // finalize any remaining shape objects
 
   const tmp = document.createElement('canvas');
   tmp.width = W; tmp.height = H;
-  tmp.getContext('2d').fillStyle = '#fff';
-  tmp.getContext('2d').fillRect(0,0,W,H);
+  const tmpCtx = tmp.getContext('2d');
+  tmpCtx.fillStyle = '#fff';
+  tmpCtx.fillRect(0, 0, W, H);
   if (bgC.toDataURL() === tmp.toDataURL()) {
     showToast('⚠️ Kanvas bo\'sh! Avval rasm chizing.'); return;
   }
 
+  if (!SESSION || !CHAT_ID) {
+    showToast('❌ Sessiya ma\'lumotlari topilmadi.'); return;
+  }
+
   const btn = document.getElementById('btn-send');
-  btn.disabled = true; btn.textContent = '⏳...';
-  showToast('📤 Rasm guruhga yuborilmoqda...', 4000);
+  btn.disabled = true; btn.textContent = '⏳ Yuborilmoqda...';
+  showToast('📤 Rasm guruhga yuborilmoqda...', 5000);
 
   try {
+    const imageBase64 = bgC.toDataURL('image/png');
+    const payload = {
+      session_id:   SESSION,
+      chat_id:      CHAT_ID,
+      init_data:    INIT_DATA || '',
+      image_base64: imageBase64,
+    };
+
     const res = await fetch('/api/draw/submit', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        session_id: SESSION, chat_id: CHAT_ID,
-        init_data: INIT_DATA, image_base64: bgC.toDataURL('image/png')
-      })
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
     });
-    if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error||res.status); }
-    showToast('✅ Rasm guruhga yuborildi!', 3000);
-    setTimeout(() => { if (tg) tg.close(); }, 2500);
+
+    let resData = {};
+    try { resData = await res.json(); } catch(_) {}
+
+    if (!res.ok) {
+      throw new Error(resData.error || `Server xatosi: ${res.status}`);
+    }
+
+    showToast('✅ Rasm guruhga yuborildi! O\'yin boshlanadi...', 3500);
+    btn.textContent = '✅ Yuborildi';
+    setTimeout(() => { if (tg) tg.close(); }, 3000);
   } catch(err) {
-    showToast('❌ Xatolik: '+err.message, 3500);
-    btn.disabled = false; btn.textContent = '📤 Yuborish';
+    console.error('Submit error:', err);
+    showToast('❌ Xatolik: ' + err.message, 4000);
+    btn.disabled = false;
+    btn.textContent = '📤 Yuborish';
   }
 });
 
