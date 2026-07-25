@@ -176,24 +176,89 @@ def _waiting_keyboard(chat_id: int) -> InlineKeyboardMarkup:
 def _draw_start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     """
     "✅ Shu so'zni tanladim" bosilgandan keyin guruhda ko'rinadigan klaviatura.
-    URL tugma: bitta bosish → Telegram ichida Mini App avtomatik ochiladi.
+    URL tugma: bitta bosish → lichkaga o'tadi → bot darhol web_app tugma yuboradi.
+    start param format: d{32hexchars}_{abs_chat_id}   (faqat [A-Za-z0-9_], maks 47 ta belgi)
     """
-    bot_username  = _bot_username or ""
-    app_shortname = os.getenv("BOT_APP_SHORTNAME", "draw")
-    # start_param: faqat [A-Za-z0-9_-], maks 64 belgi
-    start_param   = f"{session_id}__{chat_id}"   # UUID(36)+__(2)+chat_id(≤14) = ≤52 ✓
-    mini_app_url  = f"https://t.me/{bot_username}/{app_shortname}?startapp={start_param}"
+    bot_username = _bot_username or ""
+    sid_hex      = session_id.replace("-", "")          # UUID → 32 hex char
+    abs_cid      = str(abs(chat_id))                    # guruh har doim manfiy
+    start_param  = f"d{sid_hex}_{abs_cid}"              # 1+32+1+≤13 = ≤47 ✓
+    deep_link    = f"https://t.me/{bot_username}?start={start_param}"
 
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text = "🎨 Chizishni boshlash",
-            url  = mini_app_url,
+            url  = deep_link,
         )],
         [InlineKeyboardButton(
             text          = "❌ Chizishni rad etish",
             callback_data = f"draw_decline:{chat_id}:{session_id}",
         )],
     ])
+
+
+async def handle_draw_deeplink(user_id: int, start_param: str, bot: Bot) -> bool:
+    """
+    main.py /start handleri tomonidan chaqiriladi.
+    start_param = 'd{32hexchars}_{abs_chat_id}' formatida bo'ladi.
+    Agar to'g'ri bo'lsa, foydalanuvchining lichkasiga web_app tugmali xabar yuboradi.
+    Qaytaradi: True — muvaffaqiyatli, False — tegishli emas yoki xato.
+    """
+    if not (start_param.startswith("d") and "_" in start_param):
+        return False
+
+    body = start_param[1:]  # 'd' prefiksini olib tashlash
+    sep  = body.index("_")
+    sid_hex = body[:sep]
+    abs_cid = body[sep + 1:]
+
+    if len(sid_hex) != 32 or not sid_hex.isalnum() or not abs_cid.isdigit():
+        return False
+
+    # UUID ni tiklash: 8-4-4-4-12
+    s = sid_hex
+    session_id = f"{s[0:8]}-{s[8:12]}-{s[12:16]}-{s[16:20]}-{s[20:32]}"
+    chat_id    = -int(abs_cid)   # guruh chat_id manfiy
+
+    state = _get_state(chat_id)
+    if not state or state.get("session_id") != session_id:
+        await bot.send_message(
+            user_id,
+            "❌ O'yin sessiyasi topilmadi yoki muddati o'tgan.\n"
+            "Guruhda /rasm bilan yangi o'yin boshlang.",
+        )
+        return True
+
+    if str(user_id) != state.get("drawer_id"):
+        await bot.send_message(
+            user_id,
+            "❌ Siz bu o'yinda chizuvchi emassiz.",
+        )
+        return True
+
+    if state.get("status") not in ("waiting",):
+        await bot.send_message(
+            user_id,
+            "⚠️ O'yin holati noto'g'ri. Guruhda qaytadan urinib ko'ring.",
+        )
+        return True
+
+    base_url = _base_url()
+    draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
+
+    await bot.send_message(
+        user_id,
+        f"🎨 <b>So'zingiz tayyor!</b>\n\n"
+        f"Quyidagi tugmani bosib rasm chizishni boshlang 👇",
+        parse_mode  = "HTML",
+        reply_markup = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text    = "🎨 Rasm chizishni boshlash",
+                web_app = WebAppInfo(url=draw_url),
+            )]
+        ]),
+    )
+    return True
 
 def _submitted_keyboard(chat_id: int, message_id: int, drawer_id) -> InlineKeyboardMarkup:
     """Rasm guruhga yuborilgandan keyin ko'rinadigan klaviatura"""
@@ -229,6 +294,27 @@ rasm_router = Router()
 async def cmd_rasm(message: types.Message, bot: Bot):
     chat_id    = message.chat.id
     user       = message.from_user
+
+    # ── Bir vaqtda bitta o'yin ───────────────────────────────────────────────
+    existing = _get_state(chat_id)
+    if existing and existing.get("status") in ("selecting", "waiting", "submitted",
+                                                "custom_word_pending"):
+        drawer_name = existing.get("drawer_name", "Noma'lum")
+        status      = existing.get("status", "")
+        status_text = {
+            "selecting":          "so'z tanlayapti",
+            "custom_word_pending":"o'z so'zini kiritayapti",
+            "waiting":            "rasm chizayapti",
+            "submitted":          "rasm yuborildi, javob kutilmoqda",
+        }.get(status, status)
+        await message.answer(
+            f"⚠️ Guruhda allaqachon faol o'yin bor!\n\n"
+            f"🖊️ Chizuvchi: <b>{drawer_name}</b> — {status_text}.\n\n"
+            f"O'yin tugagandan so'ng yangi o'yin boshlash mumkin.",
+            parse_mode="HTML",
+        )
+        return
+
     session_id = str(uuid.uuid4())
 
     # 3 ta so'z tayyorla
