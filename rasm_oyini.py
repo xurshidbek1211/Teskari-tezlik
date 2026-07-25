@@ -101,13 +101,13 @@ def _add_like(message_id, chat_id, liker_id, drawer_id):
     return False
 
 # ─── YULDUZ BALL TIZIMI ───────────────────────────────────────────────────────
-def _add_star(chat_id, user_id):
+def _add_star(chat_id, user_id, amount: int = 1):
     scores = _load(DRAW_SCORES_FILE)
     cid    = str(chat_id)
     uid    = str(user_id)
     if cid not in scores:
         scores[cid] = {}
-    scores[cid][uid] = scores[cid].get(uid, 0) + 1
+    scores[cid][uid] = scores[cid].get(uid, 0) + amount
     _save(DRAW_SCORES_FILE, scores)
     return scores[cid][uid]
 
@@ -274,16 +274,14 @@ def _submitted_keyboard(chat_id: int, message_id: int, drawer_id) -> InlineKeybo
     ])
 
 def _answered_keyboard(chat_id: int, message_id: int, drawer_id) -> InlineKeyboardMarkup:
-    """To'g'ri javob topilgandan keyin ko'rinadigan klaviatura"""
+    """To'g'ri javob topilgandan keyin rasm xabarida ko'rinadigan klaviatura"""
     return InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="👍 Layk",
                                  callback_data=f"draw_like:{chat_id}:{message_id}:{drawer_id}"),
+            InlineKeyboardButton(text="🎨 Chizishni xohlayman",
+                                 callback_data=f"draw_want:{chat_id}"),
         ],
-        [InlineKeyboardButton(text="🎨 Chizishni xohlayman",
-                              callback_data=f"draw_want:{chat_id}")],
-        [InlineKeyboardButton(text="⏳🎨 Yangi o'yin",
-                              callback_data=f"draw_restart:{chat_id}")],
     ])
 
 # ─── ROUTER ───────────────────────────────────────────────────────────────────
@@ -648,10 +646,31 @@ async def cb_draw_decline(query: types.CallbackQuery, bot: Bot):
 # ─── ⏳🎨 YANGI O'YIN ──────────────────────────────────────────────────────────
 @rasm_router.callback_query(F.data.startswith("draw_restart:"))
 async def cb_draw_restart(query: types.CallbackQuery, bot: Bot):
-    chat_id    = int(query.data.split(":")[1])
-    state      = _get_state(chat_id)
-    want_queue = state.get("want_queue", []) if state else []
-    used_words = state.get("used_words", []) if state else []
+    chat_id = int(query.data.split(":")[1])
+    state   = _get_state(chat_id)
+
+    # Faqat "answered" holatda ishlaydi — qayta bosilishdan himoya
+    if not state or state.get("status") != "answered":
+        await query.answer("✅ O'yin allaqachon boshlangan yoki tugagan.", show_alert=False)
+        return
+
+    want_queue = state.get("want_queue", [])
+    used_words = state.get("used_words", [])
+
+    # Tugmani darhol bloklash uchun statusni o'zgartir (race condition himoyasi)
+    state["status"] = "restarting"
+    _set_state(chat_id, state)
+
+    # Natija xabaridagi tugmani o'chirib qo'y
+    try:
+        await bot.edit_message_reply_markup(
+            chat_id      = chat_id,
+            message_id   = query.message.message_id,
+            reply_markup = InlineKeyboardMarkup(inline_keyboard=[]),
+        )
+    except Exception:
+        pass
+
     _clear_state(chat_id)
 
     user = query.from_user
@@ -730,24 +749,36 @@ async def check_drawing_answer(message: types.Message, bot: Bot) -> bool:
     state["winner_id"] = str(user.id)
     _set_state(chat_id, state)
 
-    # Rasm xabarining klaviaturasini yangilash
+    # +4 yulduz: javob topganga ham, chizuvchiga ham
+    winner_stars = _add_star(chat_id, user.id,  amount=4)
+    drawer_stars = _add_star(chat_id, drawer_id, amount=4)
+
+    # Rasm xabarining klaviaturasini yangilash (layk + xohlayman)
     if draw_msg_id:
         try:
             ans_kb = _answered_keyboard(chat_id, draw_msg_id, drawer_id)
             await bot.edit_message_reply_markup(
-                chat_id    = chat_id,
-                message_id = draw_msg_id,
+                chat_id      = chat_id,
+                message_id   = draw_msg_id,
                 reply_markup = ans_kb,
             )
         except Exception as e:
             log.warning("edit answered keyboard error: %s", e)
 
+    # Natija xabari + "Yangi o'yin boshlash" tugmasi
+    result_kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text          = "🆕 Yangi o'yin boshlash",
+            callback_data = f"draw_restart:{chat_id}",
+        )],
+    ])
     await message.answer(
         f"🎯 <b>To'g'ri javob!</b>\n\n"
         f"🖼️ So'z: <b>{word}</b>\n"
-        f"🏆 Topdi: <b>{user.full_name}</b>\n"
-        f"🎨 Chizgan: <b>{drawer_name}</b>",
-        parse_mode="HTML",
+        f"🏆 Topdi: <b>{user.full_name}</b> +4🌟\n"
+        f"🎨 Chizgan: <b>{drawer_name}</b> +4🌟",
+        parse_mode   = "HTML",
+        reply_markup = result_kb,
     )
     return True
 
