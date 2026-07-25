@@ -1144,22 +1144,78 @@ document.getElementById('btn-see').addEventListener('click', async () => {
   } catch { showToast('❌ So\'zni yuklab bo\'lmadi.'); }
 });
 
+// ─── 30 SONIYALIK PREVIEW ─────────────────────────────────────────────────
+let previewInterval = null;
+let previewSending  = false;
+let gameFinished    = false;
+
+function isCanvasBlank() {
+  const tmp = document.createElement('canvas');
+  tmp.width = W; tmp.height = H;
+  const c = tmp.getContext('2d');
+  c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+  return bgC.toDataURL() === tmp.toDataURL();
+}
+
+async function sendPreview() {
+  if (previewSending || gameFinished || !SESSION || !CHAT_ID) return;
+  if (isCanvasBlank()) return;   // Kanvas bo'sh bo'lsa preview yubormaymiz
+
+  previewSending = true;
+  try {
+    const imageBase64 = bgC.toDataURL('image/png');
+    const res = await fetch('/api/draw/preview', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        session_id:   SESSION,
+        chat_id:      CHAT_ID,
+        init_data:    INIT_DATA || '',
+        image_base64: imageBase64,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // O'yin tugagan bo'lsa — preview to'xtatiladi
+      if (data.status && data.status !== 'waiting') {
+        stopPreviewInterval();
+        gameFinished = true;
+      }
+    }
+  } catch(err) {
+    console.warn('Preview error:', err);
+  } finally {
+    previewSending = false;
+  }
+}
+
+function startPreviewInterval() {
+  if (previewInterval) return;
+  previewInterval = setInterval(sendPreview, 30000);
+}
+
+function stopPreviewInterval() {
+  if (previewInterval) {
+    clearInterval(previewInterval);
+    previewInterval = null;
+  }
+}
+
 // ─── SEND ─────────────────────────────────────────────────────────────────
 document.getElementById('btn-send').addEventListener('click', async () => {
   bakeObjs(); // finalize any remaining shape objects
 
-  const tmp = document.createElement('canvas');
-  tmp.width = W; tmp.height = H;
-  const tmpCtx = tmp.getContext('2d');
-  tmpCtx.fillStyle = '#fff';
-  tmpCtx.fillRect(0, 0, W, H);
-  if (bgC.toDataURL() === tmp.toDataURL()) {
+  if (isCanvasBlank()) {
     showToast('⚠️ Kanvas bo\'sh! Avval rasm chizing.'); return;
   }
 
   if (!SESSION || !CHAT_ID) {
     showToast('❌ Sessiya ma\'lumotlari topilmadi.'); return;
   }
+
+  // Submit paytida preview to'xtatiladi
+  stopPreviewInterval();
+  gameFinished = true;
 
   const btn = document.getElementById('btn-send');
   btn.disabled = true; btn.textContent = '⏳ Yuborilmoqda...';
@@ -1195,6 +1251,9 @@ document.getElementById('btn-send').addEventListener('click', async () => {
     showToast('❌ Xatolik: ' + err.message, 4000);
     btn.disabled = false;
     btn.textContent = '📤 Yuborish';
+    // Xatolik bo'lsa preview qaytadan ishga tushishi mumkin
+    gameFinished = false;
+    startPreviewInterval();
   }
 });
 
@@ -1211,6 +1270,11 @@ async function init() {
     document.getElementById('current-word').textContent = currentWord;
     document.getElementById('word-overlay').classList.add('show');
   } catch { /* non-fatal */ }
+
+  // 30 soniyalik preview interval — so'z muvaffaqiyatli yuklanganda boshlanadi
+  if (SESSION && CHAT_ID) {
+    startPreviewInterval();
+  }
 }
 
 init();

@@ -12,6 +12,7 @@ import hashlib
 import logging
 import pathlib
 import io
+import asyncio
 from datetime import datetime
 from urllib.parse import parse_qs
 
@@ -27,6 +28,9 @@ log = logging.getLogger(__name__)
 # ── Modul darajasida bot havolasi (setup() tomonidan o'rnatiladi) ─────────────
 _bot: Bot | None = None
 _bot_username: str | None = None   # startup'da to'ldiriladi
+
+# ─── ASYNC TAYMERLAR (xotirada, restart'da tozalanadi) ───────────────────────
+_pending_cancel_tasks: dict[int, asyncio.Task] = {}
 
 # ─── FAYLLAR ──────────────────────────────────────────────────────────────────
 WORDS_FILE       = "rasm_sozlar.json"
@@ -164,6 +168,8 @@ def _selection_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
                               callback_data=f"draw_help:{chat_id}")],
         [InlineKeyboardButton(text="✅ Shu so'zni tanladim — Chizishni boshlash",
                               callback_data=f"draw_start:{chat_id}:{session_id}")],
+        [InlineKeyboardButton(text="❌ Rad etish",
+                              callback_data=f"draw_decline:{chat_id}:{session_id}")],
     ])
 
 def _waiting_keyboard(chat_id: int) -> InlineKeyboardMarkup:
@@ -172,6 +178,55 @@ def _waiting_keyboard(chat_id: int) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="❌ Chizishni rad etish",
                               callback_data=f"draw_decline:{chat_id}")],
     ])
+
+# ─── 2 DAQIQALIK BEKOR QILISH TAYMERI ────────────────────────────────────────
+
+async def _cancel_game_timeout(chat_id: int, session_id: str):
+    """2 daqiqa ichida chizish boshlanmasa o'yinni avtomatik bekor qiladi."""
+    try:
+        await asyncio.sleep(120)
+    except asyncio.CancelledError:
+        return
+
+    state = _get_state(chat_id)
+    # Holat o'zgargan bo'lsa (preview kelgan, submit bo'lgan) — hech narsa qilmaymiz
+    if not state or state.get("session_id") != session_id or state.get("status") != "waiting":
+        return
+
+    _pending_cancel_tasks.pop(chat_id, None)
+    _clear_state(chat_id)
+
+    log.info("Timeout: chat=%s session=%s — o'yin bekor qilindi", chat_id, session_id)
+
+    if _bot:
+        try:
+            await _bot.send_message(
+                chat_id,
+                "⏰ <b>Vaqt tugadi!</b>\n\n"
+                "Chizuvchi 2 daqiqa ichida chizishni boshlamadi.\n"
+                "O'yin bekor qilindi. Yangi o'yin uchun /rasm yozing!",
+                parse_mode="HTML",
+            )
+        except Exception as e:
+            log.warning("timeout msg error: %s", e)
+
+
+def _start_cancel_timer(chat_id: int, session_id: str):
+    """2 daqiqalik bekor qilish taymerini ishga tushiradi."""
+    _stop_cancel_timer(chat_id)
+    try:
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(_cancel_game_timeout(chat_id, session_id))
+        _pending_cancel_tasks[chat_id] = task
+    except RuntimeError:
+        pass   # event loop yo'q — ishlatilmaydi
+
+
+def _stop_cancel_timer(chat_id: int):
+    """Ishlab turgan bekor qilish taymerini to'xtatadi."""
+    task = _pending_cancel_tasks.pop(chat_id, None)
+    if task and not task.done():
+        task.cancel()
 
 def _draw_start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     """
@@ -330,6 +385,7 @@ async def cmd_rasm(message: types.Message, bot: Bot):
         "status":             "selecting",
         "game_message_id":    None,
         "drawing_message_id": None,
+        "preview_message_id": None,
         "used_words":         candidates[:],
         "custom_word":        False,
         "want_queue":         [],
@@ -506,6 +562,9 @@ async def cb_draw_start(query: types.CallbackQuery, bot: Bot):
     state["status"] = "waiting"
     _set_state(chat_id, state)
 
+    # 2 daqiqalik bekor qilish taymerini ishga tushir
+    _start_cancel_timer(chat_id, session_id)
+
     # Guruh xabarini yangilash — URL tugma, bitta bosish → Mini App ochiladi
     group_kb    = _draw_start_keyboard(chat_id, session_id)
     game_msg_id = state.get("game_message_id")
@@ -592,6 +651,9 @@ async def cb_draw_decline(query: types.CallbackQuery, bot: Bot):
     if str(user.id) != state.get("drawer_id"):
         await query.answer("❌ Faqat chizuvchi rad eta oladi.", show_alert=True)
         return
+
+    # Taymer va preview xabarini tozalash
+    _stop_cancel_timer(chat_id)
 
     want_queue = state.get("want_queue", [])
     used_words = state.get("used_words", [])
@@ -822,8 +884,11 @@ async def handle_private_custom_word(message: types.Message) -> bool:
     chat_id_int = int(found_chat)
     _set_state(chat_id_int, state)
 
-    # Guruh xabarini yangilash — URL tugma, bitta bosish → Mini App ochiladi
+    # 2 daqiqalik bekor qilish taymerini ishga tushir
     session_id = state.get("session_id")
+    _start_cancel_timer(chat_id_int, session_id)
+
+    # Guruh xabarini yangilash — URL tugma, bitta bosish → Mini App ochiladi
     group_kb   = _draw_start_keyboard(chat_id_int, session_id)
 
     await message.answer(
@@ -920,49 +985,184 @@ async def _api_draw_submit(request):
     if not _bot:
         return JSONResponse({"error": "bot not ready"}, status_code=503)
 
-    drawer_name = state.get("drawer_name", "Chizuvchi")
-    drawer_id   = state.get("drawer_id")
-    session_id  = state.get("session_id")
+    # Yakuniy submit — taymerlarni to'xtat
+    _stop_cancel_timer(chat_id)
+
+    drawer_name    = state.get("drawer_name", "Chizuvchi")
+    drawer_id      = state.get("drawer_id")
+    session_id     = state.get("session_id")
+    preview_msg_id = state.get("preview_message_id")
 
     try:
-        # aiogram 3.x da BufferedInputFile ishlatish shart
+        from aiogram.types import InputMediaPhoto
+
         photo = BufferedInputFile(image_bytes, filename="drawing.png")
 
-        # Birinchi placeholder keyboard bilan yuborish (message_id hali noma'lum)
-        ph_kb = _submitted_keyboard(chat_id, 0, drawer_id)
-
-        sent = await _bot.send_photo(
-            chat_id,
-            photo      = photo,
-            caption    = (
-                f"🎨 <b>{drawer_name}</b> rasm chizdi!\n\n"
-                "🤔 Bu nima? Rasmga qarab so'zni toping va yozing!"
-            ),
-            reply_markup = ph_kb,
-            parse_mode   = "HTML",
+        final_caption = (
+            f"🎨 <b>{drawer_name}</b> rasm chizdi!\n\n"
+            "🤔 Bu nima? Rasmga qarab so'zni toping va yozing!"
         )
 
-        # Haqiqiy message_id bilan keyboard yangilash
-        real_kb = _submitted_keyboard(chat_id, sent.message_id, drawer_id)
-        try:
-            await _bot.edit_message_reply_markup(
-                chat_id      = chat_id,
-                message_id   = sent.message_id,
-                reply_markup = real_kb,
+        final_msg_id = None
+
+        # Preview xabar mavjud bo'lsa — uni yakuniy rasmga aylantir
+        if preview_msg_id:
+            try:
+                media = InputMediaPhoto(
+                    media      = photo,
+                    caption    = final_caption,
+                    parse_mode = "HTML",
+                )
+                await _bot.edit_message_media(
+                    chat_id    = chat_id,
+                    message_id = preview_msg_id,
+                    media      = media,
+                )
+                await _bot.edit_message_reply_markup(
+                    chat_id      = chat_id,
+                    message_id   = preview_msg_id,
+                    reply_markup = _submitted_keyboard(chat_id, preview_msg_id, drawer_id),
+                )
+                final_msg_id = preview_msg_id
+            except Exception as e:
+                log.warning("preview → final edit error: %s — yangi xabar yuboriladi", e)
+                preview_msg_id = None
+
+        if not final_msg_id:
+            # Yangi rasm xabari yuborish
+            ph_kb = _submitted_keyboard(chat_id, 0, drawer_id)
+            sent  = await _bot.send_photo(
+                chat_id,
+                photo        = photo,
+                caption      = final_caption,
+                reply_markup = ph_kb,
+                parse_mode   = "HTML",
             )
-        except Exception as e:
-            log.warning("edit markup error: %s", e)
+            real_kb = _submitted_keyboard(chat_id, sent.message_id, drawer_id)
+            try:
+                await _bot.edit_message_reply_markup(
+                    chat_id      = chat_id,
+                    message_id   = sent.message_id,
+                    reply_markup = real_kb,
+                )
+            except Exception as e:
+                log.warning("edit markup error: %s", e)
+            final_msg_id = sent.message_id
 
         state["status"]             = "submitted"
-        state["drawing_message_id"] = sent.message_id
+        state["drawing_message_id"] = final_msg_id
         _set_state(chat_id, state)
 
-        log.info("Drawing submitted: chat=%s msg=%s", chat_id, sent.message_id)
-        return JSONResponse({"ok": True, "message_id": sent.message_id})
+        log.info("Drawing submitted: chat=%s msg=%s", chat_id, final_msg_id)
+        return JSONResponse({"ok": True, "message_id": final_msg_id})
 
     except Exception as e:
         log.error("draw submit error: %s", e)
         return JSONResponse({"error": str(e)}, status_code=500)
+
+async def _api_draw_preview(request):
+    """
+    Har 30 soniyada frontenddan chaqiriladi.
+    Joriy kanvas holatini guruhga yuboradi yoki oldingi preview xabarini yangilaydi.
+    Birinchi preview kelganda 2 daqiqalik taymer bekor qilinadi.
+    """
+    from fastapi.responses import JSONResponse
+    from aiogram.types import InputMediaPhoto
+    import base64
+
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "invalid json"}, status_code=400)
+
+    session_id = body.get("session_id")
+    chat_id    = body.get("chat_id")
+    init_data  = body.get("init_data", "")
+    image_b64  = body.get("image_base64", "")
+
+    if not session_id or not chat_id or not image_b64:
+        return JSONResponse({"error": "missing fields"}, status_code=400)
+
+    chat_id = int(chat_id)
+    state   = _get_state(chat_id)
+
+    if not state or state.get("session_id") != session_id:
+        return JSONResponse({"status": "session_not_found"})
+
+    # Faqat "waiting" holatda ishlaydi
+    current_status = state.get("status", "")
+    if current_status != "waiting":
+        return JSONResponse({"status": current_status})
+
+    # Foydalanuvchi tekshiruvi
+    user_id = _user_id_from_init_data(init_data)
+    if user_id and user_id != state.get("drawer_id"):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+
+    # Birinchi preview — 2 daqiqalik taymer bekor qilinadi
+    _stop_cancel_timer(chat_id)
+
+    try:
+        if "," in image_b64:
+            image_b64 = image_b64.split(",", 1)[1]
+        image_bytes = base64.b64decode(image_b64)
+    except Exception as e:
+        return JSONResponse({"error": f"image decode error: {e}"}, status_code=400)
+
+    if not image_bytes or len(image_bytes) < 100:
+        return JSONResponse({"error": "image too small"}, status_code=400)
+
+    if not _bot:
+        return JSONResponse({"error": "bot not ready"}, status_code=503)
+
+    drawer_name    = state.get("drawer_name", "Chizuvchi")
+    preview_msg_id = state.get("preview_message_id")
+
+    preview_caption = (
+        f"🎨 <b>{drawer_name}</b> chizmoqda...\n"
+        f"⏱️ Har 30 soniyada yangilanadi"
+    )
+
+    try:
+        photo = BufferedInputFile(image_bytes, filename="preview.png")
+
+        if preview_msg_id:
+            # Mavjud rasmni yangilash
+            try:
+                media = InputMediaPhoto(
+                    media      = photo,
+                    caption    = preview_caption,
+                    parse_mode = "HTML",
+                )
+                await _bot.edit_message_media(
+                    chat_id    = chat_id,
+                    message_id = preview_msg_id,
+                    media      = media,
+                )
+                return JSONResponse({"ok": True, "status": "waiting"})
+            except Exception as e:
+                log.warning("edit preview media error: %s — yangi xabar yuboriladi", e)
+                # Edit muvaffaqiyatsiz bo'lsa yangi yuboramiz
+                state["preview_message_id"] = None
+                _set_state(chat_id, state)
+                preview_msg_id = None
+
+        # Yangi preview xabar yuborish
+        sent = await _bot.send_photo(
+            chat_id,
+            photo      = photo,
+            caption    = preview_caption,
+            parse_mode = "HTML",
+        )
+        state["preview_message_id"] = sent.message_id
+        _set_state(chat_id, state)
+        log.info("Preview sent: chat=%s msg=%s", chat_id, sent.message_id)
+        return JSONResponse({"ok": True, "status": "waiting"})
+
+    except Exception as e:
+        log.error("draw preview error: %s", e)
+        return JSONResponse({"error": str(e)}, status_code=500)
+
 
 async def _serve_draw(request):
     from fastapi.responses import FileResponse
@@ -984,9 +1184,10 @@ async def setup_fastapi(bot: Bot, app):
     except Exception as e:
         log.warning("Bot username olinmadi: %s", e)
 
-    app.add_route("/api/draw/word",   _api_draw_word,   methods=["GET"])
-    app.add_route("/api/draw/submit", _api_draw_submit, methods=["POST"])
-    app.add_route("/draw",            _serve_draw,      methods=["GET"])
+    app.add_route("/api/draw/word",    _api_draw_word,    methods=["GET"])
+    app.add_route("/api/draw/submit",  _api_draw_submit,  methods=["POST"])
+    app.add_route("/api/draw/preview", _api_draw_preview, methods=["POST"])
+    app.add_route("/draw",             _serve_draw,       methods=["GET"])
 
     pathlib.Path("static").mkdir(exist_ok=True)
     log.info("✅ rasm_oyini FastAPI endpointlari sozlandi")
