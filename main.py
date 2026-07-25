@@ -152,6 +152,77 @@ async def boshla(message: types.Message, bot: Bot):
         return
     await send_new_question(message.chat.id, bot)
 
+# ---------- /stop ----------
+@main_router.message(Command("stop"))
+async def stop_cmd(message: types.Message, bot: Bot):
+    user = message.from_user
+    chat_id = message.chat.id
+
+    # Admin tekshiruvi: RUXSAT_ETILGANLAR yoki guruh admin
+    is_allowed = user.id in RUXSAT_ETILGANLAR
+    if not is_allowed and message.chat.type != "private":
+        try:
+            member = await bot.get_chat_member(chat_id, user.id)
+            is_allowed = member.status in ("administrator", "creator")
+        except Exception:
+            pass
+
+    if not is_allowed:
+        await message.answer("❌ Faqat adminlar /stop buyrug'idan foydalana oladi.")
+        return
+
+    result = await rasm_oyini.stop_game(chat_id)
+
+    if not result["stopped"]:
+        await message.answer("ℹ️ Hozirda faol rasm o'yini yo'q.")
+        return
+
+    status_text = {
+        "selecting":          "so'z tanlanmoqda edi",
+        "custom_word_pending":"so'z kiritilmoqda edi",
+        "waiting":            "rasm chizilmoqda edi",
+        "submitted":          "javob kutilmoqda edi",
+    }.get(result["status"], result["status"])
+
+    word_info = f"\n📝 So'z: <b>{result['word']}</b>" if result.get("word") else ""
+    await message.answer(
+        f"🛑 <b>Admin tomonidan o'yin to'xtatildi.</b>\n\n"
+        f"📊 Holat: {status_text}{word_info}\n\n"
+        f"Yangi o'yin uchun /rasm yozing!",
+        parse_mode="HTML",
+    )
+
+# ---------- /reyting ----------
+@main_router.message(Command("reyting"))
+async def reyting_cmd(message: types.Message, bot: Bot):
+    chat_id  = str(message.chat.id)
+    scores   = load_json(SCORE_FILE)
+    chat_scores = scores.get(chat_id, {})
+
+    if not chat_scores:
+        await message.answer("📊 Hali hech kim ball to'plamagan.")
+        return
+
+    top20 = sorted(chat_scores.items(), key=lambda x: x[1], reverse=True)[:20]
+
+    medals = ["🥇", "🥈", "🥉"]
+    lines  = []
+    for i, (uid, ball) in enumerate(top20):
+        try:
+            member = await bot.get_chat_member(message.chat.id, int(uid))
+            name   = member.user.full_name
+        except Exception:
+            name = "👤 Noma'lum"
+        prefix = medals[i] if i < 3 else f"{i+1}."
+        lines.append(f"{prefix} {name} — <b>{ball}</b> ball")
+
+    text = (
+        "🏆 <b>Reyting (Top 20)</b>\n"
+        "━━━━━━━━━━━━━━━━\n"
+        + "\n".join(lines)
+    )
+    await message.answer(text, parse_mode="HTML")
+
 # ---------- /add ----------
 @main_router.message(Command("add"))
 async def add_question_cmd(message: types.Message):
@@ -290,15 +361,13 @@ async def startup():
 
     # Bot "/" menyusida ko'rinadigan komandalar
     await bot.set_my_commands([
-        BotCommand(command="boshla",    description="Teskari tezlik o'yinini boshlash"),
-        BotCommand(command="rasm",      description="🎨 Rasm chizish o'yinini boshlash"),
-        BotCommand(command="ball",      description="Ballaringizni ko'rish"),
-        BotCommand(command="reyting",   description="Reyting ro'yxati"),
-        BotCommand(command="tabrik",    description="Tabriknoma"),
-        BotCommand(command="kun",       description="Kun bilimdoni"),
-        BotCommand(command="adminadd",  description="Admin qo'shish"),
-        BotCommand(command="add",       description="Yangi savol qo'shish (admin)"),
-        BotCommand(command="start",     description="Botni ishga tushirish"),
+        BotCommand(command="boshla",  description="Teskari tezlik o'yinini boshlash"),
+        BotCommand(command="rasm",    description="🎨 Rasm chizish o'yinini boshlash"),
+        BotCommand(command="reyting", description="Top 20 reyting ko'rish"),
+        BotCommand(command="ball",    description="Ballaringizni ko'rish"),
+        BotCommand(command="stop",    description="Faol o'yinni to'xtatish (admin)"),
+        BotCommand(command="add",     description="Yangi savol qo'shish (admin)"),
+        BotCommand(command="start",   description="Botni ishga tushirish"),
     ])
     # /on, /off, /ruxsat — foydalanuvchi menyusida ko'rsatilmaydi (qo'shilmadi)
 

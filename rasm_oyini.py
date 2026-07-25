@@ -30,7 +30,8 @@ _bot: Bot | None = None
 _bot_username: str | None = None   # startup'da to'ldiriladi
 
 # ─── ASYNC TAYMERLAR (xotirada, restart'da tozalanadi) ───────────────────────
-_pending_cancel_tasks: dict[int, asyncio.Task] = {}
+_pending_cancel_tasks: dict[int, asyncio.Task] = {}   # "waiting" taymeri
+_pending_answer_tasks: dict[int, asyncio.Task] = {}   # "submitted" faolsizlik taymeri
 
 # ─── FAYLLAR ──────────────────────────────────────────────────────────────────
 WORDS_FILE       = "rasm_sozlar.json"
@@ -227,6 +228,81 @@ def _stop_cancel_timer(chat_id: int):
     task = _pending_cancel_tasks.pop(chat_id, None)
     if task and not task.done():
         task.cancel()
+
+
+# ─── 2 DAQIQALIK FAOLSIZLIK TAYMERI (submitted holat) ────────────────────────
+
+async def _answer_game_timeout(chat_id: int, session_id: str):
+    """Rasm yuborilgandan keyin 2 daqiqa ichida javob topilmasa o'yinni tugatadi."""
+    try:
+        await asyncio.sleep(120)
+    except asyncio.CancelledError:
+        return
+
+    state = _get_state(chat_id)
+    if not state or state.get("session_id") != session_id or state.get("status") != "submitted":
+        return
+
+    _pending_answer_tasks.pop(chat_id, None)
+    word        = state.get("word", "?")
+    drawer_name = state.get("drawer_name", "Chizuvchi")
+    _clear_state(chat_id)
+
+    log.info("Answer timeout: chat=%s — o'yin tugadi, so'z=%s", chat_id, word)
+
+    if _bot:
+        try:
+            await _bot.send_message(
+                chat_id,
+                f"⏰ <b>Vaqt tugadi!</b>\n\n"
+                f"2 daqiqa ichida hech kim so'zni topa olmadi.\n"
+                f"🎨 Chizuvchi: <b>{drawer_name}</b>\n"
+                f"📝 So'z: <b>{word}</b>\n\n"
+                f"Yangi o'yin uchun /rasm yozing!",
+                parse_mode="HTML",
+            )
+        except Exception as e:
+            log.warning("answer timeout msg error: %s", e)
+
+
+def _start_answer_timer(chat_id: int, session_id: str):
+    """Rasm yuborilgandan keyin 2 daqiqalik faolsizlik taymerini ishga tushiradi."""
+    _stop_answer_timer(chat_id)
+    try:
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(_answer_game_timeout(chat_id, session_id))
+        _pending_answer_tasks[chat_id] = task
+    except RuntimeError:
+        pass
+
+
+def _stop_answer_timer(chat_id: int):
+    """Faolsizlik taymerini to'xtatadi (to'g'ri javob yoki admin /stop)."""
+    task = _pending_answer_tasks.pop(chat_id, None)
+    if task and not task.done():
+        task.cancel()
+
+
+# ─── ADMIN: O'YINNI MAJBURAN TO'XTATISH ──────────────────────────────────────
+
+async def stop_game(chat_id: int) -> dict:
+    """
+    Admin /stop buyrug'i uchun. Har qanday faol rasm o'yinini tugatadi.
+    Returns: {"stopped": bool, "word": str|None, "status": str}
+    """
+    state = _get_state(chat_id)
+    if not state:
+        return {"stopped": False, "word": None, "status": "no_game"}
+
+    word   = state.get("word")
+    status = state.get("status", "")
+
+    _stop_cancel_timer(chat_id)
+    _stop_answer_timer(chat_id)
+    _clear_state(chat_id)
+
+    log.info("Admin stop: chat=%s status=%s word=%s", chat_id, status, word)
+    return {"stopped": True, "word": word, "status": status}
 
 def _draw_start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     """
@@ -652,8 +728,9 @@ async def cb_draw_decline(query: types.CallbackQuery, bot: Bot):
         await query.answer("❌ Faqat chizuvchi rad eta oladi.", show_alert=True)
         return
 
-    # Taymer va preview xabarini tozalash
+    # Barcha taymerlarni to'xtat
     _stop_cancel_timer(chat_id)
+    _stop_answer_timer(chat_id)
 
     want_queue = state.get("want_queue", [])
     used_words = state.get("used_words", [])
@@ -799,7 +876,9 @@ async def check_drawing_answer(message: types.Message, bot: Bot) -> bool:
     if user_answer != correct_word:
         return False
 
-    # ✅ To'g'ri javob!
+    # ✅ To'g'ri javob! — faolsizlik taymerini to'xtat
+    _stop_answer_timer(chat_id)
+
     drawer_name = state.get("drawer_name", "Chizuvchi")
     drawer_id   = state.get("drawer_id")
     word        = state.get("word")
@@ -1052,6 +1131,9 @@ async def _api_draw_submit(request):
         state["status"]             = "submitted"
         state["drawing_message_id"] = final_msg_id
         _set_state(chat_id, state)
+
+        # 2 daqiqalik faolsizlik taymerini ishga tushir
+        _start_answer_timer(chat_id, state.get("session_id", ""))
 
         log.info("Drawing submitted: chat=%s msg=%s", chat_id, final_msg_id)
         return JSONResponse({"ok": True, "message_id": final_msg_id})
