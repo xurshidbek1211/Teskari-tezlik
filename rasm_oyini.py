@@ -173,6 +173,28 @@ def _waiting_keyboard(chat_id: int) -> InlineKeyboardMarkup:
                               callback_data=f"draw_decline:{chat_id}")],
     ])
 
+def _draw_start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
+    """
+    "✅ Shu so'zni tanladim" bosilgandan keyin guruhda ko'rinadigan klaviatura.
+    URL tugma: bitta bosish → Telegram ichida Mini App avtomatik ochiladi.
+    """
+    bot_username  = _bot_username or ""
+    app_shortname = os.getenv("BOT_APP_SHORTNAME", "draw")
+    # start_param: faqat [A-Za-z0-9_-], maks 64 belgi
+    start_param   = f"{session_id}__{chat_id}"   # UUID(36)+__(2)+chat_id(≤14) = ≤52 ✓
+    mini_app_url  = f"https://t.me/{bot_username}/{app_shortname}?startapp={start_param}"
+
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text = "🎨 Chizishni boshlash",
+            url  = mini_app_url,
+        )],
+        [InlineKeyboardButton(
+            text          = "❌ Chizishni rad etish",
+            callback_data = f"draw_decline:{chat_id}:{session_id}",
+        )],
+    ])
+
 def _submitted_keyboard(chat_id: int, message_id: int, drawer_id) -> InlineKeyboardMarkup:
     """Rasm guruhga yuborilgandan keyin ko'rinadigan klaviatura"""
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -402,18 +424,8 @@ async def cb_draw_start(query: types.CallbackQuery, bot: Bot):
     state["status"] = "waiting"
     _set_state(chat_id, state)
 
-    # Guruh xabarini yangilash — callback orqali Mini App ochadigan tugma
-    group_kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text          = "🎨 Chizishni boshlash",
-            callback_data = f"draw_open:{chat_id}:{session_id}",
-        )],
-        [InlineKeyboardButton(
-            text          = "❌ Chizishni rad etish",
-            callback_data = f"draw_decline:{chat_id}:{session_id}",
-        )],
-    ])
-
+    # Guruh xabarini yangilash — URL tugma, bitta bosish → Mini App ochiladi
+    group_kb    = _draw_start_keyboard(chat_id, session_id)
     game_msg_id = state.get("game_message_id")
     if game_msg_id:
         try:
@@ -433,43 +445,6 @@ async def cb_draw_start(query: types.CallbackQuery, bot: Bot):
             log.warning("edit group msg error: %s", e)
 
     await query.answer("✅ Boshlang!")
-
-# ─── 🎨 MINI APP OCHISH (guruhdan) ───────────────────────────────────────────
-@rasm_router.callback_query(F.data.startswith("draw_open:"))
-async def cb_draw_open_app(query: types.CallbackQuery):
-    """
-    Guruh xabarida "🎨 Chizishni boshlash" bosilganda chaqiriladi.
-    query.answer(url=...) orqali Telegram ichida Mini App ochiladi.
-    """
-    parts      = query.data.split(":")
-    chat_id    = int(parts[1])
-    session_id = parts[2]
-
-    state = _get_state(chat_id)
-    if not state or state.get("session_id") != session_id:
-        await query.answer("❌ O'yin sessiyasi topilmadi.", show_alert=True)
-        return
-    if state.get("status") not in ("waiting",):
-        await query.answer("❌ O'yin boshlash uchun avval so'z tanlang.", show_alert=True)
-        return
-    if str(query.from_user.id) != state.get("drawer_id"):
-        await query.answer("❌ Faqat chizuvchi boshlaydi.", show_alert=True)
-        return
-
-    bot_username  = _bot_username or ""
-    app_shortname = os.getenv("BOT_APP_SHORTNAME", "draw")
-
-    if not bot_username:
-        await query.answer("⚠️ Bot username sozlanmagan.", show_alert=True)
-        return
-
-    # start_param: faqat [A-Za-z0-9_-], max 64 belgi
-    # UUID (36) + "__" (2) + chat_id (maks 14) = maks 52 belgi ✓
-    start_param  = f"{session_id}__{chat_id}"
-    mini_app_url = f"https://t.me/{bot_username}/{app_shortname}?startapp={start_param}"
-
-    # url= bilan javob berish — Telegram Mini App'ni ichida ochadi
-    await query.answer(url=mini_app_url)
 
 # ─── 👍 LAYK ──────────────────────────────────────────────────────────────────
 @rasm_router.callback_query(F.data.startswith("draw_like:"))
@@ -732,19 +707,9 @@ async def handle_private_custom_word(message: types.Message) -> bool:
     chat_id_int = int(found_chat)
     _set_state(chat_id_int, state)
 
-    # Guruh xabarini yangilash — callback orqali Mini App ochadigan tugma
+    # Guruh xabarini yangilash — URL tugma, bitta bosish → Mini App ochiladi
     session_id = state.get("session_id")
-
-    group_kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text          = "🎨 Chizishni boshlash",
-            callback_data = f"draw_open:{chat_id_int}:{session_id}",
-        )],
-        [InlineKeyboardButton(
-            text          = "❌ Chizishni rad etish",
-            callback_data = f"draw_decline:{chat_id_int}:{session_id}",
-        )],
-    ])
+    group_kb   = _draw_start_keyboard(chat_id_int, session_id)
 
     await message.answer(
         f"✅ So'zingiz qabul qilindi: <b>{custom_word}</b>\n\n"
