@@ -279,8 +279,6 @@ def _answered_keyboard(chat_id: int, message_id: int, drawer_id) -> InlineKeyboa
         [
             InlineKeyboardButton(text="👍 Layk",
                                  callback_data=f"draw_like:{chat_id}:{message_id}:{drawer_id}"),
-            InlineKeyboardButton(text="🎨 Chizishni xohlayman",
-                                 callback_data=f"draw_want:{chat_id}"),
         ],
     ])
 
