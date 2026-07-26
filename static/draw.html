@@ -1144,6 +1144,7 @@ document.getElementById('btn-see').addEventListener('click', async () => {
   } catch { showToast('❌ So\'zni yuklab bo\'lmadi.'); }
 });
 
+<<<<<<< HEAD
 // ─── 30 SONIYALIK PREVIEW ─────────────────────────────────────────────────
 let previewInterval = null;
 let previewSending  = false;
@@ -1201,11 +1202,22 @@ function stopPreviewInterval() {
   }
 }
 
+=======
+>>>>>>> 9f36fcb9fad47c64c6fcf2819a427256acdae4ea
 // ─── SEND ─────────────────────────────────────────────────────────────────
 document.getElementById('btn-send').addEventListener('click', async () => {
   bakeObjs(); // finalize any remaining shape objects
 
+<<<<<<< HEAD
   if (isCanvasBlank()) {
+=======
+  const tmp = document.createElement('canvas');
+  tmp.width = W; tmp.height = H;
+  const tmpCtx = tmp.getContext('2d');
+  tmpCtx.fillStyle = '#fff';
+  tmpCtx.fillRect(0, 0, W, H);
+  if (bgC.toDataURL() === tmp.toDataURL()) {
+>>>>>>> 9f36fcb9fad47c64c6fcf2819a427256acdae4ea
     showToast('⚠️ Kanvas bo\'sh! Avval rasm chizing.'); return;
   }
 
@@ -1213,10 +1225,13 @@ document.getElementById('btn-send').addEventListener('click', async () => {
     showToast('❌ Sessiya ma\'lumotlari topilmadi.'); return;
   }
 
+<<<<<<< HEAD
   // Submit paytida preview to'xtatiladi
   stopPreviewInterval();
   gameFinished = true;
 
+=======
+>>>>>>> 9f36fcb9fad47c64c6fcf2819a427256acdae4ea
   const btn = document.getElementById('btn-send');
   btn.disabled = true; btn.textContent = '⏳ Yuborilmoqda...';
   showToast('📤 Rasm guruhga yuborilmoqda...', 5000);
@@ -1251,9 +1266,12 @@ document.getElementById('btn-send').addEventListener('click', async () => {
     showToast('❌ Xatolik: ' + err.message, 4000);
     btn.disabled = false;
     btn.textContent = '📤 Yuborish';
+<<<<<<< HEAD
     // Xatolik bo'lsa preview qaytadan ishga tushishi mumkin
     gameFinished = false;
     startPreviewInterval();
+=======
+>>>>>>> 9f36fcb9fad47c64c6fcf2819a427256acdae4ea
   }
 });
 
@@ -1270,11 +1288,14 @@ async function init() {
     document.getElementById('current-word').textContent = currentWord;
     document.getElementById('word-overlay').classList.add('show');
   } catch { /* non-fatal */ }
+<<<<<<< HEAD
 
   // 30 soniyalik preview interval — so'z muvaffaqiyatli yuklanganda boshlanadi
   if (SESSION && CHAT_ID) {
     startPreviewInterval();
   }
+=======
+>>>>>>> 9f36fcb9fad47c64c6fcf2819a427256acdae4ea
 }
 
 init();

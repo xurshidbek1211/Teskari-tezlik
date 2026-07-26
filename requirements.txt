@@ -4,4 +4,7 @@ fastapi>=0.110.0
 uvicorn>=0.27.0
 apscheduler>=3.10.0
 pytz
+<<<<<<< HEAD
 pillow
+=======
+>>>>>>> 9f36fcb9fad47c64c6fcf2819a427256acdae4ea
