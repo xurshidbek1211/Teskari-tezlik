@@ -1,0 +1,1 @@
+- [Telegram Mini App group links](telegram-mini-app-links.md) — use direct t.me short-name links with startapp context for group-launched Mini Apps.

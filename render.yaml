@@ -10,6 +10,8 @@ services:
         value: 3.11.8
       - key: API_TOKEN
         sync: false          # Render dashboard dan kiritiladi
+      - key: TELEGRAM_MINI_APP_SHORT_NAME
+        value: draw
       - key: RENDER_EXTERNAL_URL
         fromService:
           type: web

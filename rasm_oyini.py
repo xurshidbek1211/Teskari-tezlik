@@ -14,12 +14,12 @@ import pathlib
 import io
 import asyncio
 from datetime import datetime
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, quote
 
 from aiogram import Bot, Dispatcher, Router, types, F
 from aiogram.filters import Command
 from aiogram.types import (
-    InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo,
+    InlineKeyboardMarkup, InlineKeyboardButton,
     BotCommand, BufferedInputFile
 )
 
@@ -28,6 +28,7 @@ log = logging.getLogger(__name__)
 # ── Modul darajasida bot havolasi (setup() tomonidan o'rnatiladi) ─────────────
 _bot: Bot | None = None
 _bot_username: str | None = None   # startup'da to'ldiriladi
+_mini_app_short_name = os.getenv("TELEGRAM_MINI_APP_SHORT_NAME", "draw").strip("/")
 
 # ─── ASYNC TAYMERLAR (xotirada, restart'da tozalanadi) ───────────────────────
 _pending_cancel_tasks: dict[int, asyncio.Task] = {}   # "waiting" taymeri
@@ -152,6 +153,15 @@ def _base_url() -> str:
         return url
     dev = os.getenv("REPLIT_DEV_DOMAIN", "").strip()
     return f"https://{dev}" if dev else ""
+
+def _mini_app_url(session_id: str, chat_id: int) -> str:
+    """Telegram Mini App direct link with the game session in startapp."""
+    bot_username = _bot_username or ""
+    start_param  = f"{session_id}__{chat_id}"
+    return (
+        f"https://t.me/{bot_username}/{_mini_app_short_name}"
+        f"?startapp={quote(start_param, safe='')}"
+    )
 
 # ─── KLAVIATURALAR ───────────────────────────────────────────────────────────
 
@@ -307,19 +317,15 @@ async def stop_game(chat_id: int) -> dict:
 def _draw_start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     """
     "✅ Shu so'zni tanladim" bosilgandan keyin guruhda ko'rinadigan klaviatura.
-    URL tugma: bitta bosish → lichkaga o'tadi → bot darhol web_app tugma yuboradi.
-    start param format: d{32hexchars}_{abs_chat_id}   (faqat [A-Za-z0-9_], maks 47 ta belgi)
+    URL tugma: bitta bosish → Telegram Mini App to'g'ridan-to'g'ri ochiladi.
+    startapp format: {session_id}__{chat_id}
     """
-    bot_username = _bot_username or ""
-    sid_hex      = session_id.replace("-", "")          # UUID → 32 hex char
-    abs_cid      = str(abs(chat_id))                    # guruh har doim manfiy
-    start_param  = f"d{sid_hex}_{abs_cid}"              # 1+32+1+≤13 = ≤47 ✓
-    deep_link    = f"https://t.me/{bot_username}?start={start_param}"
+    mini_app_url = _mini_app_url(session_id, chat_id)
 
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text = "🎨 Chizishni boshlash",
-            url  = deep_link,
+            url  = mini_app_url,
         )],
         [InlineKeyboardButton(
             text          = "❌ Chizishni rad etish",
@@ -332,7 +338,7 @@ async def handle_draw_deeplink(user_id: int, start_param: str, bot: Bot) -> bool
     """
     main.py /start handleri tomonidan chaqiriladi.
     start_param = 'd{32hexchars}_{abs_chat_id}' formatida bo'ladi.
-    Agar to'g'ri bo'lsa, foydalanuvchining lichkasiga web_app tugmali xabar yuboradi.
+    Agar to'g'ri bo'lsa, foydalanuvchining lichkasiga Mini App direct-link xabari yuboradi.
     Qaytaradi: True — muvaffaqiyatli, False — tegishli emas yoki xato.
     """
     if not (start_param.startswith("d") and "_" in start_param):
@@ -374,8 +380,7 @@ async def handle_draw_deeplink(user_id: int, start_param: str, bot: Bot) -> bool
         )
         return True
 
-    base_url = _base_url()
-    draw_url = f"{base_url}/draw?session={session_id}&chat_id={chat_id}"
+    mini_app_url = _mini_app_url(session_id, chat_id)
 
     await bot.send_message(
         user_id,
@@ -385,7 +390,7 @@ async def handle_draw_deeplink(user_id: int, start_param: str, bot: Bot) -> bool
         reply_markup = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(
                 text    = "🎨 Rasm chizishni boshlash",
-                web_app = WebAppInfo(url=draw_url),
+                url     = mini_app_url,
             )]
         ]),
     )
