@@ -118,32 +118,38 @@ def _add_star(chat_id, user_id, amount: int = 1):
     return scores[cid][uid]
 
 # ─── TELEGRAM initData HMAC TEKSHIRUVI ───────────────────────────────────────
-def _verify_init_data(init_data: str, bot_token: str) -> dict | None:
-    try:
-        parsed = {k: v[0] for k, v in parse_qs(init_data, keep_blank_values=True).items()}
-        received_hash = parsed.pop("hash", None)
-        if not received_hash:
-            return None
-        data_check = "\n".join(f"{k}={v}" for k, v in sorted(parsed.items()))
-        secret     = hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
-        computed   = hmac.new(secret, data_check.encode(), hashlib.sha256).hexdigest()
-        if hmac.compare_digest(computed, received_hash):
-            return parsed
-        return None
-    except Exception as e:
-        log.warning("initData verify error: %s", e)
-        return None
-
-def _user_id_from_init_data(init_data: str) -> str | None:
+def _session_from_init_data(init_data: str) -> tuple[str, int] | None:
     bot_token = os.getenv("API_TOKEN", "")
-    verified  = _verify_init_data(init_data, bot_token) if init_data else None
+    verified = _verify_init_data(init_data, bot_token) if init_data else None
+
     if not verified:
         return None
+
+    start_param = verified.get("start_param", "")
+    if not start_param.startswith("d") or "_" not in start_param:
+        return None
+
     try:
-        user_json = verified.get("user", "{}")
-        u = json.loads(user_json)
-        return str(u.get("id"))
-    except Exception:
+        body = start_param[1:]
+        sep = body.index("_")
+
+        sid_hex = body[:sep]
+        abs_cid = body[sep + 1:]
+
+        if len(sid_hex) != 32 or not sid_hex.isalnum() or not abs_cid.isdigit():
+            return None
+
+        s = sid_hex
+        session_id = (
+            f"{s[0:8]}-{s[8:12]}-{s[12:16]}-"
+            f"{s[16:20]}-{s[20:32]}"
+        )
+        chat_id = -int(abs_cid)
+
+        return session_id, chat_id
+
+    except Exception as e:
+        log.warning("session from initData error: %s", e)
         return None
 
 # ─── URL YORDAMCHISI ──────────────────────────────────────────────────────────
