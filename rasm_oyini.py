@@ -320,8 +320,7 @@ def _draw_start_keyboard(chat_id: int, session_id: str) -> InlineKeyboardMarkup:
     URL tugma: bitta bosish → Telegram Mini App to'g'ridan-to'g'ri ochiladi.
     startapp format: {session_id}__{chat_id}
     """
-    mini_app_url = "https://t.me/Turli_Savollarbot/Rasm"
-
+    mini_app_url = _mini_app_url(session_id, chat_id)
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text = "🎨 Chizishni boshlash",
