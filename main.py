@@ -123,13 +123,6 @@ async def send_new_question(chat_id: int, bot: Bot):
 # ---------- /start ----------
 @main_router.message(Command("start"))
 async def start_cmd(message: types.Message, bot: Bot):
-    # Rasm o'yini deep link: /start d{32hex}_{abs_chat_id}
-    args = message.text.split(maxsplit=1)[1] if message.text and " " in message.text else ""
-    if args and args.startswith("d") and "_" in args:
-        handled = await rasm_oyini.handle_draw_deeplink(message.from_user.id, args, bot)
-        if handled:
-            return
-
     await message.answer(
         "👋 Salom! Men <b>Teskari Tezlik</b> botiman.\n\n"
         "📋 <b>Mavjud komandalar:</b>\n"
