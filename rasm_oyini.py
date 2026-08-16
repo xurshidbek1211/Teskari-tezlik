@@ -165,10 +165,7 @@ def _mini_app_url(session_id: str, chat_id: int) -> str:
     """Telegram Mini App direct link with the game session in startapp."""
     bot_username = _bot_username or ""
 
-    # handle_draw_deeplink() kutayotgan format:
-    # d{32 hex belgili session_id}_{abs chat_id}
-    sid_hex = session_id.replace("-", "")
-    start_param = f"d{sid_hex}_{abs(chat_id)}"
+    start_param = f"{session_id}__{chat_id}"
 
     return (
         f"https://t.me/{bot_username}/{_mini_app_short_name}"
