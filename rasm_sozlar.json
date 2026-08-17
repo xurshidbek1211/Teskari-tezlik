@@ -1,0 +1,621 @@
+{
+  "hayvonlar": {
+    "emoji": "🐶",
+    "qiyinlik": {
+      "oson": [
+        "mushuk",
+        "it",
+        "sigir",
+        "ot",
+        "qo'y",
+        "echki",
+        "cho'chqa",
+        "tovuq",
+        "o'rdak",
+        "baliq",
+        "qush",
+        "fil",
+        "sher",
+        "tulki",
+        "bo'ri",
+        "ayiq",
+        "maymun",
+        "quyon",
+        "toshbaqa",
+        "ilon",
+        "kirpi",
+        "sichqon"
+      ],
+      "orta": [
+        "krokodil",
+        "pingvin",
+        "jiraffa",
+        "kenguru",
+        "delfin",
+        "to'tiqush",
+        "burgut",
+        "qo'zichoq",
+        "eshak",
+        "tuya",
+        "zebra",
+        "qoplon",
+        "panda",
+        "koala",
+        "sincob"
+      ],
+      "qiyin": [
+        "xameleon",
+        "platipus",
+        "akula",
+        "meduza",
+        "sakkizoyoq",
+        "armadillo",
+        "pangolin",
+        "flamingo",
+        "gepard",
+        "gorilla",
+        "sirtlon",
+        "lama"
+      ]
+    }
+  },
+  "mevalar": {
+    "emoji": "🍎",
+    "qiyinlik": {
+      "oson": [
+        "olma",
+        "nok",
+        "uzum",
+        "shaftoli",
+        "o'rik",
+        "gilos",
+        "tarvuz",
+        "qovun",
+        "limon",
+        "apelsin",
+        "banan",
+        "anor",
+        "anjir",
+        "xurmo",
+        "qulupnay",
+        "behi"
+      ],
+      "orta": [
+        "mango",
+        "avokado",
+        "ananas",
+        "papaya",
+        "pomelo",
+        "mandarin",
+        "greypfrut",
+        "feijoa",
+        "nektarin",
+        "olcha",
+        "unabi"
+      ],
+      "qiyin": [
+        "durian",
+        "rambutan",
+        "lichi",
+        "karambola",
+        "marakuya",
+        "pitaya",
+        "guava",
+        "jakfrut"
+      ]
+    }
+  },
+  "sabzavotlar": {
+    "emoji": "🥕",
+    "qiyinlik": {
+      "oson": [
+        "kartoshka",
+        "sabzi",
+        "piyoz",
+        "pomidor",
+        "bodring",
+        "karam",
+        "baqlajon",
+        "sarimsoq",
+        "rediska",
+        "qalampir"
+      ],
+      "orta": [
+        "lavlagi",
+        "ismaloq",
+        "qovoq",
+        "brokkoli",
+        "gulkaram",
+        "selderey",
+        "makkajo'xori",
+        "no'xat",
+        "loviya"
+      ],
+      "qiyin": [
+        "artishok",
+        "batat",
+        "turp",
+        "kolrabi",
+        "reven"
+      ]
+    }
+  },
+  "hasharotlar": {
+    "emoji": "🐛",
+    "qiyinlik": {
+      "oson": [
+        "chivin",
+        "pashsha",
+        "chumoli",
+        "kapalak",
+        "asalari",
+        "qo'ng'iz",
+        "chigirtka",
+        "o'rgimchak"
+      ],
+      "orta": [
+        "ninachi",
+        "termit",
+        "kuya",
+        "qandala",
+        "kana",
+        "chayon"
+      ],
+      "qiyin": [
+        "qoraqurt",
+        "bit",
+        "burga",
+        "tarakan"
+      ]
+    }
+  },
+  "texnikalar": {
+    "emoji": "📱",
+    "qiyinlik": {
+      "oson": [
+        "telefon",
+        "kompyuter",
+        "planshet",
+        "soat",
+        "kamera",
+        "printer",
+        "quloqchin",
+        "zaryadlagich",
+        "noutbuk",
+        "sichqoncha"
+      ],
+      "orta": [
+        "proyektor",
+        "skaner",
+        "router",
+        "monitor",
+        "klaviatura",
+        "dron",
+        "quvvat banki"
+      ],
+      "qiyin": [
+        "server",
+        "protsessor",
+        "3D printer",
+        "VR ko'zoynak",
+        "smart soat"
+      ]
+    }
+  },
+  "buyumlar": {
+    "emoji": "🎒",
+    "qiyinlik": {
+      "oson": [
+        "sumka",
+        "kalit",
+        "qalam",
+        "ruchka",
+        "daftar",
+        "kitob",
+        "ko'zoynak",
+        "soyabon",
+        "sharf",
+        "qo'lqop"
+      ],
+      "orta": [
+        "chamadon",
+        "hamyon",
+        "pasport",
+        "uzuk",
+        "sirg'a",
+        "bilaguzuk",
+        "shlyapa"
+      ],
+      "qiyin": [
+        "kompas",
+        "durbin",
+        "lupa",
+        "termometr",
+        "batareyka"
+      ]
+    }
+  },
+  "jihozlar": {
+    "emoji": "🔧",
+    "qiyinlik": {
+      "oson": [
+        "bolg'a",
+        "qaychi",
+        "arra",
+        "otvyortka",
+        "mix",
+        "gayka kaliti",
+        "lom",
+        "belkurak"
+      ],
+      "orta": [
+        "burg'u",
+        "domkrat",
+        "nasos",
+        "qisqich",
+        "payvandlash apparati"
+      ],
+      "qiyin": [
+        "mikroskop",
+        "teleskop",
+        "stetoskop",
+        "dozimetr",
+        "manometr"
+      ]
+    }
+  },
+  "idishlar": {
+    "emoji": "🍽️",
+    "qiyinlik": {
+      "oson": [
+        "lagan",
+        "kosa",
+        "chelak",
+        "termos",
+        "banka",
+        "qopqoq",
+        "savat"
+      ],
+      "orta": [
+        "vaza",
+        "patnis",
+        "kastryulka",
+        "tova",
+        "cho'mich"
+      ],
+      "qiyin": [
+        "samovar",
+        "krujka",
+        "grafin",
+        "tog'ora"
+      ]
+    }
+  },
+  "mashina_markalar": {
+    "emoji": "🚗",
+    "qiyinlik": {
+      "oson": [
+        "Chevrolet",
+        "Lada",
+        "Toyota",
+        "Hyundai",
+        "Kia",
+        "Nexia",
+        "Cobalt",
+        "Damas"
+      ],
+      "orta": [
+        "BMW",
+        "Mercedes",
+        "Audi",
+        "Lexus",
+        "Honda",
+        "Nissan",
+        "Ford",
+        "Volkswagen"
+      ],
+      "qiyin": [
+        "Ferrari",
+        "Lamborghini",
+        "Porsche",
+        "Bentley",
+        "Rolls-Royce",
+        "Bugatti"
+      ]
+    }
+  },
+  "ovqatlar": {
+    "emoji": "🍔",
+    "qiyinlik": {
+      "oson": [
+        "non",
+        "sho'rva",
+        "osh",
+        "somsa",
+        "manti",
+        "lag'mon",
+        "shashlik",
+        "chuchvara",
+        "mastava",
+        "qozon kabob"
+      ],
+      "orta": [
+        "burger",
+        "pizza",
+        "sushi",
+        "xinkali",
+        "dolma",
+        "bo'g'irsoq",
+        "halva",
+        "qatlama",
+        "yupqa",
+        "dimlama"
+      ],
+      "qiyin": [
+        "tiramisu",
+        "risotto",
+        "paella",
+        "sirniki",
+        "pelmeni"
+      ]
+    }
+  },
+  "transport": {
+    "emoji": "🚗",
+    "qiyinlik": {
+      "oson": [
+        "mashina",
+        "avtobus",
+        "velosiped",
+        "mototsikl",
+        "samolyot",
+        "kema",
+        "poezd",
+        "taksi",
+        "traktor",
+        "yaxt"
+      ],
+      "orta": [
+        "metro",
+        "vertolyot",
+        "qayiq",
+        "skeytbord",
+        "skuter",
+        "yuk mashinasi",
+        "ambulans",
+        "tramvay",
+        "troleybus"
+      ],
+      "qiyin": [
+        "suv osti kemasi",
+        "paraplan",
+        "gidrotsikl",
+        "ekranoplan",
+        "xovercraft"
+      ]
+    }
+  },
+  "uy_rozgor": {
+    "emoji": "🏠",
+    "qiyinlik": {
+      "oson": [
+        "stol",
+        "stul",
+        "karavot",
+        "shkaf",
+        "televizor",
+        "qozon",
+        "piyola",
+        "ko'za",
+        "choynak",
+        "shisha",
+        "qoshiq",
+        "vilka",
+        "pichoq",
+        "tarelka",
+        "gilam"
+      ],
+      "orta": [
+        "muzlatgich",
+        "kir yuvish mashinasi",
+        "divan",
+        "isitgich",
+        "lampochka",
+        "shamdon",
+        "utyuk",
+        "vanna",
+        "sanduq",
+        "akvarium"
+      ],
+      "qiyin": [
+        "konditsioner",
+        "mikrotolqinli pech",
+        "blender",
+        "termostat",
+        "barometr"
+      ]
+    }
+  },
+  "tabiat": {
+    "emoji": "🌳",
+    "qiyinlik": {
+      "oson": [
+        "daraxt",
+        "gul",
+        "tog'",
+        "daryo",
+        "ko'l",
+        "dengiz",
+        "quyosh",
+        "oy",
+        "yulduz",
+        "bulut",
+        "yomg'ir",
+        "qor",
+        "shamol",
+        "o't"
+      ],
+      "orta": [
+        "vulqon",
+        "sharshara",
+        "botqoq",
+        "cho'l",
+        "o'rmon",
+        "tundra",
+        "ko'rfaz",
+        "orol",
+        "tog' cho'qqisi",
+        "kamalak"
+      ],
+      "qiyin": [
+        "geyzer",
+        "aurora",
+        "stalaktit",
+        "delta",
+        "sunami",
+        "morena"
+      ]
+    }
+  },
+  "kasblar": {
+    "emoji": "👨‍⚕️",
+    "qiyinlik": {
+      "oson": [
+        "shifokor",
+        "o'qituvchi",
+        "haydovchi",
+        "oshpaz",
+        "quruvchi",
+        "sotuvchi",
+        "fermer",
+        "harbiy",
+        "politsiya",
+        "sartarosh"
+      ],
+      "orta": [
+        "muhandis",
+        "arxitektor",
+        "artist",
+        "rasmchi",
+        "musiqachi",
+        "jurnalist",
+        "dizayner",
+        "pilot",
+        "kapitan",
+        "sudya"
+      ],
+      "qiyin": [
+        "neyroxirurg",
+        "arxeolog",
+        "vulqonolog",
+        "kosmonavt",
+        "kriminalist"
+      ]
+    }
+  },
+  "sport": {
+    "emoji": "⚽",
+    "qiyinlik": {
+      "oson": [
+        "futbol",
+        "basketbol",
+        "tennis",
+        "suzish",
+        "yugurish",
+        "kurash",
+        "boks",
+        "sakrash",
+        "velosiped",
+        "arqon tortish"
+      ],
+      "orta": [
+        "badminton",
+        "voleybol",
+        "golf",
+        "hokkey",
+        "gimnastika",
+        "strelba",
+        "karate",
+        "taekwondo",
+        "veslash"
+      ],
+      "qiyin": [
+        "pentatlon",
+        "biatlon",
+        "kyorling",
+        "polo",
+        "squash",
+        "regbi"
+      ]
+    }
+  },
+  "qiziqarli": {
+    "emoji": "🧙",
+    "qiyinlik": {
+      "oson": [
+        "zamok",
+        "robot",
+        "raketa",
+        "ninja",
+        "pirat",
+        "sehrgar",
+        "ajdar",
+        "yakkashox",
+        "toj",
+        "xazina"
+      ],
+      "orta": [
+        "farishta",
+        "iblis",
+        "vampir",
+        "mumiya",
+        "yeti",
+        "suv parisi",
+        "gladiator",
+        "faraon",
+        "samurai"
+      ],
+      "qiyin": [
+        "Eyfel minorasi",
+        "Xitoy devori",
+        "Sfinks",
+        "Kolizey",
+        "Stonehenge"
+      ]
+    }
+  },
+  "kulgili": {
+    "emoji": "😂",
+    "qiyinlik": {
+      "oson": [
+        "kulgi",
+        "uyqu",
+        "orzu",
+        "soch",
+        "qorin",
+        "oyoq",
+        "qo'l",
+        "quloq",
+        "burun",
+        "ko'z"
+      ],
+      "orta": [
+        "aksa urish",
+        "yig'lash",
+        "yashirinmoq",
+        "tomosha",
+        "fikrlash",
+        "raqsga tushish",
+        "sayr qilish",
+        "uxlash"
+      ],
+      "qiyin": [
+        "yelimlanmoq",
+        "adashmoq",
+        "ortiq yemoq",
+        "belgilamoq",
+        "tinglamoq"
+      ]
+    }
+  }
+}
