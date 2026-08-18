@@ -1,393 +1,4545 @@
 [
-  { "savol": "fusaly1f", "javob": ["faylasuf", "файласуф"] },
-  { "savol": "rot1od", "javob": ["doktor", "доктор"] },
-  { "savol": "ihca1isum", "javob": ["musiqachi", "мусиқачи"] },
-  { "savol": "tabi1um", "javob": ["musibat", "мусибат"] },
-  { "savol": "baz1g", "javob": ["gʻazab", "ғазаб"] },
-  { "savol": "akir1a", "javob": ["afrika", "африка"] },
-  { "savol": "ayis1erg", "javob": ["Gretsiya", "Греция"] },
-  { "savol": "ayila1i", "javob": ["Italiya", "Италия"] },
-  { "savol": "amr1t", "javob": ["terma", "терма"] },
-  { "savol": "aro1", "javob": ["qora", "қора"] },
-  { "savol": "qir1s", "javob": ["sariq", "сариқ"] },
-  { "savol": "lihs1y", "javob": ["yashil", "яшил"] },
-  { "savol": "liz1q", "javob": ["qizil", "қизил"] },
-  { "savol": "k1k", "javob": ["koʻk", "коʻк"] },
-  { "savol": "y1hc", "javob": ["choy", "чой"] },
-  { "savol": "1ilab", "javob": ["baliq", "балиқ"] },
-  { "savol": "as1os", "javob": ["somsa", "сомса"] },
-  { "savol": "itn1m", "javob": ["manti", "манти"] },
-  { "savol": "aravhc1hc", "javob": ["chuchvara", "чучвара"] },
-  { "savol": "av1oʻhs", "javob": ["shoʻrva", "шўрва"] },
-  { "savol": "1idnat", "javob": ["tandir", "тандир"] },
-  { "savol": "no1raf", "javob": ["farmon", "фармон"] },
-  { "savol": "1omr1d", "javob": ["darmon", "дармон"] },
-  { "savol": "dr1d", "javob": ["dard", "дард"] },
-  { "savol": "igve1", "javob": ["sevgi", "севги"] },
-  { "savol": "qhs1", "javob": ["ishq", "ишқ"] },
-  { "savol": "qi1so", "javob": ["oshiq", "ошиқ"] },
-  { "savol": "ta1bah1m", "javob": ["muhabbat", "муҳаббат"] },
-  { "savol": "ano1at", "javob": ["tarona", "тарона"] },
-  { "savol": "ro1ab", "javob": ["bahor", "бахор"] },
-  { "savol": "anoha1", "javob": ["bahona", "бахона"] },
-  { "savol": "takov1a", "javob": ["advokat", "адвокат"] },
-  { "savol": "lifo1p", "javob": ["profil", "профил"] },
-  { "savol": "roruko1p", "javob": ["prokuror", "прокурор"] },
-  { "savol": "taroz1n", "javob": ["nazorat", "назорат"] },
-  { "savol": "shiml1q", "javob": ["qilmish", "қилмиш"] },
-  { "savol": "n1tlo", "javob": ["oltin", "олтин"] },
-  { "savol": "niblo1", "javob": ["folbin", "фолбин"] },
-  { "savol": "lo1a", "javob": ["ayol", "аёл"] },
-  { "savol": "ka1re", "javob": ["erkak", "еркaк"] },
-  { "savol": "tig1y", "javob": ["yigit", "йигит"] },
-  { "savol": "z1q", "javob": ["qiz", "қиз"] },
-  { "savol": "h1i", "javob": ["ish", "иш"] },
-  { "savol": "hs1q", "javob": ["qish", "қиш"] },
-  { "savol": "z1k", "javob": ["kuz", "күз"] },
-  { "savol": "z1y", "javob": ["yoz", "ёз"] },
-  { "savol": "rb1ytn1s", "javob": ["sentyabr", "сентябр"] },
-  { "savol": "1baytk1", "javob": ["oktyabr", "октябр"] },
-  { "savol": "rbay1n", "javob": ["noyabr", "ноябр"] },
-  { "savol": "rbak1d", "javob": ["dekabr", "декабр"] },
-  { "savol": "ra1nay", "javob": ["yanvar", "январ"] },
-  { "savol": "la1vef", "javob": ["fevral", "феврал"] },
-  { "savol": "tr1m", "javob": ["mart", "март"] },
-  { "savol": "lerp1", "javob": ["aprel", "апрел"] },
-  { "savol": "y1m", "javob": ["may", "май"] },
-  { "savol": "nuy1", "javob": ["iyun", "июн"] },
-  { "savol": "luy1", "javob": ["iyul", "июл"] },
-  { "savol": "tsug1a", "javob": ["avgust", "август"] },
-  { "savol": "ilta1qah1am", "javob": ["mashaqqatli", "машаққатли"] },
-  { "savol": "tanh1m", "javob": ["mehnat", "меҳнат"] },
-  { "savol": "qilar1", "javob": ["oraliq", "оралиқ"] },
-  { "savol": "a1iss1s", "javob": ["sessiya", "сессия"] },
-  { "savol": "abala1", "javob": ["talaba", "талаба"] },
-  { "savol": "nolq1p", "javob": ["qoplon", "қоплон"] },
-  { "savol": "asi1hum", "javob": ["Muhlisa", "Мухлиса"] },
-  { "savol": "r1dras", "javob": ["sardor", "сардор"] },
-  { "savol": "1ishm1j", "javob": ["jamshid", "жамшид"] },
-  { "savol": "volus1r", "javob": ["rasulov", "расулов"] },
-  { "savol": "soms1k", "javob": ["kosmos", "космос"] },
-  { "savol": "ratta1M", "javob": ["Muattar", "Муаттар"] },
-{ "savol": "r1eM", "javob": ["Mehr", "Меhr"] },
-{ "savol": "igve1", "javob": ["Sevgi", "Севги"] },
-{ "savol": "1ilts'o1", "javob": ["Do'stlik", "До'стлик"] },
-{ "savol": "dim1", "javob": ["Umid", "Умид"] },
-{ "savol": "t1aB", "javob": ["Baxt", "Бахт"] },
-{ "savol": "h1ni'g1S", "javob": ["Sog'inch", "Соғинч"] },
-{ "savol": "1ilqiI1", "javob": ["Iliqlik", "Илиқлик"] },
-{ "savol": "1ilnirih1", "javob": ["Shirinlik", "Ширинлик"] },
-{ "savol": "kildna1ru1", "javob": ["Xursandlik", "Хурсандлик"] },
-{ "savol": "t1mm1H", "javob": ["Himmat", "Химмат"] },
-{ "savol": "rb1S", "javob": ["Sabr", "Сабр"] },
-{ "savol": "1aqoda1", "javob": ["Sadoqat", "Садоят"] },
-{ "savol": "r1aX", "javob": ["Xayr", "Хайр"] },
-{ "savol": "1ilniqro1", "javob": ["Yorqinlik", "Йорқинлик"] },
-{ "savol": "1aso1aN", "javob": ["Nafosat", "Нафосат"] },
-{ "savol": "1orih1", "javob": ["Chiroy", "Чирой"] },
-{ "savol": "kilr'1xm1'G", "javob": ["G'amxo'rlik", "Ғамҳўрлик"] },
-{ "savol": "kil1nek1r'gaB", "javob": ["Bag'rikenglik", "Боғрикенглик"] },
-{ "savol": "rd1Q", "javob": ["Qadr", "Қадр"] },
-{ "savol": "tamr1H", "javob": ["Hurmat", "Ҳурмат"] },
-{ "savol": "tabh1m1M", "javob": ["Muhabbat", "Муҳаббат"] },
-{ "savol": "hcn1v1S", "javob": ["Sevinch", "Севинч"] },
-{ "savol": "killign1Y", "javob": ["Yengillik", "Йеңиллик"] },
-{ "savol": "kilqahcqahchs1X", "javob": ["Xushchaqchaqlik", "Хушчақчақлик"] },
-{ "savol": "uzr1", "javob": ["Orzu", "Орзу"] },
-{ "savol": "iz1R", "javob": ["Rozi", "Рози"] },
-{ "savol": "an1t1o'D", "javob": ["Do'stona", "До'стона"] },
-{ "savol": "hcn1hsI", "javob": ["Ishonch", "Ишонч"] },
-{ "savol": "kilhcn1t", "javob": ["Tinchlik", "Тинчлик"] },
-{ "savol": "1ilnobirh1M", "javob": ["Mehribonlik", "Меҳрибонлик"] },
-{ "savol": "tay1mim1S", "javob": ["Samimiyat", "Самимият"] },
-{ "savol": "k1lilm1qoY", "javob": ["Yoqimlilik", "Ёқимлилик"] },
-{ "savol": "kily1odiF", "javob": ["Fidoiylik", "Фидоийлик"] },
-{ "savol": "numz1M", "javob": ["Mazmun", "Мазмун"] },
-{ "savol": "t1zzaL", "javob": ["Lazzat", "Лаззат"] },
-{ "savol": "sf1N", "javob": ["Nafs", "Нафс"] },
-{ "savol": "k1ldunhs1X", "javob": ["Xushnudlik", "Хушнудлик"] },
-{ "savol": "hsakl1D", "javob": ["Dilkash", "Дилкаш"] },
-{ "savol": "tamm1Q", "javob": ["Qimmat", "Қиммат"] },
-{ "savol": "n1myI", "javob": ["Iymon", "Иймон"] },
-{ "savol": "on'1M", "javob": ["Ma'no", "Маъно"] },
-{ "savol": "kilf1S", "javob": ["Soflik", "Софлик"] },
-{ "savol": "r'1aB", "javob": ["Bag'r", "Боғр"] },
-{ "savol": "kild1hS", "javob": ["Shodlik", "Шодлик"] },
-{ "savol": "kil1hs1aY", "javob": ["Yaxshilik", "Яхшилик"] },
-{ "savol": "kilnor1qvaN", "javob": ["Navqironlik", "Навқиронлик"] },
-{ "savol": "n1hsl1G", "javob": ["Gulshan", "Гулшан"] },
-{ "savol": "gnar1aN", "javob": ["Nayrang", "Найранг"] },
-{ "savol": "1oy-r1y", "javob": ["Yor-yor", "Йор-йор"] },
-{ "savol": "asif1N", "javob": ["Nafisa", "Нафиса"] },
-  { "savol": "al1L", "javob": ["Lola", "Лола"] },
-  { "savol": "moz1n", "javob": ["nizom", "низом"] },
-  { "savol": "ara1eh1", "javob": ["chegara", "чегара"] },
-  { "savol": "la1mak1m", "javob": ["mukammal", "мукаммал"] },
-  { "savol": "q1rich", "javob": ["chiroq", "чироқ"] },
-  { "savol": "qori1", "javob": ["yiroq", "йироқ"] },
-  { "savol": "adoz1a1s", "javob": ["shahzoda", "шаҳзода"] },
-  { "savol": "ams1", "javob": ["asma", "асма"] },
-  { "savol": "yi1om1s", "javob": ["samoviy", "самовий"] },
-  {"savol": "zoma1", "javob": ["namoz", "намоз"]},
-  {"savol": "az'o1", "javob": ["ro'za", "роза"]},
-  {"savol": "adja1", "javob": ["sajda", "сажда"]},
-  {"savol": "tajo1", "javob": ["hojat", "хожат"]},
-  {"savol": "no'ru1", "javob": ["qur'on", "қуръон"]},
-  {"savol": "sida1", "javob": ["hadis", "хадис"]},
-  {"savol": "nom1", "javob": ["imon", "имон"]},
-  {"savol": "ta1ob1", "javob": ["ibodat", "ибодат"]},
-  {"savol": "dijsa1", "javob": ["masjid", "масжид"]},
-  {"savol": "albi1", "javob": ["qibla", "кибла"]},
-  {"savol": "a1d", "javob": ["dua", "дуо"]},
-  {"savol": "rki1", "javob": ["zikr", "зикр"]},
-  {"savol": "ovqa1", "javob": ["taqvo", "тақво"]},
-  {"savol": "hall1", "javob": ["Allah", "аллaҳ"]},
-  {"savol": "dma1", "javob": ["hamd", "ҳамд"]},
-  {"savol": "1annu1", "javob": ["sunnat", "суннат"]},
-  {"savol": "zra1", "javob": ["farz", "фарз"]},
-  {"savol": "1urka1", "javob": ["makruh", "макруҳ"]},
-  {"savol": "la1a1", "javob": ["halal", "ҳалол"]},
-  {"savol": "mora1", "javob": ["harom", "ҳаром"]},
-  {"savol": "toka1", "javob": ["zakot", "закот"]},
-  {"savol": "aqada1", "javob": ["sadaqa", "садақа"]},
-  {"savol": "tao1", "javob": ["toat", "тоат"]},
-  {"savol": "1hito1", "javob": ["fotiha", "фотиҳа"]},
-  {"savol": "1anna1", "javob": ["jannat", "жаннат"]},
-  {"savol": "xazo1", "javob": ["do'zax", "дўзах"]},
-  {"savol": "1otyah1", "javob": ["shayton", ",шайтон"]},
-  {"savol": "1arobu1", "javob": ["muborak", "муборак"]},
-  {"savol": "silb1", "javob": ["iblis", "иблис"]},
-  {"savol": "1omlusu1", "javob": ["musulmon", "мусулмон"]},
-  {"savol": "nimʼo1", "javob": ["moʼmin", "мўмин"]},
-  {"savol": "rfu1", "javob": ["kufr", "куфр"]},
-  {"savol": "h1bsa1", "javob": ["tasbeh", "тасбеҳ"]},
-  {"savol": "1uj1aha1", "javob": ["tahajjud", "таҳажжуд"]},
-  {"savol": "hevora1", "javob": ["taroveh", "таровеҳ"]},
-  {"savol": "t1moq1", "javob": ["iqomat", "иқомат"]},
-  {"savol": "noz1", "javob": ["azon", "азон"]},
-  {"savol": "taori1", "javob": ["qiroat", "қироат"]},
-  {"savol": "1ozama1", "javob": ["ramazon", "рамазон"]},
-  {"savol": "1obru1", "javob": ["qurbon", "қурбон"]},
-  {"savol": "rti1", "javob": ["fitr", "фитр"]},
-  {"savol": "tayi1", "javob": ["niyat", "ният"]},
-  {"savol": "1aira1s", "javob": ["shariat", "шариат"]},
-  {"savol": "1isfa1", "javob": ["tafsir", "тафсир"]},
-  {"savol": "ja1", "javob": ["haj", "ҳаҷ"]},
-  {"savol": "arm1", "javob": ["umra", "умра"]},
-  {"savol": "jorʼe1", "javob": ["me'roj", "миърож"]},
-  {"savol": "rba1", "javob": ["qabr", "қабр"]},
-  {"savol": "ta1oyi1", "javob": ["qiyomat", "қийомат"]},
-  { "savol": "a1itnegr1", "javob": ["Argentina", "Аргентина"] },
-  { "savol": "a1ikr1t", "javob": ["Turkiya", "Туркия"] },
-  { "savol": "ah1lo1", "javob": ["Polsha", "Польша"] },
-  { "savol": "a1ilo1n1m", "javob": ["Mongoliya", "Монголия"] },
-  { "savol": "1ala1", "javob": ["Qalam", "Қалам"] },
-  { "savol": "1khc1R", "javob": ["Ruchka", "Ручка"] },
-  { "savol": "r1tfa1", "javob": ["daftar", "дафтар"] },
-  { "savol": "1atro1", "javob": ["portal", "портал"] },
-  { "savol": "1ol1P", "javob": ["Palov", "Палов"] },
-  { "savol": "1ati1aK", "javob": ["Kapitan", "Капитан"] },
-  { "savol": "tp1tah1", "javob": ["Chatgpt", "Чатгпт"] },
-  { "savol": "1ohl1", "javob": ["Ilhom", "Илҳом"] },
-  { "savol": "or1xuB", "javob": ["Buxoro", "Бухоро"] },
-  { "savol": "dnaqr1maS", "javob": ["Samarqand", "Самарқанд"] },
-  { "savol": "no1idn1", "javob": ["Andijon", "Андижон"] },
-  { "savol": "1az1iJ", "javob": ["Jizzax", "Жиззах"] },
-  { "savol": "1yr1driS", "javob": ["Sirdaryo", "Сирдарё"] },
-  { "savol": "1alA", "javob": ["Alam", "Алам"] },
-  { "savol": "m1kA", "javob": ["Akam", "Акам"] },
-  { "savol": "1oddo1", "javob": ["Xoddok", "Ходдок"] },
-  { "savol": "hs1va1", "javob": ["Lavash", "Лаваш"] },
-  { "savol": "spih1", "javob": ["Chips", "Чипс"] },
-  { "savol": "1uko1", "javob": ["Fokus", "Фокус"] },
-  { "savol": "1re1aK", "javob": ["Kamera", "Камера"] },
-  { "savol": "m1aR", "javob": ["Rasm", "Расм"] },
-  { "savol": "tar1S", "javob": ["Surat", "Сурат"] },
-  { "savol": "ta1ruJ", "javob": ["Jurʼat", "Журъат"] },
-  { "savol": "ad1A", "javob": ["Aida", "Аида"] },
-  { "savol": "ad1aS", "javob": ["Saida", "Саида"] },
-  { "savol": "i1ya1", "javob": ["Layli", "Лайли"] },
-  { "savol": "1lyaL", "javob": ["Laylo", "Лайло"] },
-  { "savol": "ayi1i1", "javob": ["Liliya", "Лилия"] },
-  { "savol": "iral1od1ili1 li1obA", "javob": ["Abobil bilimdonlari", "Абобилбилимдонлари"] },
-  { "savol": "tnegel1tni", "javob": ["Intilegent", "Интилегент"] },
-  { "savol": "1avoka1 nitl1", "javob": ["Oltin zakovat", "Олтин заковат"] },
-  { "savol": "ixrahc 1qA", "javob": ["Aql charxi", "Ақл чархи"] },
-  { "savol": "1yined1vele1", "javob": ["Televideniye", "Телевидение"] },
-  { "savol": "raltvano1soK", "javob": ["Kosmonavtlar", "Космонавтлар"] },
-  { "savol": "1otr1K", "javob": ["Karton", "Картон"] },
-  { "savol": "zoʻ1oQ", "javob": ["Qogʻoz", "Қоғоз"] },
-  { "savol": "1inya1si1", "javob": ["Lishaynik", "Лишайник"] },
-  { "savol": "1ivano1aZ", "javob": ["Zamonaviy", "Замонавий"] },
-  { "savol": "f1G", "javob": ["Gif", "Гиф"] },
-  { "savol": "akiz1f", "javob": ["Fizika", "Физика"] },
-  { "savol": "1ymi1", "javob": ["Kimyo", "Кимё"] },
-  { "savol": "arbeg1a", "javob": ["Algebra", "Алгебра"] },
-  { "savol": "k1zif", "javob": ["Fizik", "Физик"] },
-  { "savol": "aidn1", "javob": ["India", "Индия"] },
-  { "savol": "yot1x", "javob": ["Xitoy", "Хитой"] },
-  { "savol": "mussaba1", "javob": ["tabassum", "табассум"] },
-  { "savol": "nohya1", "javob": ["rayhon", "райҳон"] },
-  { "savol": "qomyaqzu1", "javob": ["muzqaymoq", "музқаймоқ"] },
-  { "savol": "afiha1", "javob": ["sahifa", "саҳифа"] },
-  { "savol": "arito1", "javob": ["xotira", "хотира"] },
-  { "savol": "ilqora1", "javob": ["maroqli", "мароқли"] },
-  { "savol": "nobirhe1", "javob": ["mehribon", "меҳрибон"] },
-  { "savol": "mol‘go1", "javob": ["sog‘lom", "соғлом"] },
-  { "savol": "tamh1r", "javob": ["rahmat", "рахмат"] },
-  { "savol": "1ovadra1", "javob": ["bardavom", "бардавом"] },
-  { "savol": "taqod1s", "javob": ["sadoqat", "садоқат"] },
-  { "savol": "to1ah", "javob": ["hayot", "ҳаёт"] },
-  { "savol": "r1hab", "javob": ["bahor", "бахор"] },
-  { "savol": "1lml1", "javob": ["ilmli", "илмли"] },
-  { "savol": "o1nud", "javob": ["dunyo", "дунё"] },
-  { "savol": "hsod1‘oy", "javob": ["yo‘ldosh", "йўлдош"] },
-  { "savol": "1aloud", "javob": ["duolar", "дуолар"] },
-  { "savol": "1yra1", "javob": ["daryo", "дарё"] },
-  { "savol": "adgno1", "javob": ["tongda", "тонгда"] },
-  { "savol": "mu1sabat", "javob": ["tabassum", "табассум"] },
-  { "savol": "ralhs1y", "javob": ["yoshlar", "ёшлар"] },
-  { "savol": "n1jan1", "javob": ["onajon", "онажон"] },
-  { "savol": "a1ala‘g", "javob": ["g‘alaba", "ғалаба"] },
-  { "savol": "aqabo1um", "javob": ["musobaqa", "мусобақа"] },
-  { "savol": "kilts‘1d", "javob": ["do‘stlik", "дўстлик"] },
-  { "savol": "1im1mas", "javob": ["samimiy", "самимий"] },
-  { "savol": "1irih1", "javob": ["shirin", "ширин"] },
-  { "savol": "ki1hcni1", "javob": ["tinchlik", "тинчлик"] },
-  { "savol": "1arosa1", "javob": ["jasorat", "жасорат"] },
-  { "savol": "1s‘od", "javob": ["do‘st", "дўст"] },
-  { "savol": "1atk1m", "javob": ["maktab", "мактаб"] },
-  { "savol": "1it1o", "javob": ["oltin", "олтин"] },
-  { "savol": "a1i1", "javob": ["oila", "оила"] },
-  { "savol": "ilr1n", "javob": ["nurli", "нурли"] },
-  { "savol": "to1ah", "javob": ["hayot", "ҳаёт"] },
-  { "savol": "r1hab", "javob": ["bahor", "бахор"] },
-  { "savol": "1lml1", "javob": ["ilmli", "илмли"] },
-  { "savol": "o1nud", "javob": ["dunyo", "дунё"] },
-  { "savol": "hsod1‘oy", "javob": ["yo‘ldosh", "йўлдош"] },
-  { "savol": "1alou1", "javob": ["duolar", "дуолар"] },
-  { "savol": "oy1ad", "javob": ["daryo", "дарё"] },
-  { "savol": "1dgno1", "javob": ["tongda", "тонгда"] },
-  { "savol": "mu1sab1t", "javob": ["tabassum", "табассум"] },
-  { "savol": "ralhs1y", "javob": ["yoshlar", "ёшлар"] },
-  { "savol": "noja1o", "javob": ["onajon", "онажон"] },
-  { "savol": "a1ala‘g", "javob": ["g‘alaba", "ғалаба"] },
-  { "savol": "aqabo1um", "javob": ["musobaqa", "мусобақа"] },
-  { "savol": "1ilts‘1d", "javob": ["do‘stlik", "дўстлик"] },
-  { "savol": "yim1mas", "javob": ["samimiy", "самимий"] },
-  { "savol": "1iri1s", "javob": ["shirin", "ширин"] },
-  { "savol": "ki1hcn1t", "javob": ["tinchlik", "тинчлик"] },
-  { "savol": "taros1j", "javob": ["jasorat", "жасорат"] },
-  { "savol": "1s‘od", "javob": ["do‘st", "дўст"] },
-  { "savol": "1atkam", "javob": ["maktab", "мактаб"] },
-  { "savol": "1it1o", "javob": ["oltin", "олтин"] },
-  { "savol": "1li1", "javob": ["oila", "оила"] },
-  { "savol": "ilr1n", "javob": ["nurli", "нурли"] },
-  { "savol": "kildo1s", "javob": ["shodlik", "шодлик"] },
-  { "savol": "t1bi1o", "javob": ["oqibat", "оқибат"] },
-  { "savol": "hc1ov1q", "javob": ["quvonch", "қувонч"] },
-  { "savol": "m1li1", "javob": ["bilim", "билим"] },
-  { "savol": "kill1z‘o1", "javob": ["go‘zallik", "гўзаллик"] },
-  { "savol": "r1zlug", "javob": ["gulzor", "гулзор"] },
-  { "savol": "1aja1ek", "javob": ["kelajak", "келажак"] },
-  { "savol": "i1nay", "javob": ["yangi", "янги"] },
-  { "savol": "1ni1am", "javob": ["madina", "мадина"] },
-  { "savol": "firhsa1", "javob": ["tashrif", "ташриф"] },
-  { "savol": "1hem", "javob": ["mehr", "меҳр"] },
-  { "savol": "1g1es", "javob": ["sevgi", "севги"] },
-  { "savol": "1al1da", "javob": ["adolat", "адолат"] },
-  { "savol": "1iblaq", "javob": ["qalbim", "қалбим"] },
-  { "savol": "dn1zraf", "javob": ["farzand", "фарзанд"] },
-  { "savol": "azo1", "javob": ["toza", "тоза"] },
-  { "savol": "1ud1uy", "javob": ["yulduz", "юлдуз"] },
-  { "savol": "1ata1", "javob": ["vatan", "ватан"] },
-  { "savol": "tn1khsot", "javob": ["toshkent", "тошкент"] },
-  { "savol": "b1tik", "javob": ["kitob", "китоб"] },
-  { "savol": "fn1s", "javob": ["sinf", "синф"] },
-  { "savol": "ad1nis", "javob": ["sinfda", "синфда"] },
-  { "savol": "bo1ik", "javob": ["kitob", "китоб"] },
-  { "savol": "oy1ad", "javob": ["daryo", "дарё"] },
-  { "savol": "ta1s", "javob": ["soat", "соат"] },
-  { "savol": "an1x", "javob": ["xona", "хона"] },
-  { "savol": "uq1u", "javob": ["uyqu", "уйқу"] },
-  { "savol": "av1m", "javob": ["meva", "мева"] },
-  { "savol": "txa1ad", "javob": ["daraxt", "дарахт"] },
-  { "savol": "yo1c", "javob": ["choy", "чой"] },
-  { "savol": "g‘1b", "javob": ["bog‘", "боғ"] },
-  { "savol": "qi1ab", "javob": ["baliq", "балиқ"] },
-  { "savol": "n1n", "javob": ["non", "нон"] },
-  { "savol": "ma1aq", "javob": ["qalam", "қалам"] },
-  { "savol": "nod1ug", "javob": ["guldon", "гулдон"] },
-  { "savol": "rozivele1", "javob": ["televizor", "телевизор"] },
-  { "savol": "anihsa1", "javob": ["mashina", "машина"] },
-  { "savol": "killiq1tsum", "javob": ["mustaqillik", "мустақиллик"] },
-  { "savol": "💙o1ilha1", "javob": ["mahliyo💙", "махлиё💙"] },
-  { "savol": "offas1m", "javob": ["musaffo", "мусаффо"] },
-  { "savol": "bl1q", "javob": ["qalb", "қалб"] },
-  { "savol": "1uk", "javob": ["kuz", "куз"] },
-  { "savol": "h1it", "javob": ["tish", "тиш"] },
-  { "savol": "hs1b", "javob": ["bosh", "бош"] },
-  { "savol": "ko1", "javob": ["nok", "нок"] },
-  { "savol": "lu1", "javob": ["gul", "гул"] },
-  { "savol": "izi1ri1", "javob": ["qirmizi", "қирмизи"] },
-  { "savol": "il1tfahs", "javob": ["shaftoli", "шафтоли"] },
-  { "savol": "am1o", "javob": ["olma", "олма"] },
-  { "savol": "r1jna", "javob": ["anjir", "анжир"] },
-  { "savol": "1he1", "javob": ["behi", "беҳи"] },
-  { "savol": "m1zu", "javob": ["uzum", "узум"] },
-  { "savol": "soli1", "javob": ["gilos", "гилос"] },
-  { "savol": "nan1b", "javob": ["banan", "банан"] },
-  { "savol": "a'1raq", "javob": ["qarg'a", "қарға"] },
-  { "savol": "1odimop", "javob": ["pomidor", "помидор"] },
-  { "savol": "1seb", "javob": ["besh", "беш"] },
-  { "savol": "nortk1le", "javob": ["elektron", "электрон"] },
-  { "savol": "g1aB", "javob": ["Barg", "Барг"] },
-  { "savol": "br1G", "javob": ["Gerb", "Герб"] },
-  { "savol": "ayi1daM", "javob": ["Madhiya", "Мадҳия"] },
-  { "savol": "aqisu1", "javob": ["Musiqa", "Мусиқа"] },
-  { "savol": "naek1", "javob": ["okean", "Океан"] },
-  { "savol": "1sp1P", "javob": ["Pepsi", "Пепси"] },
-  { "savol": "ma1gele1", "javob": ["Telegram", "Телеграм"] },
-  { "savol": "ma1gatsn1", "javob": ["Instagram", "Инстаграм"] },
-  { "savol": "k1obec1f", "javob": ["Facebook", "Фейсбук"] },
-  { "savol": "ppast1hW", "javob": ["Whatsapp", "Вотсап"] },
-  { "savol": "1repO", "javob": ["Opera", "Опера"] },
-  { "savol": "dos1tqI", "javob": ["Iqtisod", "Иқтисод"] },
-  { "savol": "isn1J", "javob": ["Jensi", "Женси"] },
-  { "savol": "riko1S", "javob": ["Shokir", "Шокир"] },
-  { "savol": "️k1bdih1ru1", "javob": ["Xurshidbek", "Хуршидбек"] },
-  { "savol": "1uvo1", "javob": ["Tovuq", "Товуқ"] },
-  { "savol": "k1hsuM", "javob": ["Mushuk", "Мушук"] },
-  { "savol": "1i1is", "javob": ["Sigir", "Сигир"] },
-  { "savol": "a1ab1so1", "javob": ["Toshbaqa", "Тошбақа"] },
-  { "savol": "1qabru1", "javob": ["Qurbaqa", "Қурбақа"] },
-  { "savol": "il1nʼaM", "javob": ["Maʼnoli", "Маъноли"] },
-  { "savol": "z1dnu1", "javob": ["Kunduz", "Кундуз"] },
-  { "savol": "1ip1Y", "javob": ["Yopiq", "Ёпиқ"] },
-  { "savol": "zis1sI", "javob": ["Ishsiz", "Ишсиз"] },
-  { "savol": "adn1P", "javob": ["Panda", "Панда"] },
-  { "savol": "ihc1niN", "javob": ["Ninachi", "Ниначи"] },
-  { "savol": "adima1i1", "javob": ["Piramida", "Пирамида"] },
-  { "savol": "a1beZ", "javob": ["Zebra", "Зебра"] },
-  { "savol": "ubila1", "javob": ["Malibu", "Малибу"] },
-  { "savol": "w1B", "javob": ["Bmw", "БМВ"] },
-  { "savol": "1reM", "javob": ["Mers", "Мерс"] },
-  { "savol": "1dlan1R", "javob": ["Ronaldo", "Роналдо"] },
-  { "savol": "1s1eM", "javob": ["Messi", "Месси"] },
-  { "savol": "lob1u1", "javob": ["Futbol", "Футбол"] },
-  { "savol": "sinn1T", "javob": ["Tennis", "Теннис"] },
-  { "savol": "ateka1", "javob": ["Raketa", "Ракета"] },
-  { "savol": "1omsO", "javob": ["Osmon", "Осмон"] },
-  { "savol": "fu1alya1", "javob": ["Faylasuf", "Файласуф"] },
-  { "savol": "1ilsidnaxu1", "javob": ["Muxandislik", "Муҳандислик"] },
-  { "savol": "a1nahsya1", "javob": ["Payshanba", "Пайшанба"] },
-  { "savol": "1muj", "javob": ["Juma", "Жума"] },
-  { "savol": "ab1ahska1", "javob": ["Yakshanba", "Якшанба"] },
-  { "savol": "a1il1ma1", "javob": ["Familiya", "Фамилия"] },
-  { "savol": "a1inato1", "javob": ["Botanika", "Ботаника"] },
-  { "savol": "rotaidal1", "javob": ["Gladiator", "Гладиатор"] },
-  { "savol": "selukre1", "javob": ["Gerkules", "Геркулес"] },
-  { "savol": "ne1 re1iP", "javob": ["Piter Pen", "Питер Пен"] },
-  { "savol": "le1ot1irA", "javob": ["Aristotel", "Аристотел"] }
+  {
+    "savol": "fusa11a1",
+    "javob": [
+      "faylasuf",
+      "файласуф"
+    ]
+  },
+  {
+    "savol": "r1t1od",
+    "javob": [
+      "doktor",
+      "доктор"
+    ]
+  },
+  {
+    "savol": "i1caq11um",
+    "javob": [
+      "musiqachi",
+      "мусиқачи"
+    ]
+  },
+  {
+    "savol": "ta11su1",
+    "javob": [
+      "musibat",
+      "мусибат"
+    ]
+  },
+  {
+    "savol": "b1z1gʻ",
+    "javob": [
+      "gʻazab",
+      "ғазаб"
+    ]
+  },
+  {
+    "savol": "a11rfa",
+    "javob": [
+      "afrika",
+      "африка"
+    ]
+  },
+  {
+    "savol": "ay1ste11",
+    "javob": [
+      "Gretsiya",
+      "Греция"
+    ]
+  },
+  {
+    "savol": "1yil11I",
+    "javob": [
+      "Italiya",
+      "Италия"
+    ]
+  },
+  {
+    "savol": "am1e1",
+    "javob": [
+      "terma",
+      "терма"
+    ]
+  },
+  {
+    "savol": "a1o1",
+    "javob": [
+      "qora",
+      "қора"
+    ]
+  },
+  {
+    "savol": "qi11s",
+    "javob": [
+      "sariq",
+      "сариқ"
+    ]
+  },
+  {
+    "savol": "l1hs1y",
+    "javob": [
+      "yashil",
+      "яшил"
+    ]
+  },
+  {
+    "savol": "liz11",
+    "javob": [
+      "qizil",
+      "қизил"
+    ]
+  },
+  {
+    "savol": "k11",
+    "javob": [
+      "koʻk",
+      "коʻк"
+    ]
+  },
+  {
+    "savol": "1oh1",
+    "javob": [
+      "choy",
+      "чой"
+    ]
+  },
+  {
+    "savol": "q1la1",
+    "javob": [
+      "baliq",
+      "балиқ"
+    ]
+  },
+  {
+    "savol": "asm11",
+    "javob": [
+      "somsa",
+      "сомса"
+    ]
+  },
+  {
+    "savol": "i1n1m",
+    "javob": [
+      "manti",
+      "манти"
+    ]
+  },
+  {
+    "savol": "ara1h1uh1",
+    "javob": [
+      "chuchvara",
+      "чучвара"
+    ]
+  },
+  {
+    "savol": "1vr1h1",
+    "javob": [
+      "shoʻrva",
+      "шўрва"
+    ]
+  },
+  {
+    "savol": "r11nat",
+    "javob": [
+      "tandir",
+      "тандир"
+    ]
+  },
+  {
+    "savol": "1omr1f",
+    "javob": [
+      "farmon",
+      "фармон"
+    ]
+  },
+  {
+    "savol": "nomr11",
+    "javob": [
+      "darmon",
+      "дармон"
+    ]
+  },
+  {
+    "savol": "1r1d",
+    "javob": [
+      "dard",
+      "дард"
+    ]
+  },
+  {
+    "savol": "i1ve1",
+    "javob": [
+      "sevgi",
+      "севги"
+    ]
+  },
+  {
+    "savol": "q1s1",
+    "javob": [
+      "ishq",
+      "ишқ"
+    ]
+  },
+  {
+    "savol": "q1hs1",
+    "javob": [
+      "oshiq",
+      "ошиқ"
+    ]
+  },
+  {
+    "savol": "11bbah1m",
+    "javob": [
+      "muhabbat",
+      "муҳаббат"
+    ]
+  },
+  {
+    "savol": "11orat",
+    "javob": [
+      "tarona",
+      "тарона"
+    ]
+  },
+  {
+    "savol": "r1h1b",
+    "javob": [
+      "bahor",
+      "бахор"
+    ]
+  },
+  {
+    "savol": "a1o1ab",
+    "javob": [
+      "bahona",
+      "бахона"
+    ]
+  },
+  {
+    "savol": "t1k1v1a",
+    "javob": [
+      "advokat",
+      "адвокат"
+    ]
+  },
+  {
+    "savol": "l1fo1p",
+    "javob": [
+      "profil",
+      "профил"
+    ]
+  },
+  {
+    "savol": "r1r11orp",
+    "javob": [
+      "prokuror",
+      "прокурор"
+    ]
+  },
+  {
+    "savol": "t111zan",
+    "javob": [
+      "nazorat",
+      "назорат"
+    ]
+  },
+  {
+    "savol": "hs1m11q",
+    "javob": [
+      "qilmish",
+      "қилмиш"
+    ]
+  },
+  {
+    "savol": "1itl1",
+    "javob": [
+      "oltin",
+      "олтин"
+    ]
+  },
+  {
+    "savol": "n11lof",
+    "javob": [
+      "folbin",
+      "фолбин"
+    ]
+  },
+  {
+    "savol": "1oy1",
+    "javob": [
+      "ayol",
+      "аёл"
+    ]
+  },
+  {
+    "savol": "k1k1e",
+    "javob": [
+      "erkak",
+      "еркaк"
+    ]
+  },
+  {
+    "savol": "1ig1y",
+    "javob": [
+      "yigit",
+      "йигит"
+    ]
+  },
+  {
+    "savol": "z11",
+    "javob": [
+      "qiz",
+      "қиз"
+    ]
+  },
+  {
+    "savol": "1s1",
+    "javob": [
+      "ish",
+      "иш"
+    ]
+  },
+  {
+    "savol": "h1i1",
+    "javob": [
+      "qish",
+      "қиш"
+    ]
+  },
+  {
+    "savol": "1u1",
+    "javob": [
+      "kuz",
+      "күз"
+    ]
+  },
+  {
+    "savol": "1o1",
+    "javob": [
+      "yoz",
+      "ёз"
+    ]
+  },
+  {
+    "savol": "11ayt1es",
+    "javob": [
+      "sentyabr",
+      "сентябр"
+    ]
+  },
+  {
+    "savol": "rbay111",
+    "javob": [
+      "oktyabr",
+      "октябр"
+    ]
+  },
+  {
+    "savol": "11ayon",
+    "javob": [
+      "noyabr",
+      "ноябр"
+    ]
+  },
+  {
+    "savol": "11aked",
+    "javob": [
+      "dekabr",
+      "декабр"
+    ]
+  },
+  {
+    "savol": "1a1nay",
+    "javob": [
+      "yanvar",
+      "январ"
+    ]
+  },
+  {
+    "savol": "lar1e1",
+    "javob": [
+      "fevral",
+      "феврал"
+    ]
+  },
+  {
+    "savol": "1r1m",
+    "javob": [
+      "mart",
+      "март"
+    ]
+  },
+  {
+    "savol": "ler11",
+    "javob": [
+      "aprel",
+      "апрел"
+    ]
+  },
+  {
+    "savol": "1a1",
+    "javob": [
+      "may",
+      "май"
+    ]
+  },
+  {
+    "savol": "1uy1",
+    "javob": [
+      "iyun",
+      "июн"
+    ]
+  },
+  {
+    "savol": "11yi",
+    "javob": [
+      "iyul",
+      "июл"
+    ]
+  },
+  {
+    "savol": "1su1va",
+    "javob": [
+      "avgust",
+      "август"
+    ]
+  },
+  {
+    "savol": "il11qq1h1am",
+    "javob": [
+      "mashaqqatli",
+      "машаққатли"
+    ]
+  },
+  {
+    "savol": "tanh11",
+    "javob": [
+      "mehnat",
+      "меҳнат"
+    ]
+  },
+  {
+    "savol": "1il1ro",
+    "javob": [
+      "oraliq",
+      "оралиқ"
+    ]
+  },
+  {
+    "savol": "a11ss1s",
+    "javob": [
+      "sessiya",
+      "сессия"
+    ]
+  },
+  {
+    "savol": "ab1la1",
+    "javob": [
+      "talaba",
+      "талаба"
+    ]
+  },
+  {
+    "savol": "1olp1q",
+    "javob": [
+      "qoplon",
+      "қоплон"
+    ]
+  },
+  {
+    "savol": "a1il1u1",
+    "javob": [
+      "Muhlisa",
+      "Мухлиса"
+    ]
+  },
+  {
+    "savol": "r1dr1s",
+    "javob": [
+      "sardor",
+      "сардор"
+    ]
+  },
+  {
+    "savol": "di1s1a1",
+    "javob": [
+      "jamshid",
+      "жамшид"
+    ]
+  },
+  {
+    "savol": "vo111ar",
+    "javob": [
+      "rasulov",
+      "расулов"
+    ]
+  },
+  {
+    "savol": "soms11",
+    "javob": [
+      "kosmos",
+      "космос"
+    ]
+  },
+  {
+    "savol": "r1t11uM",
+    "javob": [
+      "Muattar",
+      "Муаттар"
+    ]
+  },
+  {
+    "savol": "11eM",
+    "javob": [
+      "Mehr",
+      "Меhr"
+    ]
+  },
+  {
+    "savol": "ig1e1",
+    "javob": [
+      "Sevgi",
+      "Севги"
+    ]
+  },
+  {
+    "savol": "11l1s'oD",
+    "javob": [
+      "Do'stlik",
+      "До'стлик"
+    ]
+  },
+  {
+    "savol": "di11",
+    "javob": [
+      "Umid",
+      "Умид"
+    ]
+  },
+  {
+    "savol": "11aB",
+    "javob": [
+      "Baxt",
+      "Бахт"
+    ]
+  },
+  {
+    "savol": "11ni'1oS",
+    "javob": [
+      "Sog'inch",
+      "Соғинч"
+    ]
+  },
+  {
+    "savol": "1i1qi1I",
+    "javob": [
+      "Iliqlik",
+      "Илиқлик"
+    ]
+  },
+  {
+    "savol": "k1lnir11S",
+    "javob": [
+      "Shirinlik",
+      "Ширинлик"
+    ]
+  },
+  {
+    "savol": "k1ldna11u1",
+    "javob": [
+      "Xursandlik",
+      "Хурсандлик"
+    ]
+  },
+  {
+    "savol": "1am1iH",
+    "javob": [
+      "Himmat",
+      "Химмат"
+    ]
+  },
+  {
+    "savol": "t1q11aS",
+    "javob": [
+      "Sadoqat",
+      "Садоят"
+    ]
+  },
+  {
+    "savol": "r11X",
+    "javob": [
+      "Xayr",
+      "Хайр"
+    ]
+  },
+  {
+    "savol": "kilni11o1",
+    "javob": [
+      "Yorqinlik",
+      "Йорқинлик"
+    ]
+  },
+  {
+    "savol": "t1s11aN",
+    "javob": [
+      "Nafosat",
+      "Нафосат"
+    ]
+  },
+  {
+    "savol": "11rihC",
+    "javob": [
+      "Chiroy",
+      "Чирой"
+    ]
+  },
+  {
+    "savol": "ki1r111ma'G",
+    "javob": [
+      "G'amxo'rlik",
+      "Ғамҳўрлик"
+    ]
+  },
+  {
+    "savol": "k1l1nekir'g11",
+    "javob": [
+      "Bag'rikenglik",
+      "Боғрикенглик"
+    ]
+  },
+  {
+    "savol": "1da1",
+    "javob": [
+      "Qadr",
+      "Қадр"
+    ]
+  },
+  {
+    "savol": "ta11uH",
+    "javob": [
+      "Hurmat",
+      "Ҳурмат"
+    ]
+  },
+  {
+    "savol": "1ab1a1uM",
+    "javob": [
+      "Muhabbat",
+      "Муҳаббат"
+    ]
+  },
+  {
+    "savol": "1cni1e1",
+    "javob": [
+      "Sevinch",
+      "Севинч"
+    ]
+  },
+  {
+    "savol": "killi1n11",
+    "javob": [
+      "Yengillik",
+      "Йеңиллик"
+    ]
+  },
+  {
+    "savol": "1i1qa1cqa1chsuX",
+    "javob": [
+      "Xushchaqchaqlik",
+      "Хушчақчақлик"
+    ]
+  },
+  {
+    "savol": "1z1O",
+    "javob": [
+      "Orzu",
+      "Орзу"
+    ]
+  },
+  {
+    "savol": "1zo1",
+    "javob": [
+      "Rozi",
+      "Рози"
+    ]
+  },
+  {
+    "savol": "1n11s'oD",
+    "javob": [
+      "Do'stona",
+      "До'стона"
+    ]
+  },
+  {
+    "savol": "hc1oh11",
+    "javob": [
+      "Ishonch",
+      "Ишонч"
+    ]
+  },
+  {
+    "savol": "11lhcni1",
+    "javob": [
+      "Tinchlik",
+      "Тинчлик"
+    ]
+  },
+  {
+    "savol": "1il1ob11heM",
+    "javob": [
+      "Mehribonlik",
+      "Меҳрибонлик"
+    ]
+  },
+  {
+    "savol": "1ayimi11S",
+    "javob": [
+      "Samimiyat",
+      "Самимият"
+    ]
+  },
+  {
+    "savol": "11l1l1iqoY",
+    "javob": [
+      "Yoqimlilik",
+      "Ёқимлилик"
+    ]
+  },
+  {
+    "savol": "kil1i11iF",
+    "javob": [
+      "Fidoiylik",
+      "Фидоийлик"
+    ]
+  },
+  {
+    "savol": "n1mz1M",
+    "javob": [
+      "Mazmun",
+      "Мазмун"
+    ]
+  },
+  {
+    "savol": "ta1z1L",
+    "javob": [
+      "Lazzat",
+      "Лаззат"
+    ]
+  },
+  {
+    "savol": "sf11",
+    "javob": [
+      "Nafs",
+      "Нафс"
+    ]
+  },
+  {
+    "savol": "1ild1nhs11",
+    "javob": [
+      "Xushnudlik",
+      "Хушнудлик"
+    ]
+  },
+  {
+    "savol": "h1a1l1D",
+    "javob": [
+      "Dilkash",
+      "Дилкаш"
+    ]
+  },
+  {
+    "savol": "1a1miQ",
+    "javob": [
+      "Qimmat",
+      "Қиммат"
+    ]
+  },
+  {
+    "savol": "n1my1",
+    "javob": [
+      "Iymon",
+      "Иймон"
+    ]
+  },
+  {
+    "savol": "on'11",
+    "javob": [
+      "Ma'no",
+      "Маъно"
+    ]
+  },
+  {
+    "savol": "1ilf1S",
+    "javob": [
+      "Soflik",
+      "Софлик"
+    ]
+  },
+  {
+    "savol": "r'g11",
+    "javob": [
+      "Bag'r",
+      "Боғр"
+    ]
+  },
+  {
+    "savol": "k1l11hS",
+    "javob": [
+      "Shodlik",
+      "Шодлик"
+    ]
+  },
+  {
+    "savol": "kil1hs1a1",
+    "javob": [
+      "Yaxshilik",
+      "Яхшилик"
+    ]
+  },
+  {
+    "savol": "11ln1riqv1N",
+    "javob": [
+      "Navqironlik",
+      "Навқиронлик"
+    ]
+  },
+  {
+    "savol": "na1s11G",
+    "javob": [
+      "Gulshan",
+      "Гулшан"
+    ]
+  },
+  {
+    "savol": "gna111N",
+    "javob": [
+      "Nayrang",
+      "Найранг"
+    ]
+  },
+  {
+    "savol": "ro11ro1",
+    "javob": [
+      "Yor-yor",
+      "Йор-йор"
+    ]
+  },
+  {
+    "savol": "1sifa1",
+    "javob": [
+      "Nafisa",
+      "Нафиса"
+    ]
+  },
+  {
+    "savol": "1l1L",
+    "javob": [
+      "Lola",
+      "Лола"
+    ]
+  },
+  {
+    "savol": "moz11",
+    "javob": [
+      "nizom",
+      "низом"
+    ]
+  },
+  {
+    "savol": "a111ehc",
+    "javob": [
+      "chegara",
+      "чегара"
+    ]
+  },
+  {
+    "savol": "la1ma11m",
+    "javob": [
+      "mukammal",
+      "мукаммал"
+    ]
+  },
+  {
+    "savol": "qo11hc",
+    "javob": [
+      "chiroq",
+      "чироқ"
+    ]
+  },
+  {
+    "savol": "qo1i1",
+    "javob": [
+      "yiroq",
+      "йироқ"
+    ]
+  },
+  {
+    "savol": "1d1zhah1",
+    "javob": [
+      "shahzoda",
+      "шаҳзода"
+    ]
+  },
+  {
+    "savol": "a1s1",
+    "javob": [
+      "asma",
+      "асма"
+    ]
+  },
+  {
+    "savol": "11voma1",
+    "javob": [
+      "samoviy",
+      "самовий"
+    ]
+  },
+  {
+    "savol": "az1o1",
+    "javob": [
+      "ro'za",
+      "роза"
+    ]
+  },
+  {
+    "savol": "adj11",
+    "javob": [
+      "sajda",
+      "сажда"
+    ]
+  },
+  {
+    "savol": "ta11h",
+    "javob": [
+      "hojat",
+      "хожат"
+    ]
+  },
+  {
+    "savol": "11'ruq",
+    "javob": [
+      "qur'on",
+      "қуръон"
+    ]
+  },
+  {
+    "savol": "11dobi",
+    "javob": [
+      "ibodat",
+      "ибодат"
+    ]
+  },
+  {
+    "savol": "11biq",
+    "javob": [
+      "qibla",
+      "кибла"
+    ]
+  },
+  {
+    "savol": "11d",
+    "javob": [
+      "dua",
+      "дуо"
+    ]
+  },
+  {
+    "savol": "r1i1",
+    "javob": [
+      "zikr",
+      "зикр"
+    ]
+  },
+  {
+    "savol": "1al1A",
+    "javob": [
+      "Allah",
+      "аллaҳ"
+    ]
+  },
+  {
+    "savol": "d11h",
+    "javob": [
+      "hamd",
+      "ҳамд"
+    ]
+  },
+  {
+    "savol": "t1nnu1",
+    "javob": [
+      "sunnat",
+      "суннат"
+    ]
+  },
+  {
+    "savol": "z11f",
+    "javob": [
+      "farz",
+      "фарз"
+    ]
+  },
+  {
+    "savol": "1u1kam",
+    "javob": [
+      "makruh",
+      "макруҳ"
+    ]
+  },
+  {
+    "savol": "la11h",
+    "javob": [
+      "halal",
+      "ҳалол"
+    ]
+  },
+  {
+    "savol": "1ora1",
+    "javob": [
+      "harom",
+      "ҳаром"
+    ]
+  },
+  {
+    "savol": "11ot",
+    "javob": [
+      "toat",
+      "тоат"
+    ]
+  },
+  {
+    "savol": "1h1tof",
+    "javob": [
+      "fotiha",
+      "фотиҳа"
+    ]
+  },
+  {
+    "savol": "11z'od",
+    "javob": [
+      "do'zax",
+      "дўзах"
+    ]
+  },
+  {
+    "savol": "11t1ahs",
+    "javob": [
+      "shayton",
+      ",шайтон"
+    ]
+  },
+  {
+    "savol": "ka11bu1",
+    "javob": [
+      "muborak",
+      "муборак"
+    ]
+  },
+  {
+    "savol": "sil11",
+    "javob": [
+      "iblis",
+      "иблис"
+    ]
+  },
+  {
+    "savol": "n1mlu11m",
+    "javob": [
+      "musulmon",
+      "мусулмон"
+    ]
+  },
+  {
+    "savol": "n1m1om",
+    "javob": [
+      "moʼmin",
+      "мўмин"
+    ]
+  },
+  {
+    "savol": "r11k",
+    "javob": [
+      "kufr",
+      "куфр"
+    ]
+  },
+  {
+    "savol": "1ebs1t",
+    "javob": [
+      "tasbeh",
+      "тасбеҳ"
+    ]
+  },
+  {
+    "savol": "dujj1h11",
+    "javob": [
+      "tahajjud",
+      "таҳажжуд"
+    ]
+  },
+  {
+    "savol": "1ev11at",
+    "javob": [
+      "taroveh",
+      "таровеҳ"
+    ]
+  },
+  {
+    "savol": "1amo1i",
+    "javob": [
+      "iqomat",
+      "иқомат"
+    ]
+  },
+  {
+    "savol": "t1o1iq",
+    "javob": [
+      "qiroat",
+      "қироат"
+    ]
+  },
+  {
+    "savol": "1oz1m1r",
+    "javob": [
+      "ramazon",
+      "рамазон"
+    ]
+  },
+  {
+    "savol": "nobr11",
+    "javob": [
+      "qurbon",
+      "қурбон"
+    ]
+  },
+  {
+    "savol": "r11f",
+    "javob": [
+      "fitr",
+      "фитр"
+    ]
+  },
+  {
+    "savol": "1ay1n",
+    "javob": [
+      "niyat",
+      "ният"
+    ]
+  },
+  {
+    "savol": "1ai11hs",
+    "javob": [
+      "shariat",
+      "шариат"
+    ]
+  },
+  {
+    "savol": "risf11",
+    "javob": [
+      "tafsir",
+      "тафсир"
+    ]
+  },
+  {
+    "savol": "j11",
+    "javob": [
+      "haj",
+      "ҳаҷ"
+    ]
+  },
+  {
+    "savol": "1r1u",
+    "javob": [
+      "umra",
+      "умра"
+    ]
+  },
+  {
+    "savol": "j1r'e1",
+    "javob": [
+      "me'roj",
+      "миърож"
+    ]
+  },
+  {
+    "savol": "r1a1",
+    "javob": [
+      "qabr",
+      "қабр"
+    ]
+  },
+  {
+    "savol": "1a11yiq",
+    "javob": [
+      "qiyomat",
+      "қийомат"
+    ]
+  },
+  {
+    "savol": "1n1t1egrA",
+    "javob": [
+      "Argentina",
+      "Аргентина"
+    ]
+  },
+  {
+    "savol": "1y1k1uT",
+    "javob": [
+      "Turkiya",
+      "Туркия"
+    ]
+  },
+  {
+    "savol": "ahsl11",
+    "javob": [
+      "Polsha",
+      "Польша"
+    ]
+  },
+  {
+    "savol": "a1i1o1noM",
+    "javob": [
+      "Mongoliya",
+      "Монголия"
+    ]
+  },
+  {
+    "savol": "1a1aQ",
+    "javob": [
+      "Qalam",
+      "Қалам"
+    ]
+  },
+  {
+    "savol": "1khcu1",
+    "javob": [
+      "Ruchka",
+      "Ручка"
+    ]
+  },
+  {
+    "savol": "r1t1ad",
+    "javob": [
+      "daftar",
+      "дафтар"
+    ]
+  },
+  {
+    "savol": "la1ro1",
+    "javob": [
+      "portal",
+      "портал"
+    ]
+  },
+  {
+    "savol": "1o1aP",
+    "javob": [
+      "Palov",
+      "Палов"
+    ]
+  },
+  {
+    "savol": "na11p1K",
+    "javob": [
+      "Kapitan",
+      "Капитан"
+    ]
+  },
+  {
+    "savol": "1pgt11C",
+    "javob": [
+      "Chatgpt",
+      "Чатгпт"
+    ]
+  },
+  {
+    "savol": "m11lI",
+    "javob": [
+      "Ilhom",
+      "Илҳом"
+    ]
+  },
+  {
+    "savol": "1r1xuB",
+    "javob": [
+      "Buxoro",
+      "Бухоро"
+    ]
+  },
+  {
+    "savol": "dn1q1ama1",
+    "javob": [
+      "Samarqand",
+      "Самарқанд"
+    ]
+  },
+  {
+    "savol": "n1ji11A",
+    "javob": [
+      "Andijon",
+      "Андижон"
+    ]
+  },
+  {
+    "savol": "x1zzi1",
+    "javob": [
+      "Jizzax",
+      "Жиззах"
+    ]
+  },
+  {
+    "savol": "oyr111iS",
+    "javob": [
+      "Sirdaryo",
+      "Сирдарё"
+    ]
+  },
+  {
+    "savol": "ma11",
+    "javob": [
+      "Alam",
+      "Алам"
+    ]
+  },
+  {
+    "savol": "11kA",
+    "javob": [
+      "Akam",
+      "Акам"
+    ]
+  },
+  {
+    "savol": "k1ddo1",
+    "javob": [
+      "Xoddok",
+      "Ходдок"
+    ]
+  },
+  {
+    "savol": "h1a1aL",
+    "javob": [
+      "Lavash",
+      "Лаваш"
+    ]
+  },
+  {
+    "savol": "1p1hC",
+    "javob": [
+      "Chips",
+      "Чипс"
+    ]
+  },
+  {
+    "savol": "s1k1F",
+    "javob": [
+      "Fokus",
+      "Фокус"
+    ]
+  },
+  {
+    "savol": "are11K",
+    "javob": [
+      "Kamera",
+      "Камера"
+    ]
+  },
+  {
+    "savol": "1sa1",
+    "javob": [
+      "Rasm",
+      "Расм"
+    ]
+  },
+  {
+    "savol": "1aru1",
+    "javob": [
+      "Surat",
+      "Сурат"
+    ]
+  },
+  {
+    "savol": "1aʼ1uJ",
+    "javob": [
+      "Jurʼat",
+      "Журъат"
+    ]
+  },
+  {
+    "savol": "a1i1",
+    "javob": [
+      "Aida",
+      "Аида"
+    ]
+  },
+  {
+    "savol": "a1ia1",
+    "javob": [
+      "Saida",
+      "Саида"
+    ]
+  },
+  {
+    "savol": "1lya1",
+    "javob": [
+      "Layli",
+      "Лайли"
+    ]
+  },
+  {
+    "savol": "o1ya1",
+    "javob": [
+      "Laylo",
+      "Лайло"
+    ]
+  },
+  {
+    "savol": "11iliL",
+    "javob": [
+      "Liliya",
+      "Лилия"
+    ]
+  },
+  {
+    "savol": "i11lnodmi1ib li1obA",
+    "javob": [
+      "Abobil bilimdonlari",
+      "Абобилбилимдонлари"
+    ]
+  },
+  {
+    "savol": "tneg11i11I",
+    "javob": [
+      "Intilegent",
+      "Интилегент"
+    ]
+  },
+  {
+    "savol": "1avok1z 1it1O",
+    "javob": [
+      "Oltin zakovat",
+      "Олтин заковат"
+    ]
+  },
+  {
+    "savol": "i1rah1 11A",
+    "javob": [
+      "Aql charxi",
+      "Ақл чархи"
+    ]
+  },
+  {
+    "savol": "ey1ne1iv1le1",
+    "javob": [
+      "Televideniye",
+      "Телевидение"
+    ]
+  },
+  {
+    "savol": "111tvanoms1K",
+    "javob": [
+      "Kosmonavtlar",
+      "Космонавтлар"
+    ]
+  },
+  {
+    "savol": "1otra1",
+    "javob": [
+      "Karton",
+      "Картон"
+    ]
+  },
+  {
+    "savol": "1ogʻo1",
+    "javob": [
+      "Qogʻoz",
+      "Қоғоз"
+    ]
+  },
+  {
+    "savol": "kinya11i1",
+    "javob": [
+      "Lishaynik",
+      "Лишайник"
+    ]
+  },
+  {
+    "savol": "1iv1nom1Z",
+    "javob": [
+      "Zamonaviy",
+      "Замонавий"
+    ]
+  },
+  {
+    "savol": "11G",
+    "javob": [
+      "Gif",
+      "Гиф"
+    ]
+  },
+  {
+    "savol": "a1iz1F",
+    "javob": [
+      "Fizika",
+      "Физика"
+    ]
+  },
+  {
+    "savol": "oy11K",
+    "javob": [
+      "Kimyo",
+      "Кимё"
+    ]
+  },
+  {
+    "savol": "ar1eg11",
+    "javob": [
+      "Algebra",
+      "Алгебра"
+    ]
+  },
+  {
+    "savol": "ki11F",
+    "javob": [
+      "Fizik",
+      "Физик"
+    ]
+  },
+  {
+    "savol": "a11nI",
+    "javob": [
+      "India",
+      "Индия"
+    ]
+  },
+  {
+    "savol": "y1ti1",
+    "javob": [
+      "Xitoy",
+      "Хитой"
+    ]
+  },
+  {
+    "savol": "m1s1aba1",
+    "javob": [
+      "tabassum",
+      "табассум"
+    ]
+  },
+  {
+    "savol": "1ohya1",
+    "javob": [
+      "rayhon",
+      "райҳон"
+    ]
+  },
+  {
+    "savol": "q1mya11um",
+    "javob": [
+      "muzqaymoq",
+      "музқаймоқ"
+    ]
+  },
+  {
+    "savol": "afi1a1",
+    "javob": [
+      "sahifa",
+      "саҳифа"
+    ]
+  },
+  {
+    "savol": "ar1t1x",
+    "javob": [
+      "xotira",
+      "хотира"
+    ]
+  },
+  {
+    "savol": "1lqor11",
+    "javob": [
+      "maroqli",
+      "мароқли"
+    ]
+  },
+  {
+    "savol": "n11irhe1",
+    "javob": [
+      "mehribon",
+      "меҳрибон"
+    ]
+  },
+  {
+    "savol": "mo1‘11s",
+    "javob": [
+      "sog‘lom",
+      "соғлом"
+    ]
+  },
+  {
+    "savol": "1amha1",
+    "javob": [
+      "rahmat",
+      "рахмат"
+    ]
+  },
+  {
+    "savol": "11vadr1b",
+    "javob": [
+      "bardavom",
+      "бардавом"
+    ]
+  },
+  {
+    "savol": "1aqo11s",
+    "javob": [
+      "sadoqat",
+      "садоқат"
+    ]
+  },
+  {
+    "savol": "to1a1",
+    "javob": [
+      "hayot",
+      "ҳаёт"
+    ]
+  },
+  {
+    "savol": "11hab",
+    "javob": [
+      "bahor",
+      "бахор"
+    ]
+  },
+  {
+    "savol": "ilm11",
+    "javob": [
+      "ilmli",
+      "илмли"
+    ]
+  },
+  {
+    "savol": "oy1u1",
+    "javob": [
+      "dunyo",
+      "дунё"
+    ]
+  },
+  {
+    "savol": "h1od1‘1y",
+    "javob": [
+      "yo‘ldosh",
+      "йўлдош"
+    ]
+  },
+  {
+    "savol": "1alou1",
+    "javob": [
+      "duolar",
+      "дуолар"
+    ]
+  },
+  {
+    "savol": "o1r1d",
+    "javob": [
+      "daryo",
+      "дарё"
+    ]
+  },
+  {
+    "savol": "ad1no1",
+    "javob": [
+      "tongda",
+      "тонгда"
+    ]
+  },
+  {
+    "savol": "1u1saba1",
+    "javob": [
+      "tabassum",
+      "табассум"
+    ]
+  },
+  {
+    "savol": "ra111oy",
+    "javob": [
+      "yoshlar",
+      "ёшлар"
+    ]
+  },
+  {
+    "savol": "11jano",
+    "javob": [
+      "onajon",
+      "онажон"
+    ]
+  },
+  {
+    "savol": "a1ala11",
+    "javob": [
+      "g‘alaba",
+      "ғалаба"
+    ]
+  },
+  {
+    "savol": "aqa1o11m",
+    "javob": [
+      "musobaqa",
+      "мусобақа"
+    ]
+  },
+  {
+    "savol": "11lts1od",
+    "javob": [
+      "do‘stlik",
+      "дўстлик"
+    ]
+  },
+  {
+    "savol": "1i1i1as",
+    "javob": [
+      "samimiy",
+      "самимий"
+    ]
+  },
+  {
+    "savol": "nir11s",
+    "javob": [
+      "shirin",
+      "ширин"
+    ]
+  },
+  {
+    "savol": "kil1c1i1",
+    "javob": [
+      "tinchlik",
+      "тинчлик"
+    ]
+  },
+  {
+    "savol": "1ar1s1j",
+    "javob": [
+      "jasorat",
+      "жасорат"
+    ]
+  },
+  {
+    "savol": "ts11d",
+    "javob": [
+      "do‘st",
+      "дўст"
+    ]
+  },
+  {
+    "savol": "b1t1am",
+    "javob": [
+      "maktab",
+      "мактаб"
+    ]
+  },
+  {
+    "savol": "1itl1",
+    "javob": [
+      "oltin",
+      "олтин"
+    ]
+  },
+  {
+    "savol": "11io",
+    "javob": [
+      "oila",
+      "оила"
+    ]
+  },
+  {
+    "savol": "i11un",
+    "javob": [
+      "nurli",
+      "нурли"
+    ]
+  },
+  {
+    "savol": "to11h",
+    "javob": [
+      "hayot",
+      "ҳаёт"
+    ]
+  },
+  {
+    "savol": "ro11b",
+    "javob": [
+      "bahor",
+      "бахор"
+    ]
+  },
+  {
+    "savol": "1l1li",
+    "javob": [
+      "ilmli",
+      "илмли"
+    ]
+  },
+  {
+    "savol": "o11ud",
+    "javob": [
+      "dunyo",
+      "дунё"
+    ]
+  },
+  {
+    "savol": "1sod11oy",
+    "javob": [
+      "yo‘ldosh",
+      "йўлдош"
+    ]
+  },
+  {
+    "savol": "r11oud",
+    "javob": [
+      "duolar",
+      "дуолар"
+    ]
+  },
+  {
+    "savol": "1y1ad",
+    "javob": [
+      "daryo",
+      "дарё"
+    ]
+  },
+  {
+    "savol": "ad1no1",
+    "javob": [
+      "tongda",
+      "тонгда"
+    ]
+  },
+  {
+    "savol": "11ss1bat",
+    "javob": [
+      "tabassum",
+      "табассум"
+    ]
+  },
+  {
+    "savol": "r1l1so1",
+    "javob": [
+      "yoshlar",
+      "ёшлар"
+    ]
+  },
+  {
+    "savol": "11jano",
+    "javob": [
+      "onajon",
+      "онажон"
+    ]
+  },
+  {
+    "savol": "1b11a‘g",
+    "javob": [
+      "g‘alaba",
+      "ғалаба"
+    ]
+  },
+  {
+    "savol": "1qab11um",
+    "javob": [
+      "musobaqa",
+      "мусобақа"
+    ]
+  },
+  {
+    "savol": "1il1s‘o1",
+    "javob": [
+      "do‘stlik",
+      "дўстлик"
+    ]
+  },
+  {
+    "savol": "y11i1as",
+    "javob": [
+      "samimiy",
+      "самимий"
+    ]
+  },
+  {
+    "savol": "n1rih1",
+    "javob": [
+      "shirin",
+      "ширин"
+    ]
+  },
+  {
+    "savol": "ki111nit",
+    "javob": [
+      "tinchlik",
+      "тинчлик"
+    ]
+  },
+  {
+    "savol": "ta11sa1",
+    "javob": [
+      "jasorat",
+      "жасорат"
+    ]
+  },
+  {
+    "savol": "t1‘o1",
+    "javob": [
+      "do‘st",
+      "дўст"
+    ]
+  },
+  {
+    "savol": "bat11m",
+    "javob": [
+      "maktab",
+      "мактаб"
+    ]
+  },
+  {
+    "savol": "11tlo",
+    "javob": [
+      "oltin",
+      "олтин"
+    ]
+  },
+  {
+    "savol": "11io",
+    "javob": [
+      "oila",
+      "оила"
+    ]
+  },
+  {
+    "savol": "ilr11",
+    "javob": [
+      "nurli",
+      "нурли"
+    ]
+  },
+  {
+    "savol": "11ldo1s",
+    "javob": [
+      "shodlik",
+      "шодлик"
+    ]
+  },
+  {
+    "savol": "t1b1qo",
+    "javob": [
+      "oqibat",
+      "оқибат"
+    ]
+  },
+  {
+    "savol": "h1n11uq",
+    "javob": [
+      "quvonch",
+      "қувонч"
+    ]
+  },
+  {
+    "savol": "1i1ib",
+    "javob": [
+      "bilim",
+      "билим"
+    ]
+  },
+  {
+    "savol": "111laz‘og",
+    "javob": [
+      "go‘zallik",
+      "гўзаллик"
+    ]
+  },
+  {
+    "savol": "1ozl1g",
+    "javob": [
+      "gulzor",
+      "гулзор"
+    ]
+  },
+  {
+    "savol": "k1j1l1k",
+    "javob": [
+      "kelajak",
+      "келажак"
+    ]
+  },
+  {
+    "savol": "i1n1y",
+    "javob": [
+      "yangi",
+      "янги"
+    ]
+  },
+  {
+    "savol": "a1i1am",
+    "javob": [
+      "madina",
+      "мадина"
+    ]
+  },
+  {
+    "savol": "f11hsa1",
+    "javob": [
+      "tashrif",
+      "ташриф"
+    ]
+  },
+  {
+    "savol": "11em",
+    "javob": [
+      "mehr",
+      "меҳр"
+    ]
+  },
+  {
+    "savol": "i1ve1",
+    "javob": [
+      "sevgi",
+      "севги"
+    ]
+  },
+  {
+    "savol": "1al1da",
+    "javob": [
+      "adolat",
+      "адолат"
+    ]
+  },
+  {
+    "savol": "1i1laq",
+    "javob": [
+      "qalbim",
+      "қалбим"
+    ]
+  },
+  {
+    "savol": "1na1ra1",
+    "javob": [
+      "farzand",
+      "фарзанд"
+    ]
+  },
+  {
+    "savol": "az11",
+    "javob": [
+      "toza",
+      "тоза"
+    ]
+  },
+  {
+    "savol": "z1dlu1",
+    "javob": [
+      "yulduz",
+      "юлдуз"
+    ]
+  },
+  {
+    "savol": "na1a1",
+    "javob": [
+      "vatan",
+      "ватан"
+    ]
+  },
+  {
+    "savol": "t1ekh1o1",
+    "javob": [
+      "toshkent",
+      "тошкент"
+    ]
+  },
+  {
+    "savol": "1o1ik",
+    "javob": [
+      "kitob",
+      "китоб"
+    ]
+  },
+  {
+    "savol": "fn11",
+    "javob": [
+      "sinf",
+      "синф"
+    ]
+  },
+  {
+    "savol": "1dfn1s",
+    "javob": [
+      "sinfda",
+      "синфда"
+    ]
+  },
+  {
+    "savol": "bot11",
+    "javob": [
+      "kitob",
+      "китоб"
+    ]
+  },
+  {
+    "savol": "o1ra1",
+    "javob": [
+      "daryo",
+      "дарё"
+    ]
+  },
+  {
+    "savol": "t11s",
+    "javob": [
+      "soat",
+      "соат"
+    ]
+  },
+  {
+    "savol": "11ox",
+    "javob": [
+      "xona",
+      "хона"
+    ]
+  },
+  {
+    "savol": "1q1u",
+    "javob": [
+      "uyqu",
+      "уйқу"
+    ]
+  },
+  {
+    "savol": "1ve1",
+    "javob": [
+      "meva",
+      "мева"
+    ]
+  },
+  {
+    "savol": "1xara1",
+    "javob": [
+      "daraxt",
+      "дарахт"
+    ]
+  },
+  {
+    "savol": "y1h1",
+    "javob": [
+      "choy",
+      "чой"
+    ]
+  },
+  {
+    "savol": "11ob",
+    "javob": [
+      "bog‘",
+      "боғ"
+    ]
+  },
+  {
+    "savol": "q11ab",
+    "javob": [
+      "baliq",
+      "балиқ"
+    ]
+  },
+  {
+    "savol": "11n",
+    "javob": [
+      "non",
+      "нон"
+    ]
+  },
+  {
+    "savol": "m1l1q",
+    "javob": [
+      "qalam",
+      "қалам"
+    ]
+  },
+  {
+    "savol": "11dlug",
+    "javob": [
+      "guldon",
+      "гулдон"
+    ]
+  },
+  {
+    "savol": "11z1velet",
+    "javob": [
+      "televizor",
+      "телевизор"
+    ]
+  },
+  {
+    "savol": "11ih1am",
+    "javob": [
+      "mashina",
+      "машина"
+    ]
+  },
+  {
+    "savol": "11lliqa11um",
+    "javob": [
+      "mustaqillik",
+      "мустақиллик"
+    ]
+  },
+  {
+    "savol": "1oyi1h1m",
+    "javob": [
+      "mahliyo💙",
+      "махлиё💙"
+    ]
+  },
+  {
+    "savol": "o1f11um",
+    "javob": [
+      "musaffo",
+      "мусаффо"
+    ]
+  },
+  {
+    "savol": "b1a1",
+    "javob": [
+      "qalb",
+      "қалб"
+    ]
+  },
+  {
+    "savol": "11k",
+    "javob": [
+      "kuz",
+      "куз"
+    ]
+  },
+  {
+    "savol": "11it",
+    "javob": [
+      "tish",
+      "тиш"
+    ]
+  },
+  {
+    "savol": "h11b",
+    "javob": [
+      "bosh",
+      "бош"
+    ]
+  },
+  {
+    "savol": "11n",
+    "javob": [
+      "nok",
+      "нок"
+    ]
+  },
+  {
+    "savol": "l11",
+    "javob": [
+      "gul",
+      "гул"
+    ]
+  },
+  {
+    "savol": "1zi1r1q",
+    "javob": [
+      "qirmizi",
+      "қирмизи"
+    ]
+  },
+  {
+    "savol": "1l11fahs",
+    "javob": [
+      "shaftoli",
+      "шафтоли"
+    ]
+  },
+  {
+    "savol": "am11",
+    "javob": [
+      "olma",
+      "олма"
+    ]
+  },
+  {
+    "savol": "1i1na",
+    "javob": [
+      "anjir",
+      "анжир"
+    ]
+  },
+  {
+    "savol": "i11b",
+    "javob": [
+      "behi",
+      "беҳи"
+    ]
+  },
+  {
+    "savol": "m11u",
+    "javob": [
+      "uzum",
+      "узум"
+    ]
+  },
+  {
+    "savol": "so11g",
+    "javob": [
+      "gilos",
+      "гилос"
+    ]
+  },
+  {
+    "savol": "n1na1",
+    "javob": [
+      "banan",
+      "банан"
+    ]
+  },
+  {
+    "savol": "a'gr11",
+    "javob": [
+      "qarg'a",
+      "қарға"
+    ]
+  },
+  {
+    "savol": "1o11mop",
+    "javob": [
+      "pomidor",
+      "помидор"
+    ]
+  },
+  {
+    "savol": "h11b",
+    "javob": [
+      "besh",
+      "беш"
+    ]
+  },
+  {
+    "savol": "1ort11le",
+    "javob": [
+      "elektron",
+      "электрон"
+    ]
+  },
+  {
+    "savol": "1ra1",
+    "javob": [
+      "Barg",
+      "Барг"
+    ]
+  },
+  {
+    "savol": "11eG",
+    "javob": [
+      "Gerb",
+      "Герб"
+    ]
+  },
+  {
+    "savol": "ay11da1",
+    "javob": [
+      "Madhiya",
+      "Мадҳия"
+    ]
+  },
+  {
+    "savol": "a11suM",
+    "javob": [
+      "Musiqa",
+      "Мусиқа"
+    ]
+  },
+  {
+    "savol": "1a1ko",
+    "javob": [
+      "okean",
+      "Океан"
+    ]
+  },
+  {
+    "savol": "1spe1",
+    "javob": [
+      "Pepsi",
+      "Пепси"
+    ]
+  },
+  {
+    "savol": "m11ge1eT",
+    "javob": [
+      "Telegram",
+      "Телеграм"
+    ]
+  },
+  {
+    "savol": "1a1gats1I",
+    "javob": [
+      "Instagram",
+      "Инстаграм"
+    ]
+  },
+  {
+    "savol": "1oob1ca1",
+    "javob": [
+      "Facebook",
+      "Фейсбук"
+    ]
+  },
+  {
+    "savol": "1past1h1",
+    "javob": [
+      "Whatsapp",
+      "Вотсап"
+    ]
+  },
+  {
+    "savol": "a1e1O",
+    "javob": [
+      "Opera",
+      "Опера"
+    ]
+  },
+  {
+    "savol": "d111tqI",
+    "javob": [
+      "Iqtisod",
+      "Иқтисод"
+    ]
+  },
+  {
+    "savol": "i11eJ",
+    "javob": [
+      "Jensi",
+      "Женси"
+    ]
+  },
+  {
+    "savol": "rik11S",
+    "javob": [
+      "Shokir",
+      "Шокир"
+    ]
+  },
+  {
+    "savol": "11b1ih1ruX",
+    "javob": [
+      "Xurshidbek",
+      "Хуршидбек"
+    ]
+  },
+  {
+    "savol": "11voT",
+    "javob": [
+      "Tovuq",
+      "Товуқ"
+    ]
+  },
+  {
+    "savol": "1u1suM",
+    "javob": [
+      "Mushuk",
+      "Мушук"
+    ]
+  },
+  {
+    "savol": "ri11S",
+    "javob": [
+      "Sigir",
+      "Сигир"
+    ]
+  },
+  {
+    "savol": "a1a1hso1",
+    "javob": [
+      "Toshbaqa",
+      "Тошбақа"
+    ]
+  },
+  {
+    "savol": "1qab1u1",
+    "javob": [
+      "Qurbaqa",
+      "Қурбақа"
+    ]
+  },
+  {
+    "savol": "i11n1aM",
+    "javob": [
+      "Maʼnoli",
+      "Маъноли"
+    ]
+  },
+  {
+    "savol": "zu1n1K",
+    "javob": [
+      "Kunduz",
+      "Кундуз"
+    ]
+  },
+  {
+    "savol": "11poY",
+    "javob": [
+      "Yopiq",
+      "Ёпиқ"
+    ]
+  },
+  {
+    "savol": "z1s1sI",
+    "javob": [
+      "Ishsiz",
+      "Ишсиз"
+    ]
+  },
+  {
+    "savol": "adn11",
+    "javob": [
+      "Panda",
+      "Панда"
+    ]
+  },
+  {
+    "savol": "ihc11i1",
+    "javob": [
+      "Ninachi",
+      "Ниначи"
+    ]
+  },
+  {
+    "savol": "1d1ma1iP",
+    "javob": [
+      "Piramida",
+      "Пирамида"
+    ]
+  },
+  {
+    "savol": "1rbe1",
+    "javob": [
+      "Zebra",
+      "Зебра"
+    ]
+  },
+  {
+    "savol": "u1i1aM",
+    "javob": [
+      "Malibu",
+      "Малибу"
+    ]
+  },
+  {
+    "savol": "w11",
+    "javob": [
+      "Bmw",
+      "БМВ"
+    ]
+  },
+  {
+    "savol": "1re1",
+    "javob": [
+      "Mers",
+      "Мерс"
+    ]
+  },
+  {
+    "savol": "o111noR",
+    "javob": [
+      "Ronaldo",
+      "Роналдо"
+    ]
+  },
+  {
+    "savol": "1sse1",
+    "javob": [
+      "Messi",
+      "Месси"
+    ]
+  },
+  {
+    "savol": "lobt11",
+    "javob": [
+      "Futbol",
+      "Футбол"
+    ]
+  },
+  {
+    "savol": "s1nn1T",
+    "javob": [
+      "Tennis",
+      "Теннис"
+    ]
+  },
+  {
+    "savol": "a1ek1R",
+    "javob": [
+      "Raketa",
+      "Ракета"
+    ]
+  },
+  {
+    "savol": "nom11",
+    "javob": [
+      "Osmon",
+      "Осмон"
+    ]
+  },
+  {
+    "savol": "1u1al1aF",
+    "javob": [
+      "Faylasuf",
+      "Файласуф"
+    ]
+  },
+  {
+    "savol": "ki11id1ax1M",
+    "javob": [
+      "Muxandislik",
+      "Муҳандислик"
+    ]
+  },
+  {
+    "savol": "ab1ahs1a1",
+    "javob": [
+      "Payshanba",
+      "Пайшанба"
+    ]
+  },
+  {
+    "savol": "1m1J",
+    "javob": [
+      "Juma",
+      "Жума"
+    ]
+  },
+  {
+    "savol": "111ahskaY",
+    "javob": [
+      "Yakshanba",
+      "Якшанба"
+    ]
+  },
+  {
+    "savol": "1yilim11",
+    "javob": [
+      "Familiya",
+      "Фамилия"
+    ]
+  },
+  {
+    "savol": "a1in1t1B",
+    "javob": [
+      "Botanika",
+      "Ботаника"
+    ]
+  },
+  {
+    "savol": "rot11dal1",
+    "javob": [
+      "Gladiator",
+      "Гладиатор"
+    ]
+  },
+  {
+    "savol": "s1lu1re1",
+    "javob": [
+      "Gerkules",
+      "Геркулес"
+    ]
+  },
+  {
+    "savol": "neP r1t11",
+    "javob": [
+      "Piter Pen",
+      "Питер Пен"
+    ]
+  },
+  {
+    "savol": "le11t1irA",
+    "javob": [
+      "Aristotel",
+      "Аристотел"
+    ]
+  },
+  {
+    "savol": "re11ypm1k",
+    "javob": [
+      "kompyuter",
+      "компьютер"
+    ]
+  },
+  {
+    "savol": "n1f1l1t",
+    "javob": [
+      "telefon",
+      "телефон"
+    ]
+  },
+  {
+    "savol": "t11r1tni",
+    "javob": [
+      "internet",
+      "интернет"
+    ]
+  },
+  {
+    "savol": "t1111revinu",
+    "javob": [
+      "universitet",
+      "университет"
+    ]
+  },
+  {
+    "savol": "1hcv1t11oʻ",
+    "javob": [
+      "oʻqituvchi",
+      "ўқитувчи"
+    ]
+  },
+  {
+    "savol": "r11keri1",
+    "javob": [
+      "direktor",
+      "директор"
+    ]
+  },
+  {
+    "savol": "1ni1",
+    "javob": [
+      "bino",
+      "бино"
+    ]
+  },
+  {
+    "savol": "ah11k",
+    "javob": [
+      "koʻcha",
+      "кўча"
+    ]
+  },
+  {
+    "savol": "1aha1s",
+    "javob": [
+      "shahar",
+      "шаҳар"
+    ]
+  },
+  {
+    "savol": "q1lh11q",
+    "javob": [
+      "qishloq",
+      "қишлоқ"
+    ]
+  },
+  {
+    "savol": "r1z1b",
+    "javob": [
+      "bozor",
+      "бозор"
+    ]
+  },
+  {
+    "savol": "1o1oʻd",
+    "javob": [
+      "doʻkon",
+      "дўкон"
+    ]
+  },
+  {
+    "savol": "no1h1m",
+    "javob": [
+      "mehmon",
+      "меҳмон"
+    ]
+  },
+  {
+    "savol": "a1oxn111em",
+    "javob": [
+      "mehmonxona",
+      "меҳмонхона"
+    ]
+  },
+  {
+    "savol": "rom11",
+    "javob": [
+      "bemor",
+      "бемор"
+    ]
+  },
+  {
+    "savol": "1n1xiro1",
+    "javob": [
+      "dorixona",
+      "дорихона"
+    ]
+  },
+  {
+    "savol": "1n1xof1hs",
+    "javob": [
+      "shifoxona",
+      "шифохона"
+    ]
+  },
+  {
+    "savol": "a1ox1a1ak",
+    "javob": [
+      "kasalxona",
+      "касалхона"
+    ]
+  },
+  {
+    "savol": "ir11",
+    "javob": [
+      "dori",
+      "дори"
+    ]
+  },
+  {
+    "savol": "a1g1",
+    "javob": [
+      "igna",
+      "игна"
+    ]
+  },
+  {
+    "savol": "ho1ra1",
+    "javob": [
+      "jarroh",
+      "жарроҳ"
+    ]
+  },
+  {
+    "savol": "1rih1ma1",
+    "javob": [
+      "hamshira",
+      "ҳамшира"
+    ]
+  },
+  {
+    "savol": "11lalo1",
+    "javob": [
+      "bolalar",
+      "болалар"
+    ]
+  },
+  {
+    "savol": "a11",
+    "javob": [
+      "ona",
+      "она"
+    ]
+  },
+  {
+    "savol": "11o",
+    "javob": [
+      "ota",
+      "ота"
+    ]
+  },
+  {
+    "savol": "i11b",
+    "javob": [
+      "buvi",
+      "буви"
+    ]
+  },
+  {
+    "savol": "1b1b",
+    "javob": [
+      "bobo",
+      "бобо"
+    ]
+  },
+  {
+    "savol": "a11",
+    "javob": [
+      "aka",
+      "ака"
+    ]
+  },
+  {
+    "savol": "a11",
+    "javob": [
+      "uka",
+      "ука"
+    ]
+  },
+  {
+    "savol": "1p1",
+    "javob": [
+      "opa",
+      "опа"
+    ]
+  },
+  {
+    "savol": "1ig1is",
+    "javob": [
+      "singil",
+      "сингил"
+    ]
+  },
+  {
+    "savol": "hsodn11a1",
+    "javob": [
+      "qarindosh",
+      "қариндош"
+    ]
+  },
+  {
+    "savol": "11oʻd",
+    "javob": [
+      "doʻst",
+      "дўст"
+    ]
+  },
+  {
+    "savol": "n1mh11d",
+    "javob": [
+      "dushman",
+      "душман"
+    ]
+  },
+  {
+    "savol": "in111q",
+    "javob": [
+      "qoʻshni",
+      "қўшни"
+    ]
+  },
+  {
+    "savol": "11k",
+    "javob": [
+      "koʻz",
+      "кўз"
+    ]
+  },
+  {
+    "savol": "q1lu1",
+    "javob": [
+      "quloq",
+      "қулоқ"
+    ]
+  },
+  {
+    "savol": "11rub",
+    "javob": [
+      "burun",
+      "бурун"
+    ]
+  },
+  {
+    "savol": "z1gʻ1",
+    "javob": [
+      "ogʻiz",
+      "оғиз"
+    ]
+  },
+  {
+    "savol": "11q",
+    "javob": [
+      "qoʻl",
+      "қўл"
+    ]
+  },
+  {
+    "savol": "1o1o",
+    "javob": [
+      "oyoq",
+      "оёқ"
+    ]
+  },
+  {
+    "savol": "kar11",
+    "javob": [
+      "yurak",
+      "юрак"
+    ]
+  },
+  {
+    "savol": "1e1",
+    "javob": [
+      "bel",
+      "бел"
+    ]
+  },
+  {
+    "savol": "1omo1",
+    "javob": [
+      "tomoq",
+      "томоқ"
+    ]
+  },
+  {
+    "savol": "1u1os",
+    "javob": [
+      "sovuq",
+      "совуқ"
+    ]
+  },
+  {
+    "savol": "q11si",
+    "javob": [
+      "issiq",
+      "иссиқ"
+    ]
+  },
+  {
+    "savol": "r1gʻ1o1",
+    "javob": [
+      "yomgʻir",
+      "ёмғир"
+    ]
+  },
+  {
+    "savol": "1o1",
+    "javob": [
+      "qor",
+      "қор"
+    ]
+  },
+  {
+    "savol": "1om1hs",
+    "javob": [
+      "shamol",
+      "шамол"
+    ]
+  },
+  {
+    "savol": "tul11",
+    "javob": [
+      "bulut",
+      "булут"
+    ]
+  },
+  {
+    "savol": "h1o1uq",
+    "javob": [
+      "quyosh",
+      "қуёш"
+    ]
+  },
+  {
+    "savol": "gn11",
+    "javob": [
+      "tong",
+      "тонг"
+    ]
+  },
+  {
+    "savol": "1c1k",
+    "javob": [
+      "kech",
+      "кеч"
+    ]
+  },
+  {
+    "savol": "11t",
+    "javob": [
+      "tun",
+      "тун"
+    ]
+  },
+  {
+    "savol": "at11h",
+    "javob": [
+      "hafta",
+      "ҳафта"
+    ]
+  },
+  {
+    "savol": "1i1",
+    "javob": [
+      "yil",
+      "йил"
+    ]
+  },
+  {
+    "savol": "n1g1b",
+    "javob": [
+      "bugun",
+      "бугун"
+    ]
+  },
+  {
+    "savol": "ag1t1e",
+    "javob": [
+      "ertaga",
+      "эртага"
+    ]
+  },
+  {
+    "savol": "ahc11",
+    "javob": [
+      "kecha",
+      "кеча"
+    ]
+  },
+  {
+    "savol": "ri1o1",
+    "javob": [
+      "hozir",
+      "ҳозир"
+    ]
+  },
+  {
+    "savol": "ni1e1",
+    "javob": [
+      "keyin",
+      "кейин"
+    ]
+  },
+  {
+    "savol": "z11",
+    "javob": [
+      "tez",
+      "тез"
+    ]
+  },
+  {
+    "savol": "n1ke1",
+    "javob": [
+      "sekin",
+      "секин"
+    ]
+  },
+  {
+    "savol": "d11lab",
+    "javob": [
+      "baland",
+      "баланд"
+    ]
+  },
+  {
+    "savol": "1s1p",
+    "javob": [
+      "past",
+      "паст"
+    ]
+  },
+  {
+    "savol": "at1a1",
+    "javob": [
+      "katta",
+      "катта"
+    ]
+  },
+  {
+    "savol": "kihc11",
+    "javob": [
+      "kichik",
+      "кичик"
+    ]
+  },
+  {
+    "savol": "1ks1",
+    "javob": [
+      "eski",
+      "эски"
+    ]
+  },
+  {
+    "savol": "1ol1i",
+    "javob": [
+      "iflos",
+      "ифлос"
+    ]
+  },
+  {
+    "savol": "il111ihc",
+    "javob": [
+      "chiroyli",
+      "чиройли"
+    ]
+  },
+  {
+    "savol": "1un1x",
+    "javob": [
+      "xunuk",
+      "хунук"
+    ]
+  },
+  {
+    "savol": "1l1cuk",
+    "javob": [
+      "kuchli",
+      "кучли"
+    ]
+  },
+  {
+    "savol": "zi1h11k",
+    "javob": [
+      "kuchsiz",
+      "кучсиз"
+    ]
+  },
+  {
+    "savol": "1o1",
+    "javob": [
+      "boy",
+      "бой"
+    ]
+  },
+  {
+    "savol": "la11bm1k",
+    "javob": [
+      "kambagʻal",
+      "камбағал"
+    ]
+  },
+  {
+    "savol": "1no1",
+    "javob": [
+      "dono",
+      "доно"
+    ]
+  },
+  {
+    "savol": "q1m1a",
+    "javob": [
+      "ahmoq",
+      "аҳмоқ"
+    ]
+  },
+  {
+    "savol": "1e1sil1",
+    "javob": [
+      "Alisher",
+      "Алишер"
+    ]
+  },
+  {
+    "savol": "ru11J",
+    "javob": [
+      "Jasur",
+      "Жасур"
+    ]
+  },
+  {
+    "savol": "1ozke1",
+    "javob": [
+      "Bekzod",
+      "Бекзод"
+    ]
+  },
+  {
+    "savol": "tak111S",
+    "javob": [
+      "Shavkat",
+      "Шавкат"
+    ]
+  },
+  {
+    "savol": "mo1s1",
+    "javob": [
+      "Islom",
+      "Ислом"
+    ]
+  },
+  {
+    "savol": "11rraF",
+    "javob": [
+      "Farrux",
+      "Фаррух"
+    ]
+  },
+  {
+    "savol": "n11vaD",
+    "javob": [
+      "Davron",
+      "Даврон"
+    ]
+  },
+  {
+    "savol": "k11gʻ1lU",
+    "javob": [
+      "Ulugʻbek",
+      "Улуғбек"
+    ]
+  },
+  {
+    "savol": "11boB",
+    "javob": [
+      "Bobur",
+      "Бобур"
+    ]
+  },
+  {
+    "savol": "1aj1aS",
+    "javob": [
+      "Sanjar",
+      "Санжар"
+    ]
+  },
+  {
+    "savol": "keb11O",
+    "javob": [
+      "Otabek",
+      "Отабек"
+    ]
+  },
+  {
+    "savol": "1atsu1",
+    "javob": [
+      "Rustam",
+      "Рустам"
+    ]
+  },
+  {
+    "savol": "do11e1S",
+    "javob": [
+      "Sherzod",
+      "Шерзод"
+    ]
+  },
+  {
+    "savol": "1ido1",
+    "javob": [
+      "Nodir",
+      "Нодир"
+    ]
+  },
+  {
+    "savol": "r1gno1a1",
+    "javob": [
+      "Jahongir",
+      "Жаҳонгир"
+    ]
+  },
+  {
+    "savol": "11vnA",
+    "javob": [
+      "Anvar",
+      "Анвар"
+    ]
+  },
+  {
+    "savol": "ro111oD",
+    "javob": [
+      "Doniyor",
+      "Дониёр"
+    ]
+  },
+  {
+    "savol": "xu11oh1",
+    "javob": [
+      "Shoxrux",
+      "Шохрух"
+    ]
+  },
+  {
+    "savol": "1e1roy1D",
+    "javob": [
+      "Diyorbek",
+      "Диёрбек"
+    ]
+  },
+  {
+    "savol": "ar111uG",
+    "javob": [
+      "Gulnora",
+      "Гулнора"
+    ]
+  },
+  {
+    "savol": "a1il1M",
+    "javob": [
+      "Malika",
+      "Малика"
+    ]
+  },
+  {
+    "savol": "anir11",
+    "javob": [
+      "Zarina",
+      "Зарина"
+    ]
+  },
+  {
+    "savol": "ar1g1N",
+    "javob": [
+      "Nigora",
+      "Нигора"
+    ]
+  },
+  {
+    "savol": "1ra1eS",
+    "javob": [
+      "Sevara",
+      "Севара"
+    ]
+  },
+  {
+    "savol": "azon111",
+    "javob": [
+      "Dilnoza",
+      "Дилноза"
+    ]
+  },
+  {
+    "savol": "azon111S",
+    "javob": [
+      "Shahnoza",
+      "Шаҳноза"
+    ]
+  },
+  {
+    "savol": "azur11",
+    "javob": [
+      "Feruza",
+      "Феруза"
+    ]
+  },
+  {
+    "savol": "asi11M",
+    "javob": [
+      "Munisa",
+      "Муниса"
+    ]
+  },
+  {
+    "savol": "alo1a1",
+    "javob": [
+      "Kamola",
+      "Камола"
+    ]
+  },
+  {
+    "savol": "1d1zO",
+    "javob": [
+      "Ozoda",
+      "Озода"
+    ]
+  },
+  {
+    "savol": "r1ful11",
+    "javob": [
+      "Nilufar",
+      "Нилуфар"
+    ]
+  },
+  {
+    "savol": "r1h1b1uG",
+    "javob": [
+      "Gulbahor",
+      "Гулбаҳор"
+    ]
+  },
+  {
+    "savol": "a11liZ",
+    "javob": [
+      "Zilola",
+      "Зилола"
+    ]
+  },
+  {
+    "savol": "ad1r1",
+    "javob": [
+      "Iroda",
+      "Ирода"
+    ]
+  },
+  {
+    "savol": "ani11S",
+    "javob": [
+      "Sabina",
+      "Сабина"
+    ]
+  },
+  {
+    "savol": "1an1o1c",
+    "javob": [
+      "choynak",
+      "чойнак"
+    ]
+  },
+  {
+    "savol": "no11q",
+    "javob": [
+      "qozon",
+      "қозон"
+    ]
+  },
+  {
+    "savol": "1vo1",
+    "javob": [
+      "tova",
+      "това"
+    ]
+  },
+  {
+    "savol": "1loy1p",
+    "javob": [
+      "piyola",
+      "пиёла"
+    ]
+  },
+  {
+    "savol": "ak1er11",
+    "javob": [
+      "tarelka",
+      "тарелка"
+    ]
+  },
+  {
+    "savol": "1i1soq",
+    "javob": [
+      "qoshiq",
+      "қошиқ"
+    ]
+  },
+  {
+    "savol": "q1h1ip",
+    "javob": [
+      "pichoq",
+      "пичоқ"
+    ]
+  },
+  {
+    "savol": "1qhc1a1",
+    "javob": [
+      "sanchqi",
+      "санчқи"
+    ]
+  },
+  {
+    "savol": "a11o",
+    "javob": [
+      "oyna",
+      "ойна"
+    ]
+  },
+  {
+    "savol": "o1d1r",
+    "javob": [
+      "radio",
+      "радио"
+    ]
+  },
+  {
+    "savol": "hc11tal1u1",
+    "javob": [
+      "muzlatgich",
+      "музлатгич"
+    ]
+  },
+  {
+    "savol": "1e1oist1dn1k",
+    "javob": [
+      "konditsioner",
+      "кондиционер"
+    ]
+  },
+  {
+    "savol": "n1v1d",
+    "javob": [
+      "divan",
+      "диван"
+    ]
+  },
+  {
+    "savol": "1o1ar1k",
+    "javob": [
+      "karavot",
+      "каравот"
+    ]
+  },
+  {
+    "savol": "qi1so1",
+    "javob": [
+      "yostiq",
+      "ёстиқ"
+    ]
+  },
+  {
+    "savol": "apr11",
+    "javob": [
+      "koʻrpa",
+      "кўрпа"
+    ]
+  },
+  {
+    "savol": "1ali1",
+    "javob": [
+      "gilam",
+      "гилам"
+    ]
+  },
+  {
+    "savol": "1akh1",
+    "javob": [
+      "shkaf",
+      "шкаф"
+    ]
+  },
+  {
+    "savol": "no1a1",
+    "javob": [
+      "javon",
+      "жавон"
+    ]
+  },
+  {
+    "savol": "1hcya1",
+    "javob": [
+      "qaychi",
+      "қайчи"
+    ]
+  },
+  {
+    "savol": "1mg1t",
+    "javob": [
+      "tugma",
+      "тугма"
+    ]
+  },
+  {
+    "savol": "1any1z1k",
+    "javob": [
+      "koʻzoynak",
+      "кўзойнак"
+    ]
+  },
+  {
+    "savol": "na1n11aN",
+    "javob": [
+      "Namangan",
+      "Наманган"
+    ]
+  },
+  {
+    "savol": "1nogʻ11F",
+    "javob": [
+      "Fargʻona",
+      "Фарғона"
+    ]
+  },
+  {
+    "savol": "su11N",
+    "javob": [
+      "Nukus",
+      "Нукус"
+    ]
+  },
+  {
+    "savol": "ihsr11",
+    "javob": [
+      "Qarshi",
+      "Қарши"
+    ]
+  },
+  {
+    "savol": "1imre1",
+    "javob": [
+      "Termiz",
+      "Термиз"
+    ]
+  },
+  {
+    "savol": "not1i11G",
+    "javob": [
+      "Guliston",
+      "Гулистон"
+    ]
+  },
+  {
+    "savol": "yi11aN",
+    "javob": [
+      "Navoiy",
+      "Навоий"
+    ]
+  },
+  {
+    "savol": "h11agr1",
+    "javob": [
+      "Urganch",
+      "Урганч"
+    ]
+  },
+  {
+    "savol": "a1i1",
+    "javob": [
+      "Xiva",
+      "Хива"
+    ]
+  },
+  {
+    "savol": "n1qoʻ1",
+    "javob": [
+      "Qoʻqon",
+      "Қўқон"
+    ]
+  },
+  {
+    "savol": "1oligʻr11",
+    "javob": [
+      "Margʻilon",
+      "Марғилон"
+    ]
+  },
+  {
+    "savol": "qih11i1C",
+    "javob": [
+      "Chirchiq",
+      "Чирчиқ"
+    ]
+  },
+  {
+    "savol": "n11gnA",
+    "javob": [
+      "Angren",
+      "Ангрен"
+    ]
+  },
+  {
+    "savol": "von11",
+    "javob": [
+      "Denov",
+      "Денов"
+    ]
+  },
+  {
+    "savol": "11as11hahS",
+    "javob": [
+      "Shahrisabz",
+      "Шаҳрисабз"
+    ]
+  },
+  {
+    "savol": "do1o11B",
+    "javob": [
+      "Bekobod",
+      "Бекобод"
+    ]
+  },
+  {
+    "savol": "1i11mlO",
+    "javob": [
+      "Olmaliq",
+      "Олмалиқ"
+    ]
+  },
+  {
+    "savol": "1oʻy11naY",
+    "javob": [
+      "Yangiyoʻl",
+      "Янгийўл"
+    ]
+  },
+  {
+    "savol": "n1h11araZ",
+    "javob": [
+      "Zarafshon",
+      "Зарафшон"
+    ]
+  },
+  {
+    "savol": "not1i1oz11",
+    "javob": [
+      "Qozogʻiston",
+      "Қозоғистон"
+    ]
+  },
+  {
+    "savol": "nots11i1ri1",
+    "javob": [
+      "Qirgʻiziston",
+      "Қирғизистон"
+    ]
+  },
+  {
+    "savol": "no111ki1oT",
+    "javob": [
+      "Tojikiston",
+      "Тожикистон"
+    ]
+  },
+  {
+    "savol": "111sinamkru1",
+    "javob": [
+      "Turkmaniston",
+      "Туркманистон"
+    ]
+  },
+  {
+    "savol": "ayi1s11",
+    "javob": [
+      "Rossiya",
+      "Россия"
+    ]
+  },
+  {
+    "savol": "ay111paY",
+    "javob": [
+      "Yaponiya",
+      "Япония"
+    ]
+  },
+  {
+    "savol": "1ye1oK",
+    "javob": [
+      "Koreya",
+      "Корея"
+    ]
+  },
+  {
+    "savol": "no1sidn11",
+    "javob": [
+      "Hindiston",
+      "Ҳиндистон"
+    ]
+  },
+  {
+    "savol": "n1ts11oP",
+    "javob": [
+      "Pokiston",
+      "Покистон"
+    ]
+  },
+  {
+    "savol": "1ots11o1fA",
+    "javob": [
+      "Afgʻoniston",
+      "Афғонистон"
+    ]
+  },
+  {
+    "savol": "11rE",
+    "javob": [
+      "Eron",
+      "Эрон"
+    ]
+  },
+  {
+    "savol": "ayi1a11eG",
+    "javob": [
+      "Germaniya",
+      "Германия"
+    ]
+  },
+  {
+    "savol": "a11sna1F",
+    "javob": [
+      "Fransiya",
+      "Франция"
+    ]
+  },
+  {
+    "savol": "a111gnA",
+    "javob": [
+      "Angliya",
+      "Англия"
+    ]
+  },
+  {
+    "savol": "1yi1a1sI",
+    "javob": [
+      "Ispaniya",
+      "Испания"
+    ]
+  },
+  {
+    "savol": "1dan1K",
+    "javob": [
+      "Kanada",
+      "Канада"
+    ]
+  },
+  {
+    "savol": "a11liza1B",
+    "javob": [
+      "Braziliya",
+      "Бразилия"
+    ]
+  },
+  {
+    "savol": "11iM",
+    "javob": [
+      "Misr",
+      "Миср"
+    ]
+  },
+  {
+    "savol": "a1ia1k1",
+    "javob": [
+      "Ukraina",
+      "Украина"
+    ]
+  },
+  {
+    "savol": "ayi11evh1",
+    "javob": [
+      "Shvetsiya",
+      "Швеция"
+    ]
+  },
+  {
+    "savol": "ayi11st11vhS",
+    "javob": [
+      "Shveytsariya",
+      "Швейцария"
+    ]
+  },
+  {
+    "savol": "a1il1rt1v1",
+    "javob": [
+      "Avstraliya",
+      "Австралия"
+    ]
+  },
+  {
+    "savol": "ak1s1e1",
+    "javob": [
+      "Meksika",
+      "Мексика"
+    ]
+  },
+  {
+    "savol": "t1ek1a1",
+    "javob": [
+      "Parkent",
+      "Паркент"
+    ]
+  },
+  {
+    "savol": "1ar1iQ",
+    "javob": [
+      "Qibray",
+      "Қибрай"
+    ]
+  },
+  {
+    "savol": "ato1gn11",
+    "javob": [
+      "Zangiota",
+      "Зангиота"
+    ]
+  },
+  {
+    "savol": "1onih1",
+    "javob": [
+      "Chinoz",
+      "Чиноз"
+    ]
+  },
+  {
+    "savol": "nora1n1h1",
+    "javob": [
+      "Ohangaron",
+      "Оҳангарон"
+    ]
+  },
+  {
+    "savol": "1k1B",
+    "javob": [
+      "Boʻka",
+      "Бўка"
+    ]
+  },
+  {
+    "savol": "t1e1s1P",
+    "javob": [
+      "Piskent",
+      "Пискент"
+    ]
+  },
+  {
+    "savol": "11etyoʻ1",
+    "javob": [
+      "Toʻytepa",
+      "Тўйтепа"
+    ]
+  },
+  {
+    "savol": "11s1osoK",
+    "javob": [
+      "Kosonsoy",
+      "Косонсой"
+    ]
+  },
+  {
+    "savol": "1ot1o1C",
+    "javob": [
+      "Chortoq",
+      "Чортоқ"
+    ]
+  },
+  {
+    "savol": "ih11m1Q",
+    "javob": [
+      "Qamashi",
+      "Қамаши"
+    ]
+  },
+  {
+    "savol": "1ozu1",
+    "javob": [
+      "Gʻuzor",
+      "Ғузор"
+    ]
+  },
+  {
+    "savol": "11duq1cU",
+    "javob": [
+      "Uchquduq",
+      "Учқудуқ"
+    ]
+  },
+  {
+    "savol": "ni11Z",
+    "javob": [
+      "Zomin",
+      "Зомин"
+    ]
+  },
+  {
+    "savol": "l11xaB",
+    "javob": [
+      "Baxmal",
+      "Бахмал"
+    ]
+  },
+  {
+    "savol": "o1r11aqhsa1",
+    "javob": [
+      "Qashqadaryo"
+    ]
+  },
+  {
+    "savol": "oyra1n1xr11",
+    "javob": [
+      "Surxondaryo"
+    ]
+  },
+  {
+    "savol": "11aroX",
+    "javob": [
+      "Xorazm"
+    ]
+  },
+  {
+    "savol": "nots1gʻo11aqaro1",
+    "javob": [
+      "Qoraqalpogʻiston"
+    ]
+  },
+  {
+    "savol": "1il1o1soʻ1",
+    "javob": [
+      "Boʻstonliq"
+    ]
+  },
+  {
+    "savol": "nogʻr1111",
+    "javob": [
+      "Oqqoʻrgʻon"
+    ]
+  },
+  {
+    "savol": "noh11a1uN",
+    "javob": [
+      "Nurafshon"
+    ]
+  },
+  {
+    "savol": "1ir11aP",
+    "javob": [
+      "Payariq"
+    ]
+  },
+  {
+    "savol": "1ugʻnu1u1",
+    "javob": [
+      "Bulungʻur"
+    ]
+  },
+  {
+    "savol": "yobm11",
+    "javob": [
+      "Jomboy"
+    ]
+  },
+  {
+    "savol": "t1gr1",
+    "javob": [
+      "Urgut"
+    ]
+  },
+  {
+    "savol": "no1i11sI",
+    "javob": [
+      "Ishtixon"
+    ]
+  },
+  {
+    "savol": "1a1raN",
+    "javob": [
+      "Narpay"
+    ]
+  },
+  {
+    "savol": "d1b1ru1",
+    "javob": [
+      "Nurobod"
+    ]
+  },
+  {
+    "savol": "1ogʻ11dtsa1",
+    "javob": [
+      "Pastdargʻom"
+    ]
+  },
+  {
+    "savol": "n1vu1j1Gʻ",
+    "javob": [
+      "Gʻijduvon"
+    ]
+  },
+  {
+    "savol": "1o1oK",
+    "javob": [
+      "Kogon"
+    ]
+  },
+  {
+    "savol": "ukhs11",
+    "javob": [
+      "Peshku"
+    ]
+  },
+  {
+    "savol": "no1rifo11",
+    "javob": [
+      "Shofirkon"
+    ]
+  },
+  {
+    "savol": "t1e1b1V",
+    "javob": [
+      "Vobkent"
+    ]
+  },
+  {
+    "savol": "1atim11",
+    "javob": [
+      "Romitan"
+    ]
+  },
+  {
+    "savol": "11dnoJ",
+    "javob": [
+      "Jondor"
+    ]
+  },
+  {
+    "savol": "l11ar1Q",
+    "javob": [
+      "Qorakoʻl"
+    ]
+  },
+  {
+    "savol": "1ol1",
+    "javob": [
+      "Olot"
+    ]
+  },
+  {
+    "savol": "111hsiR",
+    "javob": [
+      "Rishton"
+    ]
+  },
+  {
+    "savol": "q111hseB",
+    "javob": [
+      "Beshariq"
+    ]
+  },
+  {
+    "savol": "d1d1a1",
+    "javob": [
+      "Bagʻdod"
+    ]
+  },
+  {
+    "savol": "t1q1uF",
+    "javob": [
+      "Furqat"
+    ]
+  },
+  {
+    "savol": "111aitlO",
+    "javob": [
+      "Oltiariq"
+    ]
+  },
+  {
+    "savol": "1vu1",
+    "javob": [
+      "Quva"
+    ]
+  },
+  {
+    "savol": "kirp11h11",
+    "javob": [
+      "Uchkoʻprik"
+    ]
+  },
+  {
+    "savol": "1oʻ1",
+    "javob": [
+      "Soʻx"
+    ]
+  },
+  {
+    "savol": "novo111Y",
+    "javob": [
+      "Yozyovon"
+    ]
+  },
+  {
+    "savol": "d1b1n1X",
+    "javob": [
+      "Xonobod"
+    ]
+  },
+  {
+    "savol": "aka11",
+    "javob": [
+      "Asaka"
+    ]
+  },
+  {
+    "savol": "1oxirha11",
+    "javob": [
+      "Shahrixon"
+    ]
+  },
+  {
+    "savol": "ihc11l1B",
+    "javob": [
+      "Baliqchi"
+    ]
+  },
+  {
+    "savol": "ta1a1ra1",
+    "javob": [
+      "Marhamat"
+    ]
+  },
+  {
+    "savol": "1hsob1o11B",
+    "javob": [
+      "Buloqboshi"
+    ]
+  },
+  {
+    "savol": "do11ajoʻ1",
+    "javob": [
+      "Xoʻjaobod"
+    ]
+  },
+  {
+    "savol": "dobo1t1a1",
+    "javob": [
+      "Paxtaobod"
+    ]
+  },
+  {
+    "savol": "1o1",
+    "javob": [
+      "Pop"
+    ]
+  },
+  {
+    "savol": "i1c1U",
+    "javob": [
+      "Uychi"
+    ]
+  },
+  {
+    "savol": "t1u1C",
+    "javob": [
+      "Chust"
+    ]
+  },
+  {
+    "savol": "no1r1q1gn1Y",
+    "javob": [
+      "Yangiqoʻrgʻon"
+    ]
+  },
+  {
+    "savol": "1ir1N",
+    "javob": [
+      "Norin"
+    ]
+  },
+  {
+    "savol": "1oroa111Gʻ",
+    "javob": [
+      "Gʻallaorol"
+    ]
+  },
+  {
+    "savol": "1obo11faZ",
+    "javob": [
+      "Zafarobod"
+    ]
+  },
+  {
+    "savol": "ro1atx11",
+    "javob": [
+      "Paxtakor"
+    ]
+  },
+  {
+    "savol": "11lts1D",
+    "javob": [
+      "Doʻstlik"
+    ]
+  },
+  {
+    "savol": "h1i1oF",
+    "javob": [
+      "Forish"
+    ]
+  },
+  {
+    "savol": "loʻ1ca11i1",
+    "javob": [
+      "Mirzachoʻl"
+    ]
+  },
+  {
+    "savol": "1uv11oB",
+    "javob": [
+      "Boyovut"
+    ]
+  },
+  {
+    "savol": "1b1d1aS",
+    "javob": [
+      "Sardoba"
+    ]
+  },
+  {
+    "savol": "dobo111iM",
+    "javob": [
+      "Mirzaobod"
+    ]
+  },
+  {
+    "savol": "1ov1X",
+    "javob": [
+      "Xovos"
+    ]
+  },
+  {
+    "savol": "a1a11aK",
+    "javob": [
+      "Karmana"
+    ]
+  },
+  {
+    "savol": "xe1in11",
+    "javob": [
+      "Konimex"
+    ]
+  },
+  {
+    "savol": "1to1uN",
+    "javob": [
+      "Nurota"
+    ]
+  },
+  {
+    "savol": "i11rit1X",
+    "javob": [
+      "Xatirchi"
+    ]
+  },
+  {
+    "savol": "a11tli1iQ",
+    "javob": [
+      "Qiziltepa"
+    ]
+  },
+  {
+    "savol": "do1or11S",
+    "javob": [
+      "Sherobod"
+    ]
+  },
+  {
+    "savol": "ro11A",
+    "javob": [
+      "Angor"
+    ]
+  },
+  {
+    "savol": "n1syo1",
+    "javob": [
+      "Boysun"
+    ]
+  },
+  {
+    "savol": "oyi1o1r1S",
+    "javob": [
+      "Sariosiyo"
+    ]
+  },
+  {
+    "savol": "ih1r1h1",
+    "javob": [
+      "Shoʻrchi"
+    ]
+  },
+  {
+    "savol": "to1a11uM",
+    "javob": [
+      "Muzrabot"
+    ]
+  },
+  {
+    "savol": "n111oʻqra1",
+    "javob": [
+      "Jarqoʻrgʻon"
+    ]
+  },
+  {
+    "savol": "no1roʻ111Q",
+    "javob": [
+      "Qumqoʻrgʻon"
+    ]
+  },
+  {
+    "savol": "i1sa1",
+    "javob": [
+      "Kasbi"
+    ]
+  },
+  {
+    "savol": "ih1qor11C",
+    "javob": [
+      "Chiroqchi"
+    ]
+  },
+  {
+    "savol": "gʻoba11a1",
+    "javob": [
+      "Yakkabogʻ"
+    ]
+  },
+  {
+    "savol": "1o1siN",
+    "javob": [
+      "Nishon"
+    ]
+  },
+  {
+    "savol": "no11K",
+    "javob": [
+      "Koson"
+    ]
+  },
+  {
+    "savol": "1o11siriM",
+    "javob": [
+      "Mirishkor"
+    ]
+  },
+  {
+    "savol": "1obo11q1eD",
+    "javob": [
+      "Dehqonobod"
+    ]
+  },
+  {
+    "savol": "aq1o1",
+    "javob": [
+      "Xonqa"
+    ]
+  },
+  {
+    "savol": "ps1r1za1",
+    "javob": [
+      "Xazorasp"
+    ]
+  },
+  {
+    "savol": "t1voh1",
+    "javob": [
+      "Shovot"
+    ]
+  },
+  {
+    "savol": "n11ruG",
+    "javob": [
+      "Gurlan"
+    ]
+  },
+  {
+    "savol": "ro1ob1g11Y",
+    "javob": [
+      "Yangibozor"
+    ]
+  },
+  {
+    "savol": "togʻ11",
+    "javob": [
+      "Bogʻot"
+    ]
+  },
+  {
+    "savol": "1ipoʻ1hs11",
+    "javob": [
+      "Qoʻshkoʻpir"
+    ]
+  },
+  {
+    "savol": "yin1r11",
+    "javob": [
+      "Beruniy"
+    ]
+  },
+  {
+    "savol": "l1kt11T",
+    "javob": [
+      "Toʻrtkoʻl"
+    ]
+  },
+  {
+    "savol": "11y1joʻX",
+    "javob": [
+      "Xoʻjayli"
+    ]
+  },
+  {
+    "savol": "1ob11hC",
+    "javob": [
+      "Chimboy"
+    ]
+  },
+  {
+    "savol": "1i1oʻ1at1aT",
+    "javob": [
+      "Taxtakoʻpir"
+    ]
+  },
+  {
+    "savol": "11nyoʻ1",
+    "javob": [
+      "Moʻynoq"
+    ]
+  },
+  {
+    "savol": "1origʻ111",
+    "javob": [
+      "Qoʻngʻirot"
+    ]
+  },
+  {
+    "savol": "o11a1umA",
+    "javob": [
+      "Amudaryo"
+    ]
+  }
 ]
-  
