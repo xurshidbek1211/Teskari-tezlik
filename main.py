@@ -390,13 +390,15 @@ async def tablo_on_cmd(message: types.Message):
         "active": True,
         "boshlovchi_id": message.from_user.id,
         "boshlovchi_name": message.from_user.full_name,
+        "boshlovchi_username": message.from_user.username,
         "ball_value": 5,
         "scores": {},
     }
     save_json(TABLO_FILE, tablo)
+    boshlovchi_belgi = f'<a href="tg://user?id={message.from_user.id}">{message.from_user.full_name}</a>'
     await message.answer(
         f"📊 <b>Tablo yoqildi!</b>\n"
-        f"👑 Boshlovchi: {message.from_user.full_name}\n\n"
+        f"👑 Boshlovchi: {boshlovchi_belgi}\n\n"
         f"Endi boshlovchi kimningdir xabariga <b>✅</b> (ball qo'shish) yoki "
         f"<b>➕</b> (ball ayirish) bilan javob (reply) qilib turadi.\n"
         f"Bitta belgi = {5} ball. O'zgartirish uchun: /ball <son>",
@@ -430,6 +432,7 @@ async def tablo_recount_cmd(message: types.Message, bot: Bot):
 
     state["boshlovchi_id"]   = new_user.id
     state["boshlovchi_name"] = new_user.full_name
+    state["boshlovchi_username"] = new_user.username
     tablo[chat_id] = state
     save_json(TABLO_FILE, tablo)
     await message.answer(f"👑 Boshlovchilik endi {new_user.full_name}ga topshirildi.")
@@ -455,18 +458,22 @@ async def tablo_off_cmd(message: types.Message, bot: Bot):
 
     if scores:
         winner_uid, winner_data = max(scores.items(), key=lambda x: x[1]["score"])
-        winner_text = (
-            f'🏆 Tabriklaymiz — <a href="tg://user?id={winner_uid}">{winner_data["name"]}</a> '
-            f'{winner_data["score"]} ball bilan 1-o\'rinni egalladi!'
+        text = (
+            f"🏆 1-O'RIN SOHIBINI TABRIKLAYMIZ! 🥳\n\n"
+            f'🥇 <a href="tg://user?id={winner_uid}">{winner_data["name"]}</a> — '
+            f'{winner_data["score"]} ball! G\'alabangiz muborak bo\'lsin! '
+            f"Bilimingiz va faolligingiz uchun tahsinga loyiqsiz! 👏\n\n"
+            f"🎤 Boshlovchimiz <b>{boshlovchi_name}</b>ga o'yinni ajoyib olib borgani uchun, "
+            f"barcha qatnashchilarga esa faol ishtiroki uchun katta rahmat! 🤝\n\n"
+            f"🌟 Keyingi o'yinlarda barchangizga omad va yanada katta g'alabalar tilaymiz! 🎉"
         )
     else:
-        winner_text = "Bu safar hech kimga ball berilmadi."
+        text = (
+            f"🛑 <b>Tablo yakunlandi.</b>\n\n"
+            f"Bu safar hech kimga ball berilmadi.\n"
+            f"🙏 Boshlovchi <b>{boshlovchi_name}</b>ga baribir rahmat!"
+        )
 
-    text = (
-        f"🛑 <b>Tablo yakunlandi!</b>\n\n"
-        f"{winner_text}\n\n"
-        f"🙏 Boshlovchi <b>{boshlovchi_name}</b>ga rahmat!"
-    )
     tablo[chat_id] = {"active": False}
     save_json(TABLO_FILE, tablo)
     await message.answer(text, parse_mode="HTML")
