@@ -74,9 +74,10 @@ STATE_FILE   = os.path.join(DATA_DIR, "user_states.json")
 WINNER_FILE  = os.path.join(DATA_DIR, "winner_count.json")
 MEMBERS_FILE = os.path.join(DATA_DIR, "guruh_azolari.json")   # @all/@all uchun bilingan a'zolar
 TRACKED_FILE = os.path.join(DATA_DIR, "tekshiruv_royxati.json")  # /tekshir orqali kuzatilayotgan foydalanuvchilar
+TABLO_FILE   = os.path.join(DATA_DIR, "tablo_reyting.json")       # /on /off — tablo rejimi holati
 
 # Redis orqali doimiy zaxiralanadigan fayllar (foydalanuvchi ma'lumotlari)
-_PERSISTED_FILES = [SCORE_FILE, STATE_FILE, WINNER_FILE, MEMBERS_FILE, TRACKED_FILE]
+_PERSISTED_FILES = [SCORE_FILE, STATE_FILE, WINNER_FILE, MEMBERS_FILE, TRACKED_FILE, TABLO_FILE]
 
 # ---------- JSON ----------
 def load_json(filename):
@@ -190,6 +191,43 @@ async def check_bot_admin(message: types.Message, bot: Bot) -> bool:
         return member.status in ("administrator", "creator")
     except Exception:
         return False
+
+async def is_user_admin(chat_id: int, user_id: int, bot: Bot) -> bool:
+    """Xabar yozgan ODAM shu guruhda admin/egasi ekanini tekshiradi (bot emas)."""
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in ("administrator", "creator")
+    except Exception:
+        return False
+
+# ---------- TABLO REJIMI (/on /off /ball /recount) ----------
+def _tablo_mark(text: str):
+    """Matn faqat ✅ lardan yoki faqat ➕ lardan iboratmi — shunday boʻlsa
+    (belgi_turi, nechta) qaytaradi, aks holda None."""
+    t = text.replace(" ", "").strip()
+    if not t:
+        return None
+    chars = set(t)
+    if chars == {"✅"}:
+        return ("plus", len(t))
+    if chars == {"➕"}:
+        return ("minus", len(t))
+    return None
+
+def _format_tablo_reyting(scores: dict, boshlovchi_name: str) -> str:
+    items = sorted(scores.items(), key=lambda x: x[1]["score"], reverse=True)
+    lines = [f"Boshlovchi: {boshlovchi_name}", "", "Xozirgi natijalar:", ""]
+    medals = {1: "🥇", 2: "🥈", 3: "🥉"}
+    rank, prev_score = 0, None
+    for i, (uid, data) in enumerate(items):
+        if data["score"] != prev_score:
+            rank = i + 1
+            prev_score = data["score"]
+        prefix = medals.get(rank, str(rank))
+        lines.append(f"{prefix}  {data['name']} — {data['score']} ball")
+    if not items:
+        lines.append("(hali hech kimga ball berilmagan)")
+    return "\n".join(lines)
 
 # ---------- SEND QUESTION ----------
 async def send_new_question(chat_id: int, bot: Bot, questions_file: str = TESKARI_FILE, label: str = "🔄 Toping"):
@@ -331,9 +369,128 @@ async def tekshir_cmd(message: types.Message, command: CommandObject):
         f"To'xtatish uchun: /stop {uid}"
     )
 
+# ---------- /on — tablo rejimini yoqish ----------
+@main_router.message(Command("on"))
+async def tablo_on_cmd(message: types.Message):
+    if message.chat.type not in ("group", "supergroup"):
+        await message.answer("⚠️ Bu buyruq faqat guruhlarda ishlaydi.")
+        return
+
+    chat_id = str(message.chat.id)
+    tablo = load_json(TABLO_FILE)
+    state = tablo.get(chat_id)
+    if state and state.get("active"):
+        await message.answer(
+            f"⚠️ Tablo allaqachon faol (boshlovchi: {state.get('boshlovchi_name','?')}).\n"
+            f"Avval /off bilan yakunlang."
+        )
+        return
+
+    tablo[chat_id] = {
+        "active": True,
+        "boshlovchi_id": message.from_user.id,
+        "boshlovchi_name": message.from_user.full_name,
+        "ball_value": 5,
+        "scores": {},
+    }
+    save_json(TABLO_FILE, tablo)
+    await message.answer(
+        f"📊 <b>Tablo yoqildi!</b>\n"
+        f"👑 Boshlovchi: {message.from_user.full_name}\n\n"
+        f"Endi boshlovchi kimningdir xabariga <b>✅</b> (ball qo'shish) yoki "
+        f"<b>➕</b> (ball ayirish) bilan javob (reply) qilib turadi.\n"
+        f"Bitta belgi = {5} ball. O'zgartirish uchun: /ball <son>",
+        parse_mode="HTML",
+    )
+
+# ---------- /recount — boshlovchilikni boshqasiga topshirish ----------
+@main_router.message(Command("recount"))
+async def tablo_recount_cmd(message: types.Message, bot: Bot):
+    chat_id = str(message.chat.id)
+    tablo = load_json(TABLO_FILE)
+    state = tablo.get(chat_id)
+    if not state or not state.get("active"):
+        await message.answer("ℹ️ Hozir faol tablo yo'q.")
+        return
+
+    is_boshlovchi = message.from_user.id == state.get("boshlovchi_id")
+    is_admin = await is_user_admin(message.chat.id, message.from_user.id, bot)
+    if not (is_boshlovchi or is_admin):
+        await message.answer("❌ Faqat hozirgi boshlovchi yoki adminlar boshlovchilikni topshira oladi.")
+        return
+
+    if not message.reply_to_message or not message.reply_to_message.from_user:
+        await message.answer("ℹ️ Boshlovchilikni kimga topshirmoqchi bo'lsangiz, o'sha kishining xabariga javob (reply) qilib /recount deb yozing.")
+        return
+
+    new_user = message.reply_to_message.from_user
+    if new_user.is_bot:
+        await message.answer("⚠️ Botga boshlovchilikni topshirib bo'lmaydi.")
+        return
+
+    state["boshlovchi_id"]   = new_user.id
+    state["boshlovchi_name"] = new_user.full_name
+    tablo[chat_id] = state
+    save_json(TABLO_FILE, tablo)
+    await message.answer(f"👑 Boshlovchilik endi {new_user.full_name}ga topshirildi.")
+
+# ---------- /off — tablo rejimini yakunlash ----------
+@main_router.message(Command("off"))
+async def tablo_off_cmd(message: types.Message, bot: Bot):
+    chat_id = str(message.chat.id)
+    tablo = load_json(TABLO_FILE)
+    state = tablo.get(chat_id)
+    if not state or not state.get("active"):
+        await message.answer("ℹ️ Hozir faol tablo yo'q.")
+        return
+
+    is_boshlovchi = message.from_user.id == state.get("boshlovchi_id")
+    is_admin = await is_user_admin(message.chat.id, message.from_user.id, bot)
+    if not (is_boshlovchi or is_admin):
+        await message.answer("❌ Faqat boshlovchi yoki adminlar tabloni yakunlay oladi.")
+        return
+
+    scores = state.get("scores", {})
+    boshlovchi_name = state.get("boshlovchi_name", "Boshlovchi")
+
+    if scores:
+        winner_uid, winner_data = max(scores.items(), key=lambda x: x[1]["score"])
+        winner_text = (
+            f'🏆 Tabriklaymiz — <a href="tg://user?id={winner_uid}">{winner_data["name"]}</a> '
+            f'{winner_data["score"]} ball bilan 1-o\'rinni egalladi!'
+        )
+    else:
+        winner_text = "Bu safar hech kimga ball berilmadi."
+
+    text = (
+        f"🛑 <b>Tablo yakunlandi!</b>\n\n"
+        f"{winner_text}\n\n"
+        f"🙏 Boshlovchi <b>{boshlovchi_name}</b>ga rahmat!"
+    )
+    tablo[chat_id] = {"active": False}
+    save_json(TABLO_FILE, tablo)
+    await message.answer(text, parse_mode="HTML")
+
 # ---------- /ball ----------
 @main_router.message(Command("ball"))
-async def ball_cmd(message: types.Message):
+async def ball_cmd(message: types.Message, command: CommandObject):
+    # --- Guruhda faol tablo bo'lsa va boshlovchi "/ball <son>" yozsa —
+    #     bitta ✅ ning qiymatini o'zgartiradi (bu tablo rejimiga xos) ---
+    if message.chat.type in ("group", "supergroup") and command.args and command.args.strip().lstrip('-').isdigit():
+        chat_id = str(message.chat.id)
+        tablo = load_json(TABLO_FILE)
+        state = tablo.get(chat_id)
+        if state and state.get("active") and message.from_user.id == state.get("boshlovchi_id"):
+            val = int(command.args.strip())
+            state["ball_value"] = val
+            tablo[chat_id] = state
+            save_json(TABLO_FILE, tablo)
+            await message.answer(
+                f"✅ Endi bitta ✅ = {val} ball bo'ladi.\n"
+                f"(Bu allaqachon berilgan ballarga ta'sir qilmaydi, faqat keyingi belgilashlarga.)"
+            )
+            return
+
     if message.chat.type == "private":
         await message.answer("ℹ️ Ballaringizni ko'rish uchun bu buyruqni guruhda yozing.")
         return
@@ -353,6 +510,7 @@ async def ball_cmd(message: types.Message):
         f"🎨 Rasm chizish: <b>{rasm_ball}</b>🌟",
         parse_mode="HTML",
     )
+
 
 # ---------- /reyting (GLOBAL) ----------
 @main_router.message(Command("reyting"))
@@ -529,6 +687,50 @@ async def stop_tag_cmd(message: types.Message):
     else:
         await message.answer("Hozir faol chaqiruv jarayoni yo'q.")
 
+# ---------- ✅ / ➕ — TABLO BALL BELGILASH ----------
+def _is_tablo_mark_message(message: types.Message) -> bool:
+    return (
+        bool(message.text)
+        and message.reply_to_message is not None
+        and message.reply_to_message.from_user is not None
+        and _tablo_mark(message.text) is not None
+    )
+
+@main_router.message(_is_tablo_mark_message)
+async def tablo_mark_cmd(message: types.Message):
+    chat_id = str(message.chat.id)
+    tablo = load_json(TABLO_FILE)
+    state = tablo.get(chat_id)
+    if not state or not state.get("active"):
+        return   # tablo faol emas — bu belgilarga umuman e'tibor berilmaydi
+    if message.from_user.id != state.get("boshlovchi_id"):
+        return   # boshlovchi bo'lmagan odam yozsa — e'tiborsiz qoldiriladi
+
+    kind, count = _tablo_mark(message.text)
+    ball_value = state.get("ball_value", 5)
+    delta = count * ball_value
+    if kind == "minus":
+        delta = -delta
+
+    target = message.reply_to_message.from_user
+    if target.is_bot:
+        return
+
+    uid = str(target.id)
+    scores = state.setdefault("scores", {})
+    entry = scores.setdefault(uid, {"name": target.full_name, "score": 0})
+    entry["name"] = target.full_name
+    entry["score"] += delta
+    tablo[chat_id] = state
+    save_json(TABLO_FILE, tablo)
+
+    harakat = "ball qo'shildi" if delta >= 0 else "ball ayirildi"
+    await message.answer(
+        f'<a href="tg://user?id={uid}">{target.full_name}</a>ga {abs(delta)} {harakat}',
+        parse_mode="HTML",
+    )
+    await message.answer(_format_tablo_reyting(scores, state.get("boshlovchi_name", "")))
+
 # ---------- UMUMIY XABAR HANDLER (CATCH-ALL) ----------
 # F.text filtri: faqat matn xabarlar (media, sticker emas)
 # Command xabarlar (/rasm, /boshla va h.k.) bu yerga TUSHMAYDI —
@@ -694,6 +896,9 @@ async def startup():
         BotCommand(command="reyting", description="🌍 Global reyting (Top 10)"),
         BotCommand(command="kun",     description="🏆 Kun bilimdonlari ro'yxati"),
         BotCommand(command="all",     description="📣 Guruhdagi barchani chaqirish"),
+        BotCommand(command="on",      description="📊 Tablo rejimini yoqish"),
+        BotCommand(command="off",     description="🛑 Tablo rejimini yakunlash"),
+        BotCommand(command="recount", description="👑 Boshlovchilikni topshirish"),
         BotCommand(command="ball",    description="Ballaringizni ko'rish"),
         BotCommand(command="stop",    description="Faol o'yinni to'xtatish (admin)"),
         BotCommand(command="add",     description="Yangi savol qo'shish (admin)"),
